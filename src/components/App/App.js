@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import Canvas from '../Canvas/Canvas'
+import Image from '../Image/Image'
 import { loadFile } from '../../helpers/render-docs'
 
 class App extends React.Component {
@@ -23,7 +24,7 @@ class App extends React.Component {
         files: []
       }) 
       
-      localStorage.setItem('files', [])
+      localStorage.setItem('files', '[]')
     }
   }
 
@@ -31,16 +32,18 @@ class App extends React.Component {
     const filesLoaded = e.target.files
     const numberOfFiles = filesLoaded.length
 
-    const filesForState = []
+    const filesForState = JSON.parse(localStorage?.getItem('files')) || []
 
     for (let i = 0; i < numberOfFiles; i++) {
       try {
         const fileContents = await loadFile(filesLoaded[i])  
+        const ext = filesLoaded[i].name.split('.').pop().toLowerCase()
         
         filesForState.push(
-            {
+          {
             id: `${filesLoaded[i].name}-${Math.floor((Math.random() * 100000) + 1)}`,
             name: filesLoaded[i].name,
+            type: ext,
             content: fileContents,
           }
         )
@@ -58,16 +61,25 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="App">
+      <div
+        className="App"
+        style={{maxWidth: '800px', margin: '0 auto'}}
+      >
         <h1>seltools</h1>
         <div>
           <input multiple type="file" onChange={(e) => this.handleFileInputChange(e)} />
           <button onClick={() => this.clearFiles()}>Eliminar</button>
         </div>
         {this.props.files.map((file) => {
-          return(
-            <Canvas key={file.id} file={file} />
-          )
+          if (file.type === 'pdf') {
+            return(
+              <Canvas key={file.id} file={file} />
+            )
+          } else {
+            return(
+              <Image key={file.id} file={file} />
+            )
+          }
         })}
       </div>
     );
@@ -77,7 +89,7 @@ class App extends React.Component {
 function mapStateToProps(state) {
   return {
     files: state.files,
- }
+  }
 }
 
 export default connect(mapStateToProps)(App)

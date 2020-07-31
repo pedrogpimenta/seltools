@@ -1,6 +1,20 @@
 import pdf from 'pdfjs-dist/webpack'
 
 export function getDocs(file, canvas) {
+
+  if (file.type === 'pdf') {
+    loadPdf(file, canvas)
+  } else {
+    loadImage(file, canvas)
+  }
+
+}
+
+export function loadImage(file, canvas) {
+  canvas.drawImage(file.content, 20, 20)
+}
+
+export function loadPdf(file, canvas) {
   const loadPdf = pdf.getDocument({data: file.content})
 
   loadPdf.promise.then((thisPdf) => {
@@ -70,6 +84,7 @@ export function loadFile(inputFile) {
     temporaryFileReader.onload = () => {
       resolve(temporaryFileReader.result);
     };
+    
     temporaryFileReader.readAsBinaryString(inputFile);
   });
 };
