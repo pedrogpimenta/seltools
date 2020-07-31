@@ -1,5 +1,5 @@
 import React from 'react';
-import pdf from 'pdfjs-dist/webpack'
+import { getDocs } from '../../helpers/render-docs'
 
 class Canvas extends React.Component {
   constructor() {
@@ -10,43 +10,27 @@ class Canvas extends React.Component {
 
   componentDidMount() {
     this.ctx = this.canvas.current.getContext('2d')
-    this.renderDocs()
+    getDocs(this.props.file, this.ctx)
   }
 
   componentDidUpdate() {
-    this.renderDocs()
-  }
-
-  renderDocs() {
-    // this.ctx.clearRect(0, 0, this.ctx.width, this.ctx.height)
-
-    const loadPdf = pdf.getDocument({url: this.props.file.content})
-
-    loadPdf.promise.then((thisPdf) => {
-      thisPdf.getPage(1).then((page) => {
-        console.log(page.view)
-
-        const pageWidth = page.view[2]
-        const pageHeight = page.view[3]
-
-        this.ctx.canvas.width = pageWidth
-        this.ctx.canvas.height = pageHeight
-
-        page.render({
-          canvasContext: this.ctx,
-          viewport: page.getViewport({scale: 1})
-        })
-      })
-    })
+    getDocs(this.props.file, this.ctx)
   }
 
   render() {
     return (
       <div>
-        <canvas style={{border: '1px solid red'}} ref={this.canvas} />
+        <canvas
+          ref={this.canvas}
+          style={{
+            border: '1px solid red',
+            maxWidth: '100%',
+            margin: '0 auto',
+          }}
+        />
       </div>
     )
   }
 };
 
-export default Canvas;
+export default Canvas
