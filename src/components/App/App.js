@@ -66,7 +66,7 @@ class App extends React.Component {
         </div>
         {this.props.files.map((file) => {
           return(
-            <Canvas file={file} />
+            <Canvas key={file.id} file={file} />
           )
         })}
       </div>

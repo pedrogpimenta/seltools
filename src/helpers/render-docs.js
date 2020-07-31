@@ -48,13 +48,14 @@ export function renderDocs(file, canvas) {
 
 export function updateLS(fileToUpdate) {
   const current = JSON.parse(localStorage.getItem('files'))
-  current.map((file) => {
+  const newFile = current.map((file) => {
     if (file.id === fileToUpdate.id) {
       file.page = fileToUpdate.page
     }
+    return file
   })
 
-  localStorage.setItem('files', JSON.stringify(current))
+  localStorage.setItem('files', JSON.stringify(newFile))
 }
 
 export function loadFile(inputFile) {

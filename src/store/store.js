@@ -5,8 +5,6 @@ const initialState = {
 }
 
 function reducer(state = initialState, action) {
-  const newState = {...state}
-
   switch(action.type) {
     case 'SET_FILES':
       localStorage.setItem('files', JSON.stringify(action.files))
