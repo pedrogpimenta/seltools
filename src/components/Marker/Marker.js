@@ -1,38 +1,37 @@
-import React from 'react';
+import React from 'react'
+import ContentEditable from 'react-contenteditable'
+import { connect } from 'react-redux'
 
 class Marker extends React.Component {
-  // constructor(props) {
-  //   super(props);
+  constructor(props) {
+    super(props);
 
-  //   this.markersRef = React.createRef();
-  // }
+    this.contentEditable = React.createRef()
+    this.state = {
+      html: "<b>Hello <i>World</i></b>"
+    }
+  }
 
-  // componentDidMount() {
-  //   const c = this.markerRef.current;
-
-  //   this.setState({
-  //     y: c.getBoundingClientRect().y,
-  //     x: c.getBoundingClientRect().x,
-  //   })
-  // }
+  componentDidMount() {
+    // this.contentEditable.current.focus()
+  }
 
   editMarker(e) {
-    // const { pageX, pageY } = e
-
-    // this.props.dispatch({
-    //   type: "SET_MARKER_COORDS",
-    //   x: pageX - this.state.x,
-    //   y: pageY - this.state.y,
-    // }) 
-
-    // console.log(pageX, pageY)
     e.stopPropagation()
+  }
+
+  handleChange = e => {
+    this.props.dispatch({
+      type: "EDIT_MARKER",
+      file: this.props.file,
+      id: this.props.id,
+      content: e.target.value,
+    }) 
   }
 
   render() {
     return (
       <div
-        // ref={this.markerRef}
         style={{
           position: 'absolute',
           top: this.props.y,
@@ -40,10 +39,22 @@ class Marker extends React.Component {
         }}
         onClick={(e) => this.editMarker(e)}
       >
-        <div contenteditable='true'>{this.props.content}</div>
+        <ContentEditable
+          innerRef={this.contentEditable}
+          html={this.props.content}
+          disabled={false}
+          onChange={this.handleChange}
+        />
       </div>
     )
   }
 };
 
-export default Marker
+function mapStateToProps(ownProps) {
+  return {
+    ...ownProps,
+  }
+}
+
+export default connect(mapStateToProps)(Marker)
+// export default Marker

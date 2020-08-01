@@ -25,12 +25,27 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
-    case 'ADD_MARKER':
-      console.log('add marker to file:', action.file, 'at x:', action.x, 'and y:', action.y)
+    case 'REMOVE_MARKERS':
       updatedFiles = state.files.slice()
 
       for (let file in updatedFiles) {
-        if (updatedFiles[file]. id === action.file) {
+        updatedFiles[file].markers = []
+      }
+
+      localStorage.setItem('files', JSON.stringify(updatedFiles))
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'ADD_MARKER':
+      updatedFiles = state.files.slice()
+
+      for (let file in updatedFiles) {
+        console.log('updatedFiles[file].id:', updatedFiles[file].id)
+        console.log('action.file:', action.file)
+        if (updatedFiles[file].id === action.file) {
           updatedFiles[file].markers.push({
             id: Math.floor((Math.random() * 100000) + 1),
             content: 'oli',
@@ -39,6 +54,28 @@ function reducer(state = initialState, action) {
           })
         }
       }
+
+      localStorage.setItem('files', JSON.stringify(updatedFiles))
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'EDIT_MARKER':
+      updatedFiles = state.files.slice()
+
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.file) {
+          for (let marker in updatedFiles[file].markers) {
+            if (updatedFiles[file].markers[marker].id === action.id) {
+              updatedFiles[file].markers[marker].content = action.content
+            }
+          }
+        }
+      }
+
+      localStorage.setItem('files', JSON.stringify(updatedFiles))
 
       return {
         ...state,

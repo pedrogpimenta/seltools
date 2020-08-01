@@ -43,8 +43,8 @@ class Markers extends React.Component {
     this.props.dispatch({
       type: "ADD_MARKER",
       file: this.props.file,
-      x: e.pageX - c.getBoundingClientRect().x,
-      y: e.pageY - c.getBoundingClientRect().y,
+      x: e.pageX - c.getBoundingClientRect().x - window.pageXOffset,
+      y: e.pageY - c.getBoundingClientRect().y - window.pageYOffset - 10,
     }) 
   }
 

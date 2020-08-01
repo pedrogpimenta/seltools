@@ -18,6 +18,8 @@ class FileWrapper extends React.Component {
             return(
               <Marker
                 key={marker.id}
+                file={this.props.id}
+                id={marker.id}
                 x={marker.x}
                 y={marker.y}
                 content={marker.content}
@@ -29,6 +31,6 @@ class FileWrapper extends React.Component {
       </div>
     )
   }
-};
+}
 
 export default FileWrapper
