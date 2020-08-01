@@ -3,7 +3,7 @@ import React from 'react';
 class Image extends React.Component {
   render() {
     return (
-      <div>
+      <div style={{display: 'flex'}}>
         <img
           src={`data:image/jpeg;base64,${btoa(this.props.file.content)}`}
           style={{

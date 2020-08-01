@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
+import FileWrapper from '../FileWrapper/FileWrapper'
+
 import { loadFile } from '../../helpers/render-docs'
 
 class App extends React.Component {
@@ -58,7 +60,6 @@ class App extends React.Component {
     }) 
   }
 
-
   render() {
     return (
       <div
@@ -73,11 +74,23 @@ class App extends React.Component {
         {this.props.files.map((file) => {
           if (file.type === 'pdf') {
             return(
-              <Canvas key={file.id} file={file} />
+              <FileWrapper
+                key={file.id}
+                id={file.id}
+                markers={file.markers}
+              >
+                <Canvas file={file} />
+              </FileWrapper>
             )
           } else {
             return(
-              <Image key={file.id} file={file} />
+              <FileWrapper
+                key={file.id}
+                id={file.id}
+                markers={file.markers}
+              >
+                <Image file={file} />
+              </FileWrapper>
             )
           }
         })}
