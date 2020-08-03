@@ -1,6 +1,7 @@
 import React from 'react';
 import Marker from '../Marker/Marker'
 import { connect } from 'react-redux'
+import { store } from '../../store/store'
 
 class Markers extends React.Component {
   constructor(props) {
@@ -9,42 +10,44 @@ class Markers extends React.Component {
     this.state = {
       x: 0,
       y: 0,
+      editing: null,
     }
 
     this.markersRef = React.createRef();
   }
 
-  componentDidMount() {
-    // const c = this.markersRef.current;
-    // console.log(c);
-    // setInterval(console.log(c.getBoundingClientRect()), 1);
-
-    // this.setState({
-    //   y: c.getBoundingClientRect().y,
-    //   x: c.getBoundingClientRect().x,
-    // })
-  }
-
-  // updateCoords(e) {
-  //   const { pageX, pageY } = e
-
-  //   this.props.dispatch({
-  //     type: "SET_MARKER_COORDS",
-  //     x: pageX - this.state.x,
-  //     y: pageY - this.state.y,
-  //   }) 
-
-  //   console.log(pageX, pageY)
-  // }
-
-  addNewMarker(e) {
+  addNewMarker = e => {
     const c = this.markersRef.current
+    const newId = Math.floor((Math.random() * 100000) + 1)
 
-    this.props.dispatch({
+    this.setState({editing: newId})
+
+    store.dispatch({
       type: "ADD_MARKER",
       file: this.props.file,
+      id: newId,
       x: e.pageX - c.getBoundingClientRect().x - window.pageXOffset,
       y: e.pageY - c.getBoundingClientRect().y - window.pageYOffset - 10,
+    }) 
+  }
+
+  setNotEditing = (e) => {
+    this.setState({editing: null})
+  }
+
+  editMarkerPosition = (e, markerId) => {
+    const c = this.markersRef.current
+
+    store.dispatch({
+      type: "EDIT_MARKER",
+      file: this.props.file,
+      id: markerId,
+      x: e.clientX - c.getBoundingClientRect().x - window.pageXOffset,
+      y: e.clientY - c.getBoundingClientRect().y - window.pageYOffset - 10,
+    }) 
+
+    store.dispatch({
+      type: "NOT_DRAGGING",
     }) 
   }
 
@@ -58,21 +61,29 @@ class Markers extends React.Component {
           left: 0,
           width: '100%',
           height: '100%',
+          overflow: 'hidden',
+          cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
-        onClick={(e) => this.addNewMarker(e)}
+        onDoubleClick={(e) => this.addNewMarker(e)}
       >
-        {this.props.children}
+        {this.props.markers.map((marker) => {
+          return(
+            <Marker
+              key={marker.id}
+              file={this.props.file}
+              id={marker.id}
+              x={marker.x}
+              y={marker.y}
+              content={marker.content}
+              editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
+              setNotEditing={(e) => this.setNotEditing(e)}
+              editing={this.state.editing}
+            />
+          )
+        })}
       </div>
     )
   }
-};
-
-function mapStateToProps(ownProps) {
-  return {
-    ...ownProps,
-  }
 }
 
-export default connect(mapStateToProps)(Markers)
-
-// export default Markers
+export default Markers

@@ -43,12 +43,10 @@ function reducer(state = initialState, action) {
       updatedFiles = state.files.slice()
 
       for (let file in updatedFiles) {
-        console.log('updatedFiles[file].id:', updatedFiles[file].id)
-        console.log('action.file:', action.file)
         if (updatedFiles[file].id === action.file) {
           updatedFiles[file].markers.push({
-            id: Math.floor((Math.random() * 100000) + 1),
-            content: 'oli',
+            id: action.id,
+            content: 'nuevo',
             x: action.x,
             y: action.y,
           })
@@ -69,7 +67,15 @@ function reducer(state = initialState, action) {
         if (updatedFiles[file].id === action.file) {
           for (let marker in updatedFiles[file].markers) {
             if (updatedFiles[file].markers[marker].id === action.id) {
-              updatedFiles[file].markers[marker].content = action.content
+              if (!!action.content) {
+                updatedFiles[file].markers[marker].content = action.content
+              }
+              if (!!action.x) {
+                updatedFiles[file].markers[marker].x = action.x
+              }
+              if (!!action.y) {
+                updatedFiles[file].markers[marker].y = action.y
+              }
             }
           }
         }
@@ -82,22 +88,36 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
-    case 'SET_MARKER_COORDS':
-      // updatedFiles = state.files.map(file => (file.id === '3456' ? {...file, markers: [0, 1]} : file))
+    case 'DELETE_MARKER':
       updatedFiles = state.files.slice()
 
       for (let file in updatedFiles) {
-        for (let marker in updatedFiles[file].markers) {
-          if (updatedFiles[file].markers[marker].id === '3456') {
-            updatedFiles[file].markers[marker].x = action.x
-            updatedFiles[file].markers[marker].y = action.y
+        if (updatedFiles[file].id === action.file) {
+          for (let marker in updatedFiles[file].markers) {
+            if (updatedFiles[file].markers[marker].id === action.id) {
+              updatedFiles[file].markers.splice(marker, 1)
+            }
           }
         }
       }
 
+      localStorage.setItem('files', JSON.stringify(updatedFiles))
+
       return {
         ...state,
         files: updatedFiles,
+      }
+
+    case 'IS_DRAGGING':
+      return {
+        ...state,
+        dragging: true,
+      }
+
+    case 'NOT_DRAGGING':
+      return {
+        ...state,
+        dragging: false,
       }
 
     default:

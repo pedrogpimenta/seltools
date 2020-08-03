@@ -71,37 +71,48 @@ class App extends React.Component {
     return (
       <div
         className="App"
-        style={{maxWidth: '800px', margin: '0 auto'}}
+        style={{
+          display: 'flex',
+          cursor: this.props.dragging ? 'grabbing' : 'default',
+        }}
       >
-        <h1>seltools</h1>
-        <div>
-          <input multiple type="file" onChange={(e) => this.handleFileInputChange(e)} />
-          <button onClick={() => this.clearFiles()}>Eliminar archivos</button>
-          <button onClick={() => this.clearMarkers()}>Eliminar markers</button>
+        <div
+          style={{
+            maxWidth: '800px',
+            margin: '0 auto',
+            cursor: this.props.dragging ? 'grabbing' : 'default',
+          }}
+        >
+          <h1>seltools</h1>
+          <div>
+            <input multiple type="file" onChange={(e) => this.handleFileInputChange(e)} />
+            <button onClick={() => this.clearFiles()}>Eliminar archivos</button>
+            <button onClick={() => this.clearMarkers()}>Eliminar markers</button>
+          </div>
+          {this.props.files.map((file) => {
+            if (file.type === 'pdf') {
+              return(
+                <FileWrapper
+                  key={file.id}
+                  id={file.id}
+                  markers={file.markers}
+                >
+                  <Canvas file={file} />
+                </FileWrapper>
+              )
+            } else {
+              return(
+                <FileWrapper
+                  key={file.id}
+                  id={file.id}
+                  markers={file.markers}
+                >
+                  <Image file={file} />
+                </FileWrapper>
+              )
+            }
+          })}
         </div>
-        {this.props.files.map((file) => {
-          if (file.type === 'pdf') {
-            return(
-              <FileWrapper
-                key={file.id}
-                id={file.id}
-                markers={file.markers}
-              >
-                <Canvas file={file} />
-              </FileWrapper>
-            )
-          } else {
-            return(
-              <FileWrapper
-                key={file.id}
-                id={file.id}
-                markers={file.markers}
-              >
-                <Image file={file} />
-              </FileWrapper>
-            )
-          }
-        })}
       </div>
     );
   }
@@ -110,6 +121,7 @@ class App extends React.Component {
 function mapStateToProps(state) {
   return {
     files: state.files,
+    dragging: state.dragging,
   }
 }
 

@@ -13,20 +13,7 @@ class FileWrapper extends React.Component {
         <Markers 
           file={this.props.id}
           markers={this.props.markers}
-        >
-          {this.props.markers.map((marker) => {
-            return(
-              <Marker
-                key={marker.id}
-                file={this.props.id}
-                id={marker.id}
-                x={marker.x}
-                y={marker.y}
-                content={marker.content}
-              />
-            )
-          })}
-        </Markers>
+        />
         {this.props.children}
       </div>
     )
