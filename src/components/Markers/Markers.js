@@ -16,6 +16,10 @@ class Markers extends React.Component {
     this.markersRef = React.createRef();
   }
 
+  getMarkerCoords = (x, y) => {
+    
+  }
+
   addNewMarker = e => {
     const c = this.markersRef.current
     const newId = Math.floor((Math.random() * 100000) + 1)
@@ -61,7 +65,7 @@ class Markers extends React.Component {
           left: 0,
           width: '100%',
           height: '100%',
-          overflow: 'hidden',
+          // overflow: 'hidden',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}

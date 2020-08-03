@@ -95,6 +95,8 @@ class Marker extends React.Component {
             padding: '2px 6px',
             borderRadius: '12px',
             background: '#DDD',
+            boxSizing: 'border-box',
+            zIndex: '1',
           }}
           onDoubleClick={(e) => e.stopPropagation()}
           onMouseEnter={(e) => this.handleOnMouseEnter(e)}
@@ -109,7 +111,6 @@ class Marker extends React.Component {
               cursor: this.props.dragging ? 'grabbing' : 'grab',
             }}
           >
-            {/* <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M9.5 3a.5.5 0 110-1 .5.5 0 010 1zm0 5a.5.5 0 110-1 .5.5 0 010 1zm0 5a.5.5 0 110-1 .5.5 0 010 1zm-4-10a.5.5 0 110-1 .5.5 0 010 1zm0 5a.5.5 0 110-1 .5.5 0 010 1zm0 5a.5.5 0 110-1 .5.5 0 010 1z" stroke="currentColor"></path></svg> */}
             <svg style={{transform: 'rotateZ(90deg)'}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M5.5 3v9m4-9v9" stroke="currentColor"></path></svg>
           </div>
           <ContentEditable
@@ -119,16 +120,29 @@ class Marker extends React.Component {
             onChange={(e) => this.handleChange(e)}
             onMouseDown={(e) => e.stopPropagation()}
             onDoubleClick={(e) => e.stopPropagation()}
+            style={{background: '#DDD', paddingRight: '2px'}}
           />
           <div
             className='delete'
             style={{
-              display: this.state.hover ? 'inline-flex' : 'none',
-              marginLeft: '4px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              position: 'absolute',
+              left: this.state.hover ? 'calc(100% - 18px)' : 'calc(100% - 42px)',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: 0,
+              padding: '0 4px 0 20px',
+              height: '100%',
+              background: '#DDD',
+              borderRadius: '12px',
+              zIndex: '-1',
+              opacity: this.state.hover ? '1' : '0',
+              transition: 'all 100ms ease-out',
             }}
             onClick={this.handleDelete}
           >
-            <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M4.5 4.5l6 6m-6 0l6-6m-3 10a7 7 0 110-14 7 7 0 010 14z" stroke="currentColor"></path></svg>
+            <svg style={{fontSize: 0}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M4.5 4.5l6 6m-6 0l6-6m-3 10a7 7 0 110-14 7 7 0 010 14z" stroke="currentColor"></path></svg>
           </div>
         </div>
       </Draggable>
