@@ -22,8 +22,8 @@ class Markers extends React.Component {
     const c = this.markersRef.current
     const markersInfo = c.getBoundingClientRect()
     const newId = Math.floor((Math.random() * 100000) + 1)
-    const xPercent = ((e.clientX - markersInfo.x - window.pageXOffset) * 100) / markersInfo.width
-    const yPercent = ((e.clientY - markersInfo.y - window.pageYOffset) * 100) / markersInfo.height
+    const xPercent = ((e.clientX - markersInfo.x) * 100) / markersInfo.width
+    const yPercent = ((e.clientY - markersInfo.y) * 100) / markersInfo.height
 
     this.setState({editing: newId})
 
@@ -45,10 +45,10 @@ class Markers extends React.Component {
     const markersInfo = c.getBoundingClientRect()
     const targetEl = findDOMNode(e.target)
     const parent = targetEl.closest('.react-draggable').getBoundingClientRect()
-    const thisX = parent.x
-    const thisY = parent.y + (parent.height / 2)
-    const xPercent = ((thisX - markersInfo.x - window.pageXOffset) * 100) / markersInfo.width
-    const yPercent = ((thisY - markersInfo.y - window.pageYOffset) * 100) / markersInfo.height
+    const thisX = parent.top
+    const thisY = parent.left + (parent.height / 2)
+    const xPercent = ((thisX - markersInfo.x) * 100) / markersInfo.width
+    const yPercent = ((thisY - markersInfo.y) * 100) / markersInfo.height
 
     store.dispatch({
       type: "EDIT_MARKER",
