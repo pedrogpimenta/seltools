@@ -6,6 +6,7 @@ class Image extends React.Component {
       <div style={{display: 'flex'}}>
         <img
           src={`data:image/jpeg;base64,${btoa(this.props.file.content)}`}
+          alt={this.props.file.id}
           style={{
             border: '1px solid red',
             maxWidth: '100%',

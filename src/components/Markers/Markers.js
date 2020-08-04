@@ -1,6 +1,5 @@
 import React from 'react';
 import Marker from '../Marker/Marker'
-import { connect } from 'react-redux'
 import { store } from '../../store/store'
 import { findDOMNode } from 'react-dom';
 
@@ -17,11 +16,6 @@ class Markers extends React.Component {
     }
 
     this.markersRef = React.createRef();
-    this.getMarkersWidth = this.getMarkersWidth.bind(this)
-  }
-
-  getMarkerCoords = (x, y) => {
-    
   }
 
   addNewMarker = e => {
@@ -30,7 +24,6 @@ class Markers extends React.Component {
     const newId = Math.floor((Math.random() * 100000) + 1)
     const xPercent = ((e.clientX - markersInfo.x - window.pageXOffset) * 100) / markersInfo.width
     const yPercent = ((e.clientY - markersInfo.y - window.pageYOffset) * 100) / markersInfo.height
-
 
     this.setState({editing: newId})
 
@@ -50,28 +43,12 @@ class Markers extends React.Component {
   editMarkerPosition = (e, markerId) => {
     const c = this.markersRef.current
     const markersInfo = c.getBoundingClientRect()
-
     const targetEl = findDOMNode(e.target)
     const parent = targetEl.closest('.react-draggable').getBoundingClientRect()
-    // const parent = targetEl.parentNode.toString().indexOf('svg') > 0 ? targetEl.parentNode.parentNode : targetEl.parentNode.parentNode
-
-    // debugger;
-    // const targetEl = findDOMNode(e.target).closest('react-draggable')
-
-    console.log(parent)
-    console.log(markersInfo.x)
-
     const thisX = parent.x
     const thisY = parent.y + (parent.height / 2)
-
-    // const xPercent = (e.clientX - markersInfo.x - window.pageXOffset)
-    // const yPercent = (e.clientY - markersInfo.y - window.pageYOffset)
-    // console.log('e:', e.x, e.y)
     const xPercent = ((thisX - markersInfo.x - window.pageXOffset) * 100) / markersInfo.width
     const yPercent = ((thisY - markersInfo.y - window.pageYOffset) * 100) / markersInfo.height
-
-    // console.log('xPercent:', xPercent)
-    // console.log('yPercent:', yPercent)
 
     store.dispatch({
       type: "EDIT_MARKER",
@@ -86,18 +63,8 @@ class Markers extends React.Component {
     }) 
   }
 
-  getMarkersWidth = () => {
-    const c = this.markersRef.current
-    return c.getBoundingClientRect().width
-  }
-
   componentDidMount = () => {
-    // this.setState({
-    //   width: this.markersRef.current.offsetWidth,
-    //   height: this.markersRef.current.offsetHeight,
-    // })
     window.setTimeout(() => {
-      // console.log(this.state.width)
       this.setState({
         width: this.markersRef.current.offsetWidth,
         height: this.markersRef.current.offsetHeight,
@@ -108,7 +75,6 @@ class Markers extends React.Component {
   render() {
     return (
       <div
-      id='ola'
         ref={this.markersRef}
         style={{
           position: 'absolute',
@@ -121,15 +87,8 @@ class Markers extends React.Component {
         onDoubleClick={(e) => this.addNewMarker(e)}
       >
         {this.state.width > 0 && this.props.markers.map((marker) => {
-          // const markerX = marker.x
-          // const markerY = marker.y
           const markerX = parseInt((marker.x * this.state.width) / 100)
           const markerY = parseInt((marker.y * this.state.height) / 100)
-          // console.log('marker.x:', marker.x)
-          // console.log('marker.y:', marker.y)
-          // console.log('this.state.width:', this.state.width)
-          // console.log('markerX:', markerX)
-          // console.log('markerY:', markerY)
 
           return(
             <Marker

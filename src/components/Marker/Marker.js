@@ -107,7 +107,6 @@ class Marker extends React.Component {
             style={{
               display: 'inline-flex',
               marginRight: '4px',
-              cursor: 'move',
               cursor: this.props.dragging ? 'grabbing' : 'grab',
             }}
           >
@@ -157,4 +156,3 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps)(Marker)
-// export default Marker

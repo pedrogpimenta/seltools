@@ -1,6 +1,5 @@
 import React from 'react';
 import Markers from '../Markers/Markers'
-import Marker from '../Marker/Marker'
 
 class FileWrapper extends React.Component {
   render() {
