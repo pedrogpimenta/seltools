@@ -82,7 +82,7 @@ class Marker extends React.Component {
       <Draggable
         bounds='parent'
         handle='.handle'
-        defaultPosition={{x: this.props.x, y: this.props.y}}
+        defaultPosition={{x: this.props.x, y: this.props.y - 11.5}}
         onDrag={(e) => this.reportDragging(e)}
         onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
         onDoubleClick={(e) => e.stopPropagation()}
