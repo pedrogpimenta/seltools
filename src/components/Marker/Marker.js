@@ -144,7 +144,7 @@ class Marker extends React.Component {
             onChange={(e) => this.handleChange(e)}
             onMouseDown={(e) => e.stopPropagation()}
             onDoubleClick={(e) => e.stopPropagation()}
-            style={{background: '#DDD', paddingRight: '2px'}}
+            style={{background: '#DDD', paddingRight: '2px', outline: 'none'}}
           />
           <div
             className='delete'
