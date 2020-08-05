@@ -1,9 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import './App.css'
 
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
+import Button from '../Button/Button'
 
 import { loadFile } from '../../helpers/render-docs'
 
@@ -85,16 +87,28 @@ class App extends React.Component {
       >
         <div
           style={{
-            maxWidth: '800px',
-            margin: '0 auto',
+            // maxWidth: '800px',
+            // margin: '0 auto',
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <h1>seltools</h1>
+          <h1>Seltools</h1>
           <div>
-            <input multiple type="file" onChange={(e) => this.handleFileInputChange(e)} />
-            <button onClick={() => this.clearFiles()}>Eliminar archivos</button>
-            <button onClick={() => this.clearMarkers()}>Eliminar markers</button>
+            <Button
+              type='file'
+              text='Cargar archivos'
+              onChange={(e) => this.handleFileInputChange(e)}
+            />
+            <Button
+              type='button'
+              text='Eliminar archivos'
+              onClick={() => this.clearFiles()}
+            />
+            <Button
+              type='button'
+              text='Eliminar markers'
+              onClick={() => this.clearMarkers()}
+            />
           </div>
           {this.props.files.map((file) => {
             if (file.type === 'pdf') {

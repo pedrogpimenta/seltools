@@ -109,14 +109,14 @@ class Marker extends React.Component {
         onDrag={(e) => this.reportDragging(e)}
         onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
         onDoubleClick={(e) => e.stopPropagation()}
-        >
+      >
         <div
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             position: 'absolute',
-            padding: '2px 6px',
-            borderRadius: '12px',
+            padding: '4px 6px 4px 4px',
+            borderRadius: '40px',
             background: '#DDD',
             boxSizing: 'border-box',
             zIndex: '1',
@@ -133,7 +133,8 @@ class Marker extends React.Component {
               cursor: this.props.dragging ? 'grabbing' : 'grab',
             }}
           >
-            <svg style={{transform: 'rotateZ(90deg)'}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M5.5 3v9m4-9v9" stroke="currentColor"></path></svg>
+            <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="8"/><circle cx="10.5" cy="10.5" r="2"/><circle cx="10.5" cy="10.5" r="5"/></g></svg>
+            {/* <svg style={{transform: 'rotateZ(90deg)'}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M5.5 3v9m4-9v9" stroke="currentColor"></path></svg> */}
           </div>
           <ContentEditable
             innerRef={this.contentEditable}
@@ -150,21 +151,22 @@ class Marker extends React.Component {
               display: 'inline-flex',
               alignItems: 'center',
               position: 'absolute',
-              left: this.state.hover ? 'calc(100% - 18px)' : 'calc(100% - 42px)',
+              left: this.state.hover ? 'calc(100% - 26px)' : 'calc(100% - 44px)',
               top: '50%',
               transform: 'translateY(-50%)',
               fontSize: 0,
-              padding: '0 4px 0 20px',
+              padding: '0 4px 0 28px',
               height: '100%',
               background: '#DDD',
-              borderRadius: '12px',
+              borderRadius: '40px',
               zIndex: '-1',
               opacity: this.state.hover ? '1' : '0',
               transition: 'all 100ms ease-out',
             }}
             onClick={this.handleDelete}
           >
-            <svg style={{fontSize: 0}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M4.5 4.5l6 6m-6 0l6-6m-3 10a7 7 0 110-14 7 7 0 010 14z" stroke="currentColor"></path></svg>
+            <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round" transform="translate(2 2)"><circle cx="8.5" cy="8.5" r="8"/><g transform="matrix(0 1 -1 0 17 0)"><path d="m5.5 11.5 6-6"/><path d="m5.5 5.5 6 6"/></g></g></svg>
+            {/* <svg style={{fontSize: 0}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M4.5 4.5l6 6m-6 0l6-6m-3 10a7 7 0 110-14 7 7 0 010 14z" stroke="currentColor"></path></svg> */}
           </div>
         </div>
       </Draggable>
