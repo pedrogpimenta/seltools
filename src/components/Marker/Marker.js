@@ -3,6 +3,7 @@ import ContentEditable from 'react-contenteditable'
 import Draggable from 'react-draggable'
 import { connect } from 'react-redux'
 import { store } from '../../store/store'
+import { findDOMNode } from 'react-dom'
 
 class Marker extends React.Component {
   constructor(props) {
@@ -10,8 +11,11 @@ class Marker extends React.Component {
 
     this.state = {
       hover: false,
+      parentInfo: null,
+      thisInfo: null,
     }
 
+    this.draggable = React.createRef()
     this.contentEditable = React.createRef()
   }
 
@@ -75,14 +79,33 @@ class Marker extends React.Component {
 
       this.props.setNotEditing()
     }
+
+    const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
+    const thisInfo = findDOMNode(this.draggable.current)
+    this.setState({
+      parentInfo: parentInfo,
+      thisInfo: thisInfo,
+    })
   }
 
   render() {
+    let x = 0
+    let y = 0
+
+    if (!!this.state.parentInfo) {
+      const width = this.state.parentInfo.getBoundingClientRect().width
+      const height = this.state.parentInfo.getBoundingClientRect().height
+
+      x = (this.props.x * width) / 100
+      y = (this.props.y * height) / 100
+    }
+
     return (
       <Draggable
+        ref={this.draggable}
         bounds='parent'
         handle='.handle'
-        defaultPosition={{x: this.props.x, y: this.props.y - 11.5}}
+        position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
         onDrag={(e) => this.reportDragging(e)}
         onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
         onDoubleClick={(e) => e.stopPropagation()}

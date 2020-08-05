@@ -1,7 +1,7 @@
 import React from 'react';
 import Marker from '../Marker/Marker'
 import { store } from '../../store/store'
-import { findDOMNode } from 'react-dom';
+import { findDOMNode } from 'react-dom'
 
 class Markers extends React.Component {
   constructor(props) {
@@ -45,8 +45,8 @@ class Markers extends React.Component {
     const markersInfo = c.getBoundingClientRect()
     const targetEl = findDOMNode(e.target)
     const parent = targetEl.closest('.react-draggable').getBoundingClientRect()
-    const thisX = parent.top
-    const thisY = parent.left + (parent.height / 2)
+    const thisX = parent.x
+    const thisY = parent.y + (parent.height / 2)
     const xPercent = ((thisX - markersInfo.x) * 100) / markersInfo.width
     const yPercent = ((thisY - markersInfo.y) * 100) / markersInfo.height
 
@@ -76,6 +76,7 @@ class Markers extends React.Component {
     return (
       <div
         ref={this.markersRef}
+        className='markers'
         style={{
           position: 'absolute',
           top: 0,
@@ -87,16 +88,14 @@ class Markers extends React.Component {
         onDoubleClick={(e) => this.addNewMarker(e)}
       >
         {this.state.width > 0 && this.props.markers.map((marker) => {
-          const markerX = parseInt((marker.x * this.state.width) / 100)
-          const markerY = parseInt((marker.y * this.state.height) / 100)
-
           return(
             <Marker
               key={marker.id}
               file={this.props.file}
+              hasRendered={this.props.hasRendered}
               id={marker.id}
-              x={markerX}
-              y={markerY}
+              x={marker.x}
+              y={marker.y}
               content={marker.content}
               editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
               setNotEditing={(e) => this.setNotEditing(e)}

@@ -1,20 +1,20 @@
 import pdf from 'pdfjs-dist/webpack'
 
-export function getDocs(file, canvas) {
+export function getDocs(file, canvas, callback) {
 
   if (file.type === 'pdf') {
-    loadPdf(file, canvas)
+    loadPdf(file, canvas, callback)
   } else {
     loadImage(file, canvas)
   }
 
 }
 
-export function loadImage(file, canvas) {
+export function loadImage(file, canvas, callback) {
   canvas.drawImage(file.content, 20, 20)
 }
 
-export function loadPdf(file, canvas) {
+export function loadPdf(file, canvas, callback) {
   const loadPdf = pdf.getDocument({data: file.content})
 
   loadPdf.promise.then((thisPdf) => {
@@ -32,11 +32,11 @@ export function loadPdf(file, canvas) {
     file.page = pageToRender
     updateLS(file)
     
-    renderDocs(file, canvas)
+    renderDocs(file, canvas, callback)
   })
 }
 
-export function renderDocs(file, canvas) {
+export function renderDocs(file, canvas, callback) {
   const loadPdf = pdf.getDocument({data: file.content})
 
   loadPdf.promise.then((thisPdf) => {
@@ -48,14 +48,15 @@ export function renderDocs(file, canvas) {
       
       canvas.canvas.width = pageWidth * 2
       canvas.canvas.height = pageHeight * 2
-      
+
       page.render({
         canvasContext: canvas,
         viewport: page.getViewport({scale: 2})
       })
+      // console.log(canvas.toDataURL('image/jpeg'))
     }, reason => {
       window.alert('Hubo un error: ' + reason)
-    })
+    }).then(() => callback(file.id))
 
   })
 }

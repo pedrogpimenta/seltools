@@ -67,6 +67,13 @@ class App extends React.Component {
     }) 
   }
 
+  fileHasRendered = (fileId) => {
+    this.props.dispatch({
+      type: "FILE_HAS_RENDERED",
+      fileId: fileId,
+    }) 
+  }
+
   render() {
     return (
       <div
@@ -96,8 +103,9 @@ class App extends React.Component {
                   key={file.id}
                   id={file.id}
                   markers={file.markers}
+                  hasRendered={file.hasRendered}
                 >
-                  <Canvas file={file} />
+                  <Canvas file={file} fileHasRendered={this.fileHasRendered} />
                 </FileWrapper>
               )
             } else {
@@ -106,6 +114,7 @@ class App extends React.Component {
                   key={file.id}
                   id={file.id}
                   markers={file.markers}
+                  hasRendered={file.hasRendered}
                 >
                   <Image file={file} />
                 </FileWrapper>

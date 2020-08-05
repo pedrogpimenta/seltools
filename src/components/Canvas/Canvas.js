@@ -10,11 +10,7 @@ class Canvas extends React.Component {
 
   componentDidMount() {
     this.ctx = this.canvas.current.getContext('2d')
-    getDocs(this.props.file, this.ctx)
-  }
-
-  componentDidUpdate() {
-    getDocs(this.props.file, this.ctx)
+    getDocs(this.props.file, this.ctx, this.props.fileHasRendered)
   }
 
   render() {

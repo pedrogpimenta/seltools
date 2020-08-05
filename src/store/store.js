@@ -6,6 +6,7 @@ const initialState = {
 
 function reducer(state = initialState, action) {
   let updatedFiles = []
+  let filesForLS = []
 
   switch(action.type) {
     case 'SET_FILES':
@@ -16,9 +17,29 @@ function reducer(state = initialState, action) {
         files: action.files,
       }
 
+    case 'FILE_HAS_RENDERED':
+      updatedFiles = state.files.slice()
+
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          updatedFiles[file].hasRendered = true
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
     case 'SET_FILE_PAGE_NUMBER':
       updatedFiles = state.files.map(file => (file.id === action.fileId ? {...file, page: action.page} : file))
-      localStorage.setItem('files', JSON.stringify(updatedFiles))
+
+      filesForLS = state.files.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -27,12 +48,16 @@ function reducer(state = initialState, action) {
 
     case 'REMOVE_MARKERS':
       updatedFiles = state.files.slice()
-
       for (let file in updatedFiles) {
         updatedFiles[file].markers = []
       }
 
-      localStorage.setItem('files', JSON.stringify(updatedFiles))
+      filesForLS = state.files.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -53,7 +78,12 @@ function reducer(state = initialState, action) {
         }
       }
 
-      localStorage.setItem('files', JSON.stringify(updatedFiles))
+      filesForLS = state.files.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -81,7 +111,12 @@ function reducer(state = initialState, action) {
         }
       }
 
-      localStorage.setItem('files', JSON.stringify(updatedFiles))
+      filesForLS = state.files.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -101,7 +136,12 @@ function reducer(state = initialState, action) {
         }
       }
 
-      localStorage.setItem('files', JSON.stringify(updatedFiles))
+      filesForLS = state.files.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
