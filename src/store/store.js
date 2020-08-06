@@ -18,6 +18,8 @@ function reducer(state = initialState, action) {
       }
 
     case 'DELETE_ALL_FILES':
+      localStorage.setItem('files', JSON.stringify([]))
+
       return {
         ...state,
         files: [],
