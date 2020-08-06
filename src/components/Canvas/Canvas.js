@@ -15,13 +15,19 @@ class Canvas extends React.Component {
 
   render() {
     return (
-      <div>
+      <div
+        style={{
+          userSelect: 'none',
+        }}
+      >
         <canvas
           ref={this.canvas}
           style={{
-            border: '1px solid red',
             maxWidth: '100%',
             margin: '0 auto',
+            borderRadius: '6px',
+            overflow: 'hidden',
+            boxShadow: '0 2px 10px 0 rgba(0, 0, 0, .1)',
           }}
         />
       </div>

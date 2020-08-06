@@ -87,18 +87,24 @@ class App extends React.Component {
       >
         <div
           style={{
-            // maxWidth: '800px',
-            // margin: '0 auto',
+            width: '100%',
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
           <h1>Seltools</h1>
-          <div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: '20px',
+            }}
+          >
             <Button
               type='file'
-              text='Cargar archivos'
+              text='Añadir archivos'
               onChange={(e) => this.handleFileInputChange(e)}
             />
+            <div>
             <Button
               type='button'
               text='Eliminar archivos'
@@ -106,9 +112,10 @@ class App extends React.Component {
             />
             <Button
               type='button'
-              text='Eliminar markers'
+                text='Eliminar notas'
               onClick={() => this.clearMarkers()}
             />
+          </div>
           </div>
           {this.props.files.map((file) => {
             if (file.type === 'pdf') {

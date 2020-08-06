@@ -7,6 +7,7 @@ class FileWrapper extends React.Component {
       <div
         style={{
           position: 'relative',
+          marginBottom: '20px',
         }}
       >
         <Markers 

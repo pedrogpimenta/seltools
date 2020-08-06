@@ -120,6 +120,7 @@ class Marker extends React.Component {
             background: '#DDD',
             boxSizing: 'border-box',
             zIndex: '1',
+            userSelect: 'none',
           }}
           onDoubleClick={(e) => e.stopPropagation()}
           onMouseEnter={(e) => this.handleOnMouseEnter(e)}
@@ -133,9 +134,7 @@ class Marker extends React.Component {
               cursor: this.props.dragging ? 'grabbing' : 'grab',
             }}
           >
-            <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="5" fill="black" /></g></svg>
-            {/* <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="8"/><circle cx="10.5" cy="10.5" r="2"/><circle cx="10.5" cy="10.5" r="5"/></g></svg> */}
-            {/* <svg style={{transform: 'rotateZ(90deg)'}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M5.5 3v9m4-9v9" stroke="currentColor"></path></svg> */}
+            <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="3" fill="black" /></g></svg>
           </div>
           <ContentEditable
             innerRef={this.contentEditable}
@@ -144,7 +143,11 @@ class Marker extends React.Component {
             onChange={(e) => this.handleChange(e)}
             onMouseDown={(e) => e.stopPropagation()}
             onDoubleClick={(e) => e.stopPropagation()}
-            style={{background: '#DDD', paddingRight: '2px', outline: 'none'}}
+            style={{
+              background: '#DDD',
+              paddingRight: '2px',
+              outline: 'none',
+            }}
           />
           <div
             className='delete'
@@ -153,8 +156,7 @@ class Marker extends React.Component {
               alignItems: 'center',
               position: 'absolute',
               left: this.state.hover ? 'calc(100% - 26px)' : 'calc(100% - 44px)',
-              top: '50%',
-              transform: 'translateY(-50%)',
+              top: '0',
               fontSize: 0,
               padding: '0 4px 0 28px',
               height: '100%',
@@ -166,8 +168,7 @@ class Marker extends React.Component {
             }}
             onClick={this.handleDelete}
           >
-            <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round" transform="translate(2 2)"><circle cx="8.5" cy="8.5" r="8"/><g transform="matrix(0 1 -1 0 17 0)"><path d="m5.5 11.5 6-6"/><path d="m5.5 5.5 6 6"/></g></g></svg>
-            {/* <svg style={{fontSize: 0}} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M4.5 4.5l6 6m-6 0l6-6m-3 10a7 7 0 110-14 7 7 0 010 14z" stroke="currentColor"></path></svg> */}
+            <svg height="20" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round" transform="translate(2 2)"><circle cx="8.5" cy="8.5" r="8"/><g transform="matrix(0 1 -1 0 17 0)"><path d="m5.5 11.5 6-6"/><path d="m5.5 5.5 6 6"/></g></g></svg>
           </div>
         </div>
       </Draggable>
