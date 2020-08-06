@@ -21,6 +21,7 @@ class Button extends React.Component {
           <input
             ref={this.fileInput}
             multiple
+            accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
             type={this.props.type}
             onChange={(e) => this.props.onChange(e)}
             style={{display: 'none'}}
