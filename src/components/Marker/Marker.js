@@ -103,7 +103,7 @@ class Marker extends React.Component {
     return (
       <Draggable
         ref={this.draggable}
-        bounds='parent'
+        // bounds='parent'
         handle='.handle'
         position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
         onDrag={(e) => this.reportDragging(e)}
@@ -111,6 +111,7 @@ class Marker extends React.Component {
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <div
+          className={this.props.id}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
