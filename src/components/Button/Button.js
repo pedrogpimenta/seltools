@@ -10,7 +10,6 @@ class Button extends React.Component {
   renderButton = () => {
     const buttonStyles = {
       display: 'inline-flex',
-      // borderRadius: '6px',
       backgroundColor: 'var(--c-button-bg)',
       color: 'var(--c-button-text)',
       padding: 'var(--py-button) var(--px-button)',
