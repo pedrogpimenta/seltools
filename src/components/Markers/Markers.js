@@ -29,7 +29,7 @@ class Markers extends React.Component {
 
     store.dispatch({
       type: "ADD_MARKER",
-      file: this.props.file,
+      fileId: this.props.fileId,
       id: newId,
       x: xPercent,
       y: yPercent,
@@ -52,7 +52,7 @@ class Markers extends React.Component {
 
     store.dispatch({
       type: "EDIT_MARKER",
-      file: this.props.file,
+      fileId: this.props.fileId,
       id: markerId,
       x: xPercent,
       y: yPercent,
@@ -92,7 +92,7 @@ class Markers extends React.Component {
           return(
             <Marker
               key={marker.id}
-              file={this.props.file}
+              fileId={this.props.fileId}
               hasRendered={this.props.hasRendered}
               id={marker.id}
               x={marker.x}

@@ -15,7 +15,7 @@ class App extends React.Component {
 
     if (LSfiles.length > 0) {
       this.props.dispatch({
-        type: "SET_FILES",
+        type: "ADD_FILES",
         files: JSON.parse(LSfiles),
       }) 
     }
@@ -24,8 +24,7 @@ class App extends React.Component {
   clearFiles() {
     if (window.confirm('Seguro quieres eliminar los documentos?')) {
       this.props.dispatch({
-        type: "SET_FILES",
-        files: [],
+        type: "DELETE_ALL_FILES",
       }) 
     }
   }
@@ -33,7 +32,7 @@ class App extends React.Component {
   clearMarkers() {
     if (window.confirm('Seguro quieres eliminar los markers?')) {
       this.props.dispatch({
-        type: "REMOVE_MARKERS",
+        type: "DELETE_ALL_MARKERS",
       }) 
     }
   }
@@ -64,7 +63,7 @@ class App extends React.Component {
     }
     
     this.props.dispatch({
-      type: "SET_FILES",
+      type: "ADD_FILES",
       files: filesForState
     }) 
   }
@@ -105,17 +104,17 @@ class App extends React.Component {
               onChange={(e) => this.handleFileInputChange(e)}
             />
             <div>
-            <Button
-              type='button'
-              text='Eliminar archivos'
-              onClick={() => this.clearFiles()}
-            />
-            <Button
-              type='button'
+              <Button
+                type='button'
+                text='Eliminar archivos'
+                onClick={() => this.clearFiles()}
+              />
+              <Button
+                type='button'
                 text='Eliminar notas'
-              onClick={() => this.clearMarkers()}
-            />
-          </div>
+                onClick={() => this.clearMarkers()}
+              />
+            </div>
           </div>
           {this.props.files.map((file) => {
             if (file.type === 'pdf') {

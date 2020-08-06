@@ -26,7 +26,7 @@ class Marker extends React.Component {
   handleChange = (e) => {
     store.dispatch({
       type: "EDIT_MARKER",
-      file: this.props.file,
+      fileId: this.props.fileId,
       id: this.props.id,
       content: e.target.value,
     }) 
@@ -35,7 +35,7 @@ class Marker extends React.Component {
   handleDelete = () => {
     store.dispatch({
       type: "DELETE_MARKER",
-      file: this.props.file,
+      fileId: this.props.fileId,
       id: this.props.id,
     }) 
   }
