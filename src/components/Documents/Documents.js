@@ -24,7 +24,7 @@ class Documents extends React.Component {
       .then(data => {
         this.setState({
           isLoadingStudents: false,
-          students: data[0].students,
+          students: data[0].students || [],
         })
       })
   }
@@ -63,6 +63,8 @@ class Documents extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Loading...</div>
 
+    if (this.state.documents < 1) return <div>Aun no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
+
     return this.state.documents.map(document => (
       <li key={document._id}>
         <div><Link to={`/documento/${document._id}`}>{document.name}</Link></div>
@@ -73,8 +75,10 @@ class Documents extends React.Component {
   renderStudents = () => {
     if (this.state.isLoadingStudents) return <div>Loading...</div>
 
+    if (this.state.students < 1) return <div>No tienes estudiantes, añade uno:</div>
+
     return this.state.students.map(student => (
-      <li key={student.id} style={{display: 'inline-block', marginRight: '8px'}}>
+      <li key={student._id} style={{display: 'inline-block', marginRight: '8px'}}>
         <div>{student.name}</div>
       </li>
     ))
@@ -104,7 +108,7 @@ class Documents extends React.Component {
             onClick={(e) => this.handleAddStudent(e)}
           />
         </div>
-        <ul>
+        <ul style={{margin: '0', padding: '0', listStyle: 'none'}}>
           {this.renderDocuments()}
         </ul>
       </div>

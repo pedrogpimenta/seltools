@@ -173,7 +173,7 @@ class Document extends React.Component {
       .then(data => {
         this.setState({
           isLoadingStudents: false,
-          students: data[0].students,
+          students: data[0].students || [],
         })
       })
   }
