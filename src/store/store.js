@@ -116,7 +116,7 @@ function reducer(state = initialState, action) {
         if (updatedFiles[file].id === action.fileId) {
           for (let marker in updatedFiles[file].markers) {
             if (updatedFiles[file].markers[marker].id === action.id) {
-              if (!!action.content) {
+              if (action.content !== undefined) {
                 updatedFiles[file].markers[marker].content = action.content
               }
               if (!!action.x) {
