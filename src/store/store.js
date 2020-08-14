@@ -2,6 +2,8 @@ import { createStore } from 'redux'
 
 const initialState = {
   files: [],
+  documents: [],
+  students: [],
 }
 
 function reducer(state = initialState, action) {
