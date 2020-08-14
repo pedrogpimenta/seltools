@@ -1,6 +1,7 @@
 import React from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { cloneDeep } from 'lodash'
 // import './Document.css'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
@@ -30,21 +31,21 @@ class Document extends React.Component {
   componentDidMount() {
     this.getUser()
 
-    if (this.props.isNew) {
+    if (!!this.props.isNew) {
       // const LSfiles = [] 
-      localStorage.removeItem('files')
-      localStorage.removeItem('name')
+      // localStorage.removeItem('files')
+      // localStorage.removeItem('name')
 
     } else {
 
       fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
         .then(response => response.json())
         .then(data => {
-          const LSfiles = data[0].files
+          const LSfiles = data[0].files || []
 
           if (LSfiles.length > 0) {
             this.props.dispatch({
-              type: 'ADD_FILES',
+              type: 'LOAD_FILES',
               files: LSfiles,
             })
           }
@@ -67,14 +68,6 @@ class Document extends React.Component {
             name: data[0].name,
           })
         })
-
-
-      // if (LSfiles.length > 0) {
-      //   this.props.dispatch({
-      //     type: "ADD_FILES",
-      //     files: LSfiles,
-      //   }) 
-      // }
     }
 
   }
@@ -99,7 +92,7 @@ class Document extends React.Component {
     const filesLoaded = e.target.files
     const numberOfFiles = filesLoaded.length
 
-    const filesForState = JSON.parse(localStorage?.getItem('files')) || []
+    const filesForState = []
 
     for (let i = 0; i < numberOfFiles; i++) {
       try {
@@ -138,18 +131,43 @@ class Document extends React.Component {
   }
 
   handleSaveDocument = () => {
-    const documentObject = {
-      name: this.props.name,
-      files: this.props.files,
+    console.log('new:', !this.props.id)
+    let documentObject = {}
+
+    let filesHaveChanged = false
+
+    for (let fileOnLoad in this.props.files) {
+      if ((this.props.files.length !== this.props.filesOnLoad.length) || (this.props.files[fileOnLoad] !== this.props.filesOnLoad[fileOnLoad].id)) {
+        filesHaveChanged = true
+      }
     }
 
+    if (filesHaveChanged) {
+      documentObject = {
+        name: this.props.name,
+        files: this.props.files,
+      }
+    } else {
+      const filesWithoutContent = cloneDeep(this.props.files)
+      
+      for (let file in filesWithoutContent) {
+        delete filesWithoutContent[file].content
+      }
+
+      documentObject = {
+        name: this.props.name,
+        files: filesWithoutContent,
+      }
+    }
+
+
     const requestOptions = {
-      method: this.props.isNew ? 'POST' : 'PUT',
+      method: !this.props.id ? 'POST' : 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject)
     }
 
-    const fetchUrl = this.props.isNew
+    const fetchUrl = !this.props.id
       ? `${REACT_APP_SERVER_BASE_URL}/document/`
       : `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
 
@@ -319,12 +337,13 @@ class Document extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   return {
     id: state.id,
     name: state.name,
     sharedWith: state.sharedWith || [],
     files: state.files,
+    filesOnLoad: state.filesOnLoad,
     dragging: state.dragging,
   }
 }

@@ -9,6 +9,7 @@ import './App.css'
 import Landing from '../Landing/Landing'
 import Documents from '../Documents/Documents'
 import Document from '../Document/Document'
+import DocumentStudent from '../DocumentStudent/DocumentStudent'
 import Student from '../Student/Student'
 
 class App extends React.Component {
@@ -16,7 +17,10 @@ class App extends React.Component {
     return (
       <Router>
         <Switch>
-          <Route path="/alumno">
+          <Route path="/alumno/documento/:id">
+            <DocumentStudent />
+          </Route>
+          <Route path="/alumno/documentos">
             <Student />
           </Route>
           <Route path="/documento/:id">

@@ -10,7 +10,7 @@ class Landing extends React.Component {
           Eres profesor? <Link to='/documentos'>Entra aqui</Link>
         </div>
         <div>
-          Eres alumno? <Link to='/alumno'>Entra aqui</Link>
+          Eres alumno? <Link to='/alumno/documentos'>Entra aqui</Link>
         </div>
       </div>
     )

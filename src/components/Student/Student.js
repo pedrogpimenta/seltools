@@ -36,7 +36,7 @@ class Student extends React.Component {
 
     return this.state.documents.map(document => (
       <li key={document._id}>
-        <div><Link to={`/documento/${document._id}`}>{document.name}</Link></div>
+        <div><Link to={`/alumno/documento/${document._id}`}>{document.name}</Link></div>
       </li>
     ))
   }

@@ -1,4 +1,5 @@
 import { createStore } from 'redux'
+import { cloneDeep } from 'lodash'
 
 const initialState = {
   files: [],
@@ -11,12 +12,36 @@ function reducer(state = initialState, action) {
   let filesForLS = []
 
   switch(action.type) {
-    case 'ADD_FILES':
-      localStorage.setItem('files', JSON.stringify(action.files))
+    case 'LOAD_FILES':
+      // localStorage.setItem('files', JSON.stringify(action.files))
+      console.log('yaaaass load')
+
+      const filesOnLoad = cloneDeep(action.files)
+      
+      for (let file in filesOnLoad) {
+        delete filesOnLoad[file].content
+      }
 
       return {
         ...state,
         files: action.files,
+        filesOnLoad: filesOnLoad,
+      }
+
+    case 'ADD_FILES':
+      // localStorage.setItem('files', JSON.stringify(action.files))
+      console.log('yaaaass')
+
+      // const files = cloneDeep(action.files)
+      const files = cloneDeep(state.files)
+      
+      for (let file in action.files) {
+        files.push(action.files[file])
+      }
+
+      return {
+        ...state,
+        files: files,
       }
 
     case 'DELETE_ALL_FILES':
