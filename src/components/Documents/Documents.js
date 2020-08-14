@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 // import './Documents.css'
 
+import { SERVER_BASE_URL } from '../../CONSTANTS'
+
 import Button from '../Button/Button'
 
 class Documents extends React.Component {
@@ -17,7 +19,7 @@ class Documents extends React.Component {
   }
 
   getUser = () => {
-    fetch('http://localhost:3000/user/Selen')
+    fetch(`${SERVER_BASE_URL}/user/Selen`)
       .then(response => response.json())
       .then(data => {
         this.setState({
@@ -28,7 +30,7 @@ class Documents extends React.Component {
   }
 
   getDocuments = () => {
-    fetch('http://localhost:3000/documents')
+    fetch(`${SERVER_BASE_URL}/documents`)
       .then(response => response.json())
       .then(data => {
         this.setState({
@@ -48,7 +50,7 @@ class Documents extends React.Component {
         body: JSON.stringify({name: studentName})
       }
 
-      const fetchUrl = `http://localhost:3000/student/`
+      const fetchUrl = `${SERVER_BASE_URL}/student/`
 
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())

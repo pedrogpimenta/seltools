@@ -3,6 +3,7 @@ import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 // import './Document.css'
 
+import { SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
@@ -36,7 +37,7 @@ class Document extends React.Component {
 
     } else {
 
-      fetch(`http://localhost:3000/document/${this.props.match.params.id}`)
+      fetch(`${SERVER_BASE_URL}/document/${this.props.match.params.id}`)
         .then(response => response.json())
         .then(data => {
           const LSfiles = data[0].files
@@ -149,8 +150,8 @@ class Document extends React.Component {
     }
 
     const fetchUrl = this.props.isNew
-      ? `http://localhost:3000/document/`
-      : `http://localhost:3000/document/${this.props.id}`
+      ? `${SERVER_BASE_URL}/document/`
+      : `${SERVER_BASE_URL}/document/${this.props.id}`
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
@@ -167,7 +168,7 @@ class Document extends React.Component {
   }
 
   getUser = () => {
-    fetch('http://localhost:3000/user/Selen')
+    fetch(`${SERVER_BASE_URL}/user/Selen`)
       .then(response => response.json())
       .then(data => {
         this.setState({
@@ -190,7 +191,7 @@ class Document extends React.Component {
       body: JSON.stringify(documentObject)
     }
 
-    const fetchUrl = `http://localhost:3000/student/${studentId}/document`
+    const fetchUrl = `${SERVER_BASE_URL}/student/${studentId}/document`
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
