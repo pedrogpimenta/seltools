@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { SERVER_BASE_URL } from '../../CONSTANTS'
+import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 class Student extends React.Component {
   constructor() {
@@ -16,7 +16,7 @@ class Student extends React.Component {
   componentDidMount = () => {
     const studentName = localStorage.getItem('studentName') || window.prompt('Como te llamas?')
 
-    fetch(`${SERVER_BASE_URL}/student/${studentName}`)
+    fetch(`${REACT_APP_SERVER_BASE_URL}/student/${studentName}`)
       .then(response => response.json())
       .then(data => {
         if (!!data[0]?.name) {
