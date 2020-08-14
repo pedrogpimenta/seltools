@@ -15,6 +15,18 @@ class Documents extends React.Component {
       isLoadingDocuments: true,
       documents: [],
       students: [],
+      isUserAllowed: false,
+    }
+  }
+
+  auth = () => {
+    if (this.state.isUserAllowed) return null
+
+    const pass = window.prompt('Cual es tu contraseña?')
+
+    if (pass === 'amor') {
+      this.setState({isUserAllowed: true})
+      localStorage.setItem('isUserAllowed', true)
     }
   }
 
@@ -85,11 +97,28 @@ class Documents extends React.Component {
   }
 
   componentDidMount = () => {
-    this.getDocuments()
-    this.getUser()
+    // if (localStorage.getItem('isUserAllowed')) this.setState({isUserAllowed: true})
+
+    if (!localStorage.getItem('isUserAllowed')) {
+      this.auth()
+    }
+
+    if (localStorage.getItem('isUserAllowed')) {
+      this.getDocuments()
+      this.getUser()
+    }
   }
 
+  // componentDidUpdate = () => {
+  //   if (this.state.isUserAllowed) {
+  //     this.getDocuments()
+  //     this.getUser()
+  //   }
+  // }
+
   render() {
+    if (!localStorage.getItem('isUserAllowed')) return <div>No eres Selen!</div>
+
     return (
       <div>
         <Link to='/documento' isNew={true}>Nuevo documento</Link>
