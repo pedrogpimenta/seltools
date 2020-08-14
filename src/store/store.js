@@ -44,6 +44,30 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
+    case 'CHANGE_DOCUMENT_NAME':
+      localStorage.setItem('name', JSON.stringify(action.name))
+
+      return {
+        ...state,
+        name: action.name,
+      }
+
+    case 'CHANGE_DOCUMENT_ID':
+      localStorage.setItem('id', JSON.stringify(action.id))
+
+      return {
+        ...state,
+        id: action.id,
+      }
+
+    case 'CHANGE_DOCUMENT_SHAREDWITH':
+      localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
+
+      return {
+        ...state,
+        sharedWith: action.sharedWith,
+      }
+
     case 'FILE_HAS_RENDERED':
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
