@@ -7,8 +7,9 @@ import {
   Intent,
   Breadcrumbs,
   Button,
-  Dialog,
+  Card,
   Classes,
+  Elevation,
   Popover,
   Navbar,
   NavbarDivider,
@@ -95,7 +96,14 @@ class Documents extends React.Component {
 
     return this.state.documents.map(document => (
       <li key={document._id}>
-        <div><Link to={`/documento/${document._id}`}>{document.name}</Link></div>
+        <Card
+          style={{
+            padding: '8px',
+            marginBottom: '12px',
+          }}
+        >
+            <Link to={`/documento/${document._id}`}>{document.name}</Link>
+        </Card>
       </li>
     ))
   }
@@ -166,8 +174,7 @@ class Documents extends React.Component {
                 <Breadcrumbs
                   // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
                   items={[
-                    { href: '/documentos',
-                      icon: 'folder-close',
+                    { icon: 'folder-close',
                       text: 'Documentos',
                     },
                   ]}
@@ -199,7 +206,11 @@ class Documents extends React.Component {
               text='Añadir alumno'
               onClick={(e) => this.handleAddStudent(e)}
             />
-            <ul style={{margin: '0', padding: '0', listStyle: 'none'}}>
+            <ul style={{
+              margin: '32px 0',
+              padding: '0',
+              listStyle: 'none'
+            }}>
               {this.renderDocuments()}
             </ul>
           </div>

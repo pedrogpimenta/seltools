@@ -146,11 +146,9 @@ class Document extends React.Component {
   }
 
   handleNameInputChange = (e) => {
-    e.preventDefault()
-
     this.props.dispatch({
       type: 'CHANGE_DOCUMENT_NAME',
-      name: this.fileNameInput.current.value,
+      name: e,
     })
     
     this.props.dispatch({
@@ -293,6 +291,8 @@ class Document extends React.Component {
       <Breadcrumb>
         <EditableText
           defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
+          confirmOnEnterKey={true}
+          onConfirm={(e) => this.handleNameInputChange(e)}
         >
           {/* {text} */}
         </EditableText>
