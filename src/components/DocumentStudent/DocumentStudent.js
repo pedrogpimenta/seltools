@@ -41,12 +41,6 @@ class DocumentStudent extends React.Component {
         }
 
         // TODO: Improve so much dispatches
-
-        this.props.dispatch({
-          type: 'CHANGE_DOCUMENT_SHAREDWITH',
-          sharedWith: data[0].sharedWith,
-        })
-
         this.props.dispatch({
           type: 'CHANGE_DOCUMENT_ID',
           id: this.props.match.params.id,
@@ -68,9 +62,17 @@ class DocumentStudent extends React.Component {
   }
 
   handleSaveDocument = () => {
+    const filesForSave = this.props.files.map(file => {
+      return {
+        id: file.id,
+        name: file.name,
+        markers: file.markers,
+      }
+    })
+
     const documentObject = {
       name: this.props.name,
-      files: this.props.files,
+      files: filesForSave,
     }
 
     const requestOptions = {
@@ -146,6 +148,7 @@ class DocumentStudent extends React.Component {
                   id={file.id}
                   markers={file.markers}
                   hasRendered={file.hasRendered}
+                  isStudent={true}
                 >
                   <Canvas file={file} fileHasRendered={this.fileHasRendered} />
                 </FileWrapper>
@@ -157,6 +160,7 @@ class DocumentStudent extends React.Component {
                   id={file.id}
                   markers={file.markers}
                   hasRendered={file.hasRendered}
+                  isStudent={true}
                 >
                   <Image file={file} />
                 </FileWrapper>

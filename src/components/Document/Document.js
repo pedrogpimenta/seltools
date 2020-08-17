@@ -165,15 +165,17 @@ class Document extends React.Component {
         files: this.props.files,
       }
     } else {
-      const filesWithoutContent = cloneDeep(this.props.files)
-      
-      for (let file in filesWithoutContent) {
-        delete filesWithoutContent[file].content
-      }
+      const filesForSave = this.props.files.map(file => {
+        return {
+          id: file.id,
+          name: file.name,
+          markers: file.markers,
+        }
+      })
 
       documentObject = {
         name: this.props.name,
-        files: filesWithoutContent,
+        files: filesForSave,
       }
     }
 
