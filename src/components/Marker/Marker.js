@@ -30,6 +30,10 @@ class Marker extends React.Component {
       id: this.props.id,
       content: e.target.value,
     }) 
+
+    store.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
   }
 
   handleDelete = () => {
@@ -37,6 +41,10 @@ class Marker extends React.Component {
       type: "DELETE_MARKER",
       fileId: this.props.fileId,
       id: this.props.id,
+    }) 
+
+    store.dispatch({
+      type: "DOCUMENT_UNSAVED",
     }) 
   }
 

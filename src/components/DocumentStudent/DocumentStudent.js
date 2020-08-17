@@ -44,7 +44,6 @@ class DocumentStudent extends React.Component {
       name: '',
       files: [],
       filesOnLoad: [],
-      isSaved: false,
     }
   }
 
@@ -157,7 +156,9 @@ class DocumentStudent extends React.Component {
           id: data.id,
         })
 
-        this.props.history.push(`/alumno/documento/${data.id}`)
+        this.props.dispatch({
+          type: 'DOCUMENT_SAVED',
+        })
       })
   }
 
@@ -204,8 +205,8 @@ class DocumentStudent extends React.Component {
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
               <Button
-                intent={Intent.PRIMARY}
-                className={Classes.MINIMAL}
+                intent={this.props.isSaved ? null : Intent.PRIMARY}
+                className={this.props.isSaved ? Classes.MINIMAL : null}
                 icon="floppy-disk"
                 onClick={(e) => this.handleSaveDocumentStudent(e)}
               />
@@ -217,7 +218,7 @@ class DocumentStudent extends React.Component {
             style={{
               maxWidth: '800px',
               margin: '0 auto',
-              paddingTop: '60px',
+              paddingTop: '70px',
             }}
           >
             {this.props.files.map((file) => {
@@ -262,6 +263,7 @@ function mapStateToProps(state, ownProps) {
     files: state.files,
     filesOnLoad: state.filesOnLoad,
     dragging: state.dragging,
+    isSaved: state.isSaved,
   }
 }
 

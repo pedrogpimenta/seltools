@@ -44,7 +44,6 @@ class Document extends React.Component {
       name: '',
       files: [],
       filesOnLoad: [],
-      isSaved: false,
       isLoadingStudents: true,
       students: [],
       showEditDialog: false,
@@ -109,22 +108,6 @@ class Document extends React.Component {
 
   }
 
-  clearFiles() {
-    if (window.confirm('Seguro quieres eliminar los documentos?')) {
-      this.props.dispatch({
-        type: "DELETE_ALL_FILES",
-      }) 
-    }
-  }
-
-  clearMarkers() {
-    if (window.confirm('Seguro quieres eliminar los markers?')) {
-      this.props.dispatch({
-        type: "DELETE_ALL_MARKERS",
-      }) 
-    }
-  }
-
   handleFileInputChange = async (e) => {
     const filesLoaded = e.target.files
     const numberOfFiles = filesLoaded.length
@@ -154,6 +137,10 @@ class Document extends React.Component {
       type: "ADD_FILES",
       files: filesForState
     }) 
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
   }
 
   handleNameInputChange = (e) => {
@@ -163,6 +150,10 @@ class Document extends React.Component {
       type: 'CHANGE_DOCUMENT_NAME',
       name: this.fileNameInput.current.value,
     })
+    
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
 
     this.setState({
       showEditDialog: false,
@@ -228,6 +219,10 @@ class Document extends React.Component {
           id: data.id,
         })
 
+        this.props.dispatch({
+          type: 'DOCUMENT_SAVED',
+        })
+
         this.props.history.push(`/documento/${data.id}`)
       })
 
@@ -272,10 +267,6 @@ class Document extends React.Component {
       .then(data => {
       })
   }
-
-  // handleAddFile = () => {
-  //   this.fileInput.click()
-  // }
 
   renderStudents = () => {
     if (this.state.isLoadingStudents) return <div>Loading...</div>
@@ -343,7 +334,11 @@ class Document extends React.Component {
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
               <Popover>
-                <Button className={Classes.MINIMAL} icon="document-share" />
+                <Button 
+                  className={Classes.MINIMAL} 
+                  icon="document-share"
+                  style={{marginRight: '2px', marginLeft: '2px'}}
+                />
                 <ul
                   style={{
                     listStyle: 'none',
@@ -355,8 +350,9 @@ class Document extends React.Component {
                 </ul>
               </Popover>
               <Button
-                intent={Intent.PRIMARY}
-                className={Classes.MINIMAL}
+                intent={this.props.isSaved ? null : Intent.PRIMARY}
+                className={this.props.isSaved ? Classes.MINIMAL : null}
+                style={{marginRight: '8px', marginLeft: '8px'}}
                 icon="floppy-disk"
                 onClick={(e) => this.handleSaveDocument(e)}
               />
@@ -368,42 +364,9 @@ class Document extends React.Component {
             style={{
               maxWidth: '800px',
               margin: '0 auto',
-              paddingTop: '20px',
+              paddingTop: '70px',
             }}
           >
-            <div>
-              <input
-                // TODO: improve input field
-                style={{marginBottom: '16px'}}
-                ref={this.documentNameInput}
-                defaultValue={this.props.name}
-                // value={this.props.name}
-                type='text'
-                onChange={(e) => this.handleNameInputChange(e)}
-              />
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '20px',
-              }}
-            >
-              {/* <div>
-                <Button
-                  type='file'
-                  text='Añadir archivos'
-                  onChange={(e) => this.handleFileInputChange(e)}
-                />
-              </div>
-              <div>
-                <Button
-                  type='button'
-                  text='Eliminar notas'
-                  onClick={() => this.clearMarkers()}
-                />
-              </div> */}
-            </div>
             {this.props.files.map((file) => {
               if (file.type === 'pdf') {
                 return(
@@ -445,7 +408,8 @@ class Document extends React.Component {
               <input
                 ref={this.fileInput}
                 multiple
-                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
+                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif'
+                // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
                 type='file'
                 onChange={(e) => this.handleFileInputChange(e)}
                 style={{display: 'none'}}
@@ -505,6 +469,7 @@ function mapStateToProps(state, ownProps) {
     sharedWith: state.sharedWith || [],
     files: state.files,
     filesOnLoad: state.filesOnLoad,
+    isSaved: state.isSaved,
     dragging: state.dragging,
   }
 }

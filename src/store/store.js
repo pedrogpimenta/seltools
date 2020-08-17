@@ -6,6 +6,7 @@ const initialState = {
   filesOnLoad: [],
   documents: [],
   students: [],
+  isSaved: true,
 }
 
 function reducer(state = initialState, action) {
@@ -245,6 +246,18 @@ function reducer(state = initialState, action) {
         sharedWith: currentSharedWith,
       }
     
+    case 'DOCUMENT_UNSAVED':
+      return {
+        ...state,
+        isSaved: false,
+      }
+    
+    case 'DOCUMENT_SAVED':
+      return {
+        ...state,
+        isSaved: true,
+      }
+
     case 'IS_DRAGGING':
       return {
         ...state,
