@@ -4,20 +4,13 @@ import { store } from '../../store/store'
 
 import {
   Alignment,
-  Intent,
   Breadcrumbs,
   Button,
   Card,
-  Classes,
-  Elevation,
-  Popover,
   Navbar,
   NavbarDivider,
   NavbarGroup,
   NavbarHeading,
-  FormGroup,
-  InputGroup,
-  Switch,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'

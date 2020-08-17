@@ -1,12 +1,11 @@
 import React from 'react'
-import { withRouter, Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import {
   Alignment,
   Intent,
   Breadcrumbs,
-  Breadcrumb,
   Button,
   Classes,
   Navbar,
@@ -19,8 +18,6 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
-
-import { loadFile } from '../../helpers/render-docs'
 
 class DocumentStudent extends React.Component {
   constructor() {
