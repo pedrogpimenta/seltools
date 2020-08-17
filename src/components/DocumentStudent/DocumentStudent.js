@@ -40,7 +40,6 @@ class DocumentStudent extends React.Component {
           })
         }
 
-        console.log('shared with:', data[0].sharedWith)
         // TODO: Improve so much dispatches
 
         this.props.dispatch({
@@ -85,7 +84,6 @@ class DocumentStudent extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        // console.log('data:', data)
         this.props.dispatch({
           type: 'DOCUMENT_SAVED'
         })

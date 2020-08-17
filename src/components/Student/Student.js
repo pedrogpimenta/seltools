@@ -20,7 +20,6 @@ class Student extends React.Component {
       .then(response => response.json())
       .then(data => {
         if (!!data[0]?.name) {
-          // console.log(data[0]?.name)
           this.setState({
             isLoading: false,
             studentName: data[0].name,

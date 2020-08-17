@@ -1,5 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { store } from '../../store/store'
+
 // import './Documents.css'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
@@ -55,7 +57,7 @@ class Documents extends React.Component {
   handleAddStudent = () => {
     const studentName = window.prompt('Como se llama tu nuevo alumno?')
 
-    if (studentName.length > 0) {
+    if (!!studentName && studentName.length > 0) {
       const requestOptions = {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -67,7 +69,6 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then(data => {
-          // console.log('data:', data)
         })
     }
   }
@@ -98,6 +99,11 @@ class Documents extends React.Component {
 
   componentDidMount = () => {
     // if (localStorage.getItem('isUserAllowed')) this.setState({isUserAllowed: true})
+
+    store.dispatch({
+      type: 'LOAD_FILES',
+      files: [],
+    })
 
     if (!localStorage.getItem('isUserAllowed')) {
       this.auth()

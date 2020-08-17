@@ -22,6 +22,7 @@ class Document extends React.Component {
       id: '',
       name: '',
       files: [],
+      filesOnLoad: [],
       isSaved: false,
       isLoadingStudents: true,
       students: [],
@@ -31,11 +32,26 @@ class Document extends React.Component {
   componentDidMount() {
     this.getUser()
 
-    if (!!this.props.isNew) {
-      // const LSfiles = [] 
-      // localStorage.removeItem('files')
-      // localStorage.removeItem('name')
+    if (!this.props.match.params.id) {
+      this.props.dispatch({
+        type: 'LOAD_FILES',
+        files: [],
+      })
 
+      this.props.dispatch({
+        type: 'CHANGE_DOCUMENT_SHAREDWITH',
+        sharedWith: [],
+      })
+
+      this.props.dispatch({
+        type: 'CHANGE_DOCUMENT_ID',
+        id: '',
+      })
+
+      this.props.dispatch({
+        type: 'CHANGE_DOCUMENT_NAME',
+        name: '',
+      })
     } else {
 
       fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
@@ -50,7 +66,6 @@ class Document extends React.Component {
             })
           }
 
-          console.log('shared with:', data[0].sharedWith)
           // TODO: Improve so much dispatches
 
           this.props.dispatch({
@@ -131,15 +146,17 @@ class Document extends React.Component {
   }
 
   handleSaveDocument = () => {
-    console.log('new:', !this.props.id)
     let documentObject = {}
 
     let filesHaveChanged = false
 
     for (let fileOnLoad in this.props.files) {
-      if ((this.props.files.length !== this.props.filesOnLoad.length) || (this.props.files[fileOnLoad] !== this.props.filesOnLoad[fileOnLoad].id)) {
-        filesHaveChanged = true
-      }
+      if (
+        (this.props.files.length !== this.props.filesOnLoad.length)
+        || (this.props.files[fileOnLoad].id !== this.props.filesOnLoad[fileOnLoad].id))
+        {
+          filesHaveChanged = true
+        }
     }
 
     if (filesHaveChanged) {
@@ -174,7 +191,6 @@ class Document extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        // console.log('data:', data)
         this.props.dispatch({
           type: 'CHANGE_DOCUMENT_ID',
           id: data.id,
@@ -214,7 +230,6 @@ class Document extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        // console.log('data:', data)
       })
 
   }

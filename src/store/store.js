@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash'
 
 const initialState = {
   files: [],
+  filesOnLoad: [],
   documents: [],
   students: [],
 }
@@ -14,7 +15,6 @@ function reducer(state = initialState, action) {
   switch(action.type) {
     case 'LOAD_FILES':
       // localStorage.setItem('files', JSON.stringify(action.files))
-      console.log('yaaaass load')
 
       const filesOnLoad = cloneDeep(action.files)
       
@@ -30,7 +30,6 @@ function reducer(state = initialState, action) {
 
     case 'ADD_FILES':
       // localStorage.setItem('files', JSON.stringify(action.files))
-      console.log('yaaaass')
 
       // const files = cloneDeep(action.files)
       const files = cloneDeep(state.files)
@@ -45,7 +44,7 @@ function reducer(state = initialState, action) {
       }
 
     case 'DELETE_ALL_FILES':
-      localStorage.setItem('files', JSON.stringify([]))
+      // localStorage.setItem('files', JSON.stringify([]))
 
       return {
         ...state,
@@ -59,20 +58,30 @@ function reducer(state = initialState, action) {
         }
       }
 
-      filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
-      }
+      // filesForLS = updatedFiles.slice()
+      // for (let file in filesForLS) {
+      //   filesForLS[file].hasRendered = false
+      // }
 
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
         files: updatedFiles,
       }
 
+    case 'RESET_DOCUMENT':
+      return {
+        ...state,
+        id: '',
+        name: '',
+        files: [],
+        filesOnLoad: [],
+        sharedWith: [],
+      }
+
     case 'CHANGE_DOCUMENT_NAME':
-      localStorage.setItem('name', JSON.stringify(action.name))
+      // localStorage.setItem('name', JSON.stringify(action.name))
 
       return {
         ...state,
@@ -80,7 +89,7 @@ function reducer(state = initialState, action) {
       }
 
     case 'CHANGE_DOCUMENT_ID':
-      localStorage.setItem('id', JSON.stringify(action.id))
+      // localStorage.setItem('id', JSON.stringify(action.id))
 
       return {
         ...state,
@@ -88,7 +97,7 @@ function reducer(state = initialState, action) {
       }
 
     case 'CHANGE_DOCUMENT_SHAREDWITH':
-      localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
+      // localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
 
       return {
         ...state,
@@ -115,7 +124,7 @@ function reducer(state = initialState, action) {
         filesForLS[file].hasRendered = false
       }
 
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -132,7 +141,7 @@ function reducer(state = initialState, action) {
         filesForLS[file].hasRendered = false
       }
 
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -155,7 +164,7 @@ function reducer(state = initialState, action) {
       for (let file in filesForLS) {
         filesForLS[file].hasRendered = false
       }
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -185,7 +194,7 @@ function reducer(state = initialState, action) {
       for (let file in filesForLS) {
         filesForLS[file].hasRendered = false
       }
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -207,7 +216,7 @@ function reducer(state = initialState, action) {
       for (let file in filesForLS) {
         filesForLS[file].hasRendered = false
       }
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
