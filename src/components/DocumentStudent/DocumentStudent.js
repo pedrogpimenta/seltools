@@ -1,32 +1,24 @@
 import React from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { cloneDeep } from 'lodash'
-// import './DocumentStudent.css'
 
 import {
   Alignment,
   Intent,
   Breadcrumbs,
+  Breadcrumb,
   Button,
-  Dialog,
   Classes,
-  Popover,
-  Icon,
   Navbar,
   NavbarDivider,
   NavbarGroup,
   NavbarHeading,
-  FormGroup,
-  InputGroup,
-  Switch,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
-// import Button from '../Button/Button'
 
 import { loadFile } from '../../helpers/render-docs'
 
@@ -98,6 +90,10 @@ class DocumentStudent extends React.Component {
             type: 'CHANGE_DOCUMENT_NAME',
             name: data[0].name,
           })
+
+          this.props.dispatch({
+            type: "DOCUMENT_IS_LOADED",
+          }) 
         })
     }
 
@@ -189,19 +185,23 @@ class DocumentStudent extends React.Component {
             <NavbarGroup align={Alignment.LEFT}>
               <NavbarHeading>Seltools</NavbarHeading>
               <NavbarDivider />
-              <Breadcrumbs
-                // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
-                items={[
-                  { href: '/documentos',
-                    icon: 'folder-close',
-                    text: 'Documentos',
-                  },
-                  {
-                    icon: 'document',
-                    text: this.props.name,
-                  },
-                ]}
-              />
+              <div
+                style={{marginLeft: '8px'}}
+              >
+                <Breadcrumbs
+                  // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
+                  items={[
+                    { href: '/alumno/documentos',
+                      icon: 'folder-close',
+                      text: 'Documentos',
+                    },
+                    {
+                      icon: 'document',
+                      text: this.props.documentIsLoading ? 'Cargando...' : this.props.name,
+                    },
+                  ]}
+                />
+              </div>
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
               <Button
@@ -264,6 +264,7 @@ function mapStateToProps(state, ownProps) {
     filesOnLoad: state.filesOnLoad,
     dragging: state.dragging,
     isSaved: state.isSaved,
+    documentIsLoading: state.documentIsLoading,
   }
 }
 

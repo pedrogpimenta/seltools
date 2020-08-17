@@ -2,11 +2,26 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { store } from '../../store/store'
 
-// import './Documents.css'
+import {
+  Alignment,
+  Intent,
+  Breadcrumbs,
+  Button,
+  Dialog,
+  Classes,
+  Popover,
+  Navbar,
+  NavbarDivider,
+  NavbarGroup,
+  NavbarHeading,
+  FormGroup,
+  InputGroup,
+  Switch,
+} from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
-import Button from '../Button/Button'
+// import Button from '../Button/Button'
 
 class Documents extends React.Component {
   constructor() {
@@ -74,7 +89,7 @@ class Documents extends React.Component {
   }
 
   renderDocuments = () => {
-    if (this.state.isLoadingDocuments) return <div>Loading...</div>
+    if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
     if (this.state.documents.length < 1) return <div>Aun no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
 
@@ -86,7 +101,7 @@ class Documents extends React.Component {
   }
 
   renderStudents = () => {
-    if (this.state.isLoadingStudents) return <div>Loading...</div>
+    if (this.state.isLoadingStudents) return <div>Cargando...</div>
 
     if (this.state.students < 1) return <div>No tienes estudiantes, añade uno:</div>
 
@@ -127,26 +142,68 @@ class Documents extends React.Component {
     if (!localStorage.getItem('isUserAllowed')) return <div>No eres Selen!</div>
 
     return (
-      <div>
-        <Link to='/documento' isNew={true}>Nuevo documento</Link>
-        <div>
-          <span style={{marginRight: '16px'}}>
-            Alumnos:
-          </span>
-          <span style={{marginRight: '16px', display: 'inline-block'}}>
+      <div
+        className='App'
+        style={{
+          display: 'flex',
+          overflow: 'hidden',
+          cursor: this.props.dragging ? 'grabbing' : 'default',
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            cursor: this.props.dragging ? 'grabbing' : 'default',
+          }}
+        >
+          <Navbar fixedToTop={true}>
+            <NavbarGroup align={Alignment.LEFT}>
+              <NavbarHeading>Seltools</NavbarHeading>
+              <NavbarDivider />
+              <div
+                style={{marginLeft: '8px'}}
+              >
+                <Breadcrumbs
+                  // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
+                  items={[
+                    { href: '/documentos',
+                      icon: 'folder-close',
+                      text: 'Documentos',
+                    },
+                  ]}
+                />
+              </div>
+            </NavbarGroup>
+            <NavbarGroup align={Alignment.RIGHT}>
+              {/* <NavbarDivider />
+              <Button className={Classes.MINIMAL} icon="user" /> */}
+            </NavbarGroup>
+          </Navbar>
+          <div
+            style={{
+              maxWidth: '800px',
+              margin: '0 auto',
+              paddingTop: '70px',
+            }}
+          >
+            <span style={{marginRight: '16px'}}>
+              Alumnos:
+            </span>
+            <span style={{marginRight: '16px', display: 'inline-block'}}>
+              <ul style={{margin: '0', padding: '0', listStyle: 'none'}}>
+                {this.renderStudents()}
+              </ul>
+            </span>
+            <Button
+              type='button'
+              text='Añadir alumno'
+              onClick={(e) => this.handleAddStudent(e)}
+            />
             <ul style={{margin: '0', padding: '0', listStyle: 'none'}}>
-              {this.renderStudents()}
+              {this.renderDocuments()}
             </ul>
-          </span>
-          <Button
-            type='button'
-            text='Añadir alumno'
-            onClick={(e) => this.handleAddStudent(e)}
-          />
+          </div>
         </div>
-        <ul style={{margin: '0', padding: '0', listStyle: 'none'}}>
-          {this.renderDocuments()}
-        </ul>
       </div>
     )
   }

@@ -7,6 +7,7 @@ const initialState = {
   documents: [],
   students: [],
   isSaved: true,
+  documentIsLoading: true,
 }
 
 function reducer(state = initialState, action) {
@@ -256,6 +257,12 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         isSaved: true,
+      }
+
+    case 'DOCUMENT_IS_LOADED':
+      return {
+        ...state,
+        documentIsLoading: false,
       }
 
     case 'IS_DRAGGING':

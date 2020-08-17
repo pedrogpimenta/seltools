@@ -1,18 +1,17 @@
 import React from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { cloneDeep } from 'lodash'
-// import './Document.css'
 
 import {
   Alignment,
   Intent,
   Breadcrumbs,
+  Breadcrumb,
   Button,
   Dialog,
   Classes,
+  EditableText,
   Popover,
-  Icon,
   Navbar,
   NavbarDivider,
   NavbarGroup,
@@ -26,7 +25,6 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
-// import Button from '../Button/Button'
 
 import { loadFile } from '../../helpers/render-docs'
 
@@ -103,6 +101,10 @@ class Document extends React.Component {
             type: 'CHANGE_DOCUMENT_NAME',
             name: data[0].name,
           })
+
+          this.props.dispatch({
+            type: "DOCUMENT_IS_LOADED",
+          }) 
         })
     }
 
@@ -269,7 +271,7 @@ class Document extends React.Component {
   }
 
   renderStudents = () => {
-    if (this.state.isLoadingStudents) return <div>Loading...</div>
+    if (this.state.isLoadingStudents) return <div>Cargando...</div>
 
     return this.state.students.map(student => (
       <li key={student._id} style={{display: 'block'}}>
@@ -284,6 +286,18 @@ class Document extends React.Component {
 
   openEditNameDialog = () => {
     this.setState({showEditDialog: true})
+  }
+
+  renderCurrentBreadcrumb = ({ text, ...restProps }) => {
+    return (
+      <Breadcrumb>
+        <EditableText
+          defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
+        >
+          {/* {text} */}
+        </EditableText>
+      </Breadcrumb>
+    )
   }
 
   fileHasRendered = (fileId) => {
@@ -313,24 +327,28 @@ class Document extends React.Component {
             <NavbarGroup align={Alignment.LEFT}>
               <NavbarHeading>Seltools</NavbarHeading>
               <NavbarDivider />
-              <Breadcrumbs
-                // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
-                items={[
-                  { href: '/documentos',
-                    icon: 'folder-close',
-                    text: 'Documentos',
-                  },
-                  {
-                    icon: 'document',
-                    text: this.props.name,
-                  },
-                ]}
-              />
-              <Button
-                className={Classes.MINIMAL}
-                icon="edit"
-                onClick={(e) => this.openEditNameDialog(e)}
-              />
+              <div
+                style={{marginLeft: '8px'}}
+              >
+                <Breadcrumbs
+                  currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
+                  items={[
+                    { href: '/documentos',
+                      icon: 'folder-close',
+                      text: 'Documentos',
+                    },
+                    {
+                      icon: 'document',
+                      text: this.props.name,
+                    },
+                  ]}
+                />
+                {/* <Button
+                  className={Classes.MINIMAL}
+                  icon="edit"
+                  onClick={(e) => this.openEditNameDialog(e)}
+                /> */}
+              </div>
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
               <Popover>
@@ -471,6 +489,7 @@ function mapStateToProps(state, ownProps) {
     filesOnLoad: state.filesOnLoad,
     isSaved: state.isSaved,
     dragging: state.dragging,
+    documentIsLoading: state.documentIsLoading,
   }
 }
 
