@@ -23,7 +23,7 @@ class Student extends React.Component {
           this.setState({
             isLoading: false,
             studentName: data[0].name,
-            documents: data[0].documents,
+            documents: data[0].documents || [],
           })
           localStorage.setItem('studentName', data[0].name)
         }
@@ -32,6 +32,8 @@ class Student extends React.Component {
 
   renderDocuments = () => {
     if (this.state.isLoading) return <div>Loading...</div>
+
+    if (this.state.documents.length < 1) return <div>Aun no tienes ningun documento.</div>
 
     return this.state.documents.map(document => (
       <li key={document._id}>

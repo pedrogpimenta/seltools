@@ -1,4 +1,8 @@
-:root {
+@import "~normalize.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+
+/* :root {
   --c-primary: #F87361;
   --c-white: #FFF;
 
@@ -47,4 +51,4 @@ body {
 
 .App {
   font-family: Nunito, sans-serif;
-}
+} */

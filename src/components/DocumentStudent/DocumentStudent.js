@@ -1,13 +1,32 @@
 import React from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-// import './Document.css'
+import { cloneDeep } from 'lodash'
+// import './DocumentStudent.css'
+
+import {
+  Alignment,
+  Intent,
+  Breadcrumbs,
+  Button,
+  Dialog,
+  Classes,
+  Popover,
+  Icon,
+  Navbar,
+  NavbarDivider,
+  NavbarGroup,
+  NavbarHeading,
+  FormGroup,
+  InputGroup,
+  Switch,
+} from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
-import Button from '../Button/Button'
+// import Button from '../Button/Button'
 
 import { loadFile } from '../../helpers/render-docs'
 
@@ -16,81 +35,130 @@ class DocumentStudent extends React.Component {
     super()
 
     this.documentNameInput = React.createRef()
+    this.fileInput = React.createRef()
+    this.fileNameInput = React.createRef()
+    this.editNameDialogSaveButton = React.createRef()
 
     this.state = {
       id: '',
       name: '',
       files: [],
+      filesOnLoad: [],
       isSaved: false,
-      isLoadingStudents: true,
-      students: [],
     }
   }
 
   componentDidMount() {
-    fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
-      .then(response => response.json())
-      .then(data => {
-        const LSfiles = data[0].files
 
-        if (LSfiles.length > 0) {
-          this.props.dispatch({
-            type: 'ADD_FILES',
-            files: LSfiles,
-          })
-        }
-
-        // TODO: Improve so much dispatches
-        this.props.dispatch({
-          type: 'CHANGE_DOCUMENT_ID',
-          id: this.props.match.params.id,
-        })
-
-        this.props.dispatch({
-          type: 'CHANGE_DOCUMENT_NAME',
-          name: data[0].name,
-        })
-      })
-  }
-
-  clearMarkers() {
-    if (window.confirm('Seguro quieres eliminar los markers?')) {
+    if (!this.props.match.params.id) {
       this.props.dispatch({
-        type: "DELETE_ALL_MARKERS",
-      }) 
+        type: 'LOAD_FILES',
+        files: [],
+      })
+
+      this.props.dispatch({
+        type: 'CHANGE_DOCUMENT_SHAREDWITH',
+        sharedWith: [],
+      })
+
+      this.props.dispatch({
+        type: 'CHANGE_DOCUMENT_ID',
+        id: '',
+      })
+
+      this.props.dispatch({
+        type: 'CHANGE_DOCUMENT_NAME',
+        name: '',
+      })
+    } else {
+      fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
+        .then(response => response.json())
+        .then(data => {
+          const LSfiles = data[0].files || []
+
+          if (LSfiles.length > 0) {
+            this.props.dispatch({
+              type: 'LOAD_FILES',
+              files: LSfiles,
+            })
+          }
+
+          // TODO: Improve so much dispatches
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_SHAREDWITH',
+            sharedWith: data[0].sharedWith,
+          })
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_ID',
+            id: this.props.match.params.id,
+          })
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_NAME',
+            name: data[0].name,
+          })
+        })
     }
+
   }
 
-  handleSaveDocument = () => {
-    const filesForSave = this.props.files.map(file => {
-      return {
-        id: file.id,
-        name: file.name,
-        markers: file.markers,
-      }
-    })
+  handleSaveDocumentStudent = () => {
+    let documentObject = {}
 
-    const documentObject = {
-      name: this.props.name,
-      files: filesForSave,
+    let filesHaveChanged = false
+
+    for (let fileOnLoad in this.props.files) {
+      if (
+        (this.props.files.length !== this.props.filesOnLoad.length)
+        || (this.props.files[fileOnLoad].id !== this.props.filesOnLoad[fileOnLoad].id))
+        {
+          filesHaveChanged = true
+        }
     }
+
+    if (filesHaveChanged) {
+      documentObject = {
+        name: this.props.name,
+        files: this.props.files,
+      }
+    } else {
+      const filesForSave = this.props.files.map(file => {
+        return {
+          id: file.id,
+          name: file.name,
+          markers: file.markers,
+        }
+      })
+
+      documentObject = {
+        name: this.props.name,
+        files: filesForSave,
+      }
+    }
+
 
     const requestOptions = {
-      method: 'PUT',
+      method: !this.props.id ? 'POST' : 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject)
     }
 
-    const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
+    const fetchUrl = !this.props.id
+      ? `${REACT_APP_SERVER_BASE_URL}/document/`
+      : `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
         this.props.dispatch({
-          type: 'DOCUMENT_SAVED'
+          type: 'CHANGE_DOCUMENT_ID',
+          id: data.id,
         })
-      })
 
+        this.props.history.push(`/alumno/documento/${data.id}`)
+      })
   }
 
   fileHasRendered = (fileId) => {
@@ -103,9 +171,10 @@ class DocumentStudent extends React.Component {
   render() {
     return (
       <div
-        className="App"
+        className='App'
         style={{
           display: 'flex',
+          overflow: 'hidden',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
@@ -115,58 +184,70 @@ class DocumentStudent extends React.Component {
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Link to='/alumno/documentos'>{'<'} Documentos</Link>
-          <h1>Seltools</h1>
-          <div>{this.props.name}</div>
+          <Navbar fixedToTop={true}>
+            <NavbarGroup align={Alignment.LEFT}>
+              <NavbarHeading>Seltools</NavbarHeading>
+              <NavbarDivider />
+              <Breadcrumbs
+                // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
+                items={[
+                  { href: '/documentos',
+                    icon: 'folder-close',
+                    text: 'Documentos',
+                  },
+                  {
+                    icon: 'document',
+                    text: this.props.name,
+                  },
+                ]}
+              />
+            </NavbarGroup>
+            <NavbarGroup align={Alignment.RIGHT}>
+              <Button
+                intent={Intent.PRIMARY}
+                className={Classes.MINIMAL}
+                icon="floppy-disk"
+                onClick={(e) => this.handleSaveDocumentStudent(e)}
+              />
+              {/* <NavbarDivider />
+              <Button className={Classes.MINIMAL} icon="user" /> */}
+            </NavbarGroup>
+          </Navbar>
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: '20px',
+              maxWidth: '800px',
+              margin: '0 auto',
+              paddingTop: '60px',
             }}
           >
-            <div>
-              <Button
-                type='button'
-                text='Guardar documento'
-                onClick={(e) => this.handleSaveDocument(e)}
-              />
-            </div>
-            <div>
-              <Button
-                type='button'
-                text='Eliminar notas'
-                onClick={() => this.clearMarkers()}
-              />
-            </div>
+            {this.props.files.map((file) => {
+              if (file.type === 'pdf') {
+                return(
+                  <FileWrapper
+                    key={file.id}
+                    id={file.id}
+                    markers={file.markers}
+                    hasRendered={file.hasRendered}
+                    isStudent={true}
+                  >
+                    <Canvas file={file} fileHasRendered={this.fileHasRendered} />
+                  </FileWrapper>
+                )
+              } else {
+                return(
+                  <FileWrapper
+                    key={file.id}
+                    id={file.id}
+                    markers={file.markers}
+                    hasRendered={file.hasRendered}
+                    isStudent={true}
+                  >
+                    <Image file={file} />
+                  </FileWrapper>
+                )
+              }
+            })}
           </div>
-          {this.props.files.map((file) => {
-            if (file.type === 'pdf') {
-              return(
-                <FileWrapper
-                  key={file.id}
-                  id={file.id}
-                  markers={file.markers}
-                  hasRendered={file.hasRendered}
-                  isStudent={true}
-                >
-                  <Canvas file={file} fileHasRendered={this.fileHasRendered} />
-                </FileWrapper>
-              )
-            } else {
-              return(
-                <FileWrapper
-                  key={file.id}
-                  id={file.id}
-                  markers={file.markers}
-                  hasRendered={file.hasRendered}
-                  isStudent={true}
-                >
-                  <Image file={file} />
-                </FileWrapper>
-              )
-            }
-          })}
         </div>
       </div>
     );

@@ -49,7 +49,7 @@ class Documents extends React.Component {
       .then(data => {
         this.setState({
           isLoadingDocuments: false,
-          documents: data,
+          documents: data || [],
         })
       })
   }
@@ -76,7 +76,7 @@ class Documents extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Loading...</div>
 
-    if (this.state.documents < 1) return <div>Aun no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
+    if (this.state.documents.length < 1) return <div>Aun no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
 
     return this.state.documents.map(document => (
       <li key={document._id}>
@@ -103,6 +103,7 @@ class Documents extends React.Component {
     store.dispatch({
       type: 'LOAD_FILES',
       files: [],
+      filesOnLoad: [],
     })
 
     if (!localStorage.getItem('isUserAllowed')) {

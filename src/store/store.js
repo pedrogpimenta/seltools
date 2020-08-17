@@ -223,6 +223,28 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
+    case 'CHANGE_SHAREDWITH':
+      const currentSharedWith = state.sharedWith || []
+
+      let studentHasFile = false
+
+      for (let student in currentSharedWith) {
+        if (currentSharedWith[student]._id === action.sharedWithStudent) {
+          studentHasFile = student
+        }
+      }
+
+      if (studentHasFile) {
+        currentSharedWith.splice(studentHasFile, 1)
+      } else {
+        currentSharedWith.push({_id: action.sharedWithStudent})
+      }
+
+      return {
+        ...state,
+        sharedWith: currentSharedWith,
+      }
+    
     case 'IS_DRAGGING':
       return {
         ...state,

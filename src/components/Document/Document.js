@@ -4,11 +4,29 @@ import { connect } from 'react-redux'
 import { cloneDeep } from 'lodash'
 // import './Document.css'
 
+import {
+  Alignment,
+  Intent,
+  Breadcrumbs,
+  Button,
+  Dialog,
+  Classes,
+  Popover,
+  Icon,
+  Navbar,
+  NavbarDivider,
+  NavbarGroup,
+  NavbarHeading,
+  FormGroup,
+  InputGroup,
+  Switch,
+} from "@blueprintjs/core"
+
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
-import Button from '../Button/Button'
+// import Button from '../Button/Button'
 
 import { loadFile } from '../../helpers/render-docs'
 
@@ -17,6 +35,9 @@ class Document extends React.Component {
     super()
 
     this.documentNameInput = React.createRef()
+    this.fileInput = React.createRef()
+    this.fileNameInput = React.createRef()
+    this.editNameDialogSaveButton = React.createRef()
 
     this.state = {
       id: '',
@@ -26,6 +47,7 @@ class Document extends React.Component {
       isSaved: false,
       isLoadingStudents: true,
       students: [],
+      showEditDialog: false,
     }
   }
 
@@ -135,14 +157,22 @@ class Document extends React.Component {
   }
 
   handleNameInputChange = (e) => {
+    e.preventDefault()
+
     this.props.dispatch({
       type: 'CHANGE_DOCUMENT_NAME',
-      name: e.target.value,
+      name: this.fileNameInput.current.value,
     })
 
-    // this.setState({
-    //   name: e.target.value
-    // })
+    this.setState({
+      showEditDialog: false,
+    })
+  }
+
+  handleNameInputClose = () => {
+    this.setState({
+      showEditDialog: false,
+    })
   }
 
   handleSaveDocument = () => {
@@ -215,10 +245,18 @@ class Document extends React.Component {
   }
 
   handleStudentShare = (e, studentId) => {
+    console.log('e:', e)
+
+    this.props.dispatch({
+      type: 'CHANGE_SHAREDWITH',
+      sharedWithStudent: studentId,
+    })
+
+    console.log('current shared:', this.props.sharedWith)
+    
     const documentObject = {
       _id: this.props.id,
       name: this.props.name,
-      files: this.props.files,
     }
 
     const requestOptions = {
@@ -233,25 +271,28 @@ class Document extends React.Component {
       .then(response => response.json())
       .then(data => {
       })
-
   }
+
+  // handleAddFile = () => {
+  //   this.fileInput.click()
+  // }
 
   renderStudents = () => {
     if (this.state.isLoadingStudents) return <div>Loading...</div>
 
-
     return this.state.students.map(student => (
-      <li key={student._id} style={{display: 'inline-block'}}>
-        <label>
-          <input
-            type="checkbox"
-            checked={this.props.sharedWith.find(withStudent => withStudent._id === student._id)}
-            onChange={(e) => this.handleStudentShare(e, student._id)}
-          />
-          <span>{student.name}</span>
-        </label>
+      <li key={student._id} style={{display: 'block'}}>
+        <Switch 
+          label={student.name}
+          defaultChecked={this.props.sharedWith.find(withStudent => withStudent._id === student._id)}
+          onChange={(e) => this.handleStudentShare(e, student._id)}
+        />
       </li>
     ))
+  }
+
+  openEditNameDialog = () => {
+    this.setState({showEditDialog: true})
   }
 
   fileHasRendered = (fileId) => {
@@ -264,9 +305,10 @@ class Document extends React.Component {
   render() {
     return (
       <div
-        className="App"
+        className='App'
         style={{
           display: 'flex',
+          overflow: 'hidden',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
@@ -276,79 +318,181 @@ class Document extends React.Component {
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Link to='/documentos'>{'<'} Documentos</Link>
-          <h1>Seltools</h1>
-          <div>
-            <input
-              // TODO: improve input field
-              style={{marginBottom: '16px'}}
-              ref={this.documentNameInput}
-              value={this.props.name}
-              type='text'
-              onChange={(e) => this.handleNameInputChange(e)}
-            />
-          </div>
-          <div>
-            {this.renderStudents()}
-          </div>
+          <Navbar fixedToTop={true}>
+            <NavbarGroup align={Alignment.LEFT}>
+              <NavbarHeading>Seltools</NavbarHeading>
+              <NavbarDivider />
+              <Breadcrumbs
+                // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
+                items={[
+                  { href: '/documentos',
+                    icon: 'folder-close',
+                    text: 'Documentos',
+                  },
+                  {
+                    icon: 'document',
+                    text: this.props.name,
+                  },
+                ]}
+              />
+              <Button
+                className={Classes.MINIMAL}
+                icon="edit"
+                onClick={(e) => this.openEditNameDialog(e)}
+              />
+            </NavbarGroup>
+            <NavbarGroup align={Alignment.RIGHT}>
+              <Popover>
+                <Button className={Classes.MINIMAL} icon="document-share" />
+                <ul
+                  style={{
+                    listStyle: 'none',
+                    margin: 0,
+                    padding: '16px',
+                  }}
+                >
+                  {this.renderStudents()}
+                </ul>
+              </Popover>
+              <Button
+                intent={Intent.PRIMARY}
+                className={Classes.MINIMAL}
+                icon="floppy-disk"
+                onClick={(e) => this.handleSaveDocument(e)}
+              />
+              <NavbarDivider />
+              <Button className={Classes.MINIMAL} icon="user" />
+            </NavbarGroup>
+          </Navbar>
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: '20px',
+              maxWidth: '800px',
+              margin: '0 auto',
+              paddingTop: '20px',
             }}
           >
             <div>
-              <Button
-                type='file'
-                text='Añadir archivos'
-                onChange={(e) => this.handleFileInputChange(e)}
-              />
-              <Button
-                type='button'
-                text='Guardar documento'
-                onClick={(e) => this.handleSaveDocument(e)}
+              <input
+                // TODO: improve input field
+                style={{marginBottom: '16px'}}
+                ref={this.documentNameInput}
+                defaultValue={this.props.name}
+                // value={this.props.name}
+                type='text'
+                onChange={(e) => this.handleNameInputChange(e)}
               />
             </div>
-            <div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '20px',
+              }}
+            >
+              {/* <div>
+                <Button
+                  type='file'
+                  text='Añadir archivos'
+                  onChange={(e) => this.handleFileInputChange(e)}
+                />
+              </div>
+              <div>
+                <Button
+                  type='button'
+                  text='Eliminar notas'
+                  onClick={() => this.clearMarkers()}
+                />
+              </div> */}
+            </div>
+            {this.props.files.map((file) => {
+              if (file.type === 'pdf') {
+                return(
+                  <FileWrapper
+                    key={file.id}
+                    id={file.id}
+                    markers={file.markers}
+                    hasRendered={file.hasRendered}
+                  >
+                    <Canvas file={file} fileHasRendered={this.fileHasRendered} />
+                  </FileWrapper>
+                )
+              } else {
+                return(
+                  <FileWrapper
+                    key={file.id}
+                    id={file.id}
+                    markers={file.markers}
+                    hasRendered={file.hasRendered}
+                  >
+                    <Image file={file} />
+                  </FileWrapper>
+                )
+              }
+            })}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '48px auto',
+            }}>
               <Button
-                type='button'
-                text='Eliminar archivos'
-                onClick={() => this.clearFiles()}
+                intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+                className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+                icon='add'
+                text='Añadir archivos'
+                onClick={(e) => this.fileInput.current.click()}
               />
-              <Button
-                type='button'
-                text='Eliminar notas'
-                onClick={() => this.clearMarkers()}
+              <input
+                ref={this.fileInput}
+                multiple
+                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
+                type='file'
+                onChange={(e) => this.handleFileInputChange(e)}
+                style={{display: 'none'}}
               />
             </div>
           </div>
-          {this.props.files.map((file) => {
-            if (file.type === 'pdf') {
-              return(
-                <FileWrapper
-                  key={file.id}
-                  id={file.id}
-                  markers={file.markers}
-                  hasRendered={file.hasRendered}
-                >
-                  <Canvas file={file} fileHasRendered={this.fileHasRendered} />
-                </FileWrapper>
-              )
-            } else {
-              return(
-                <FileWrapper
-                  key={file.id}
-                  id={file.id}
-                  markers={file.markers}
-                  hasRendered={file.hasRendered}
-                >
-                  <Image file={file} />
-                </FileWrapper>
-              )
-            }
-          })}
         </div>
+        <Dialog
+          title="Cambiar nombre del documento"
+          isOpen={this.state.showEditDialog}
+          onOpened={(e) => {this.fileNameInput.current.focus()}}
+          onClose={this.handleNameInputClose}
+          canOutsideClickClose={true}
+          canEscapeKeyClose={true}
+        >
+          <div className={Classes.DIALOG_BODY}>
+            <form onSubmit={(e) => this.handleNameInputChange(e)}>
+              <FormGroup
+                label="Nombre del documento"
+                labelFor="text-input"
+              >
+                <InputGroup
+                  id="text-input"
+                  defaultValue={this.props.name}
+                  placeholder="Ejercicio 1"
+                  inputRef={this.fileNameInput}
+                />
+              </FormGroup>
+            </form>
+          </div>
+          <div className={Classes.DIALOG_FOOTER}>
+            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+              <Button
+                ref={this.editNameDialogSaveButton}
+                intent={Intent.PRIMARY}
+                onClick={(e) => this.handleNameInputChange(e)}
+              >
+                Guardar cambios
+              </Button>
+              <Button
+                onClick={this.handleNameInputClose}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </Dialog>
       </div>
     );
   }
