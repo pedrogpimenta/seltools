@@ -388,10 +388,11 @@ class Document extends React.Component {
                 </ul>
               </Popover>
               <Button
-                intent={this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
+                intent={this.props.name ? this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
                 loading={this.props.isSaving}
                 // className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
                 style={{marginRight: '8px', marginLeft: '8px'}}
+                disabled={!this.props.name}
                 icon="floppy-disk"
                 text="Guardar"
                 onClick={(e) => this.handleSaveDocument(e)}

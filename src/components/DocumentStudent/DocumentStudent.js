@@ -194,8 +194,7 @@ class DocumentStudent extends React.Component {
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
               <Button
-                intent={this.props.isSaving ? Intent.WARNING : this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
-                // className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
+                intent={this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
                 loading={this.props.isSaving}
                 icon="floppy-disk"
                 text="Guardar"
