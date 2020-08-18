@@ -7,7 +7,6 @@ import {
   Intent,
   Breadcrumbs,
   Button,
-  Classes,
   Navbar,
   NavbarDivider,
   NavbarGroup,

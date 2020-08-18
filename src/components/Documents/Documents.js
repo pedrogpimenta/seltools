@@ -192,22 +192,34 @@ class Documents extends React.Component {
           </Navbar>
           <div
             style={{
-              maxWidth: '800px',
+              maxWidth: '900px',
               margin: '0 auto',
               paddingTop: '70px',
+              paddingLeft: '16px',
+              paddingRight: '16px',
             }}
           >
             <div
               style={{
-                display: 'flex'
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
               }}
               >
               <div
                 style={{
                   width: '70%',
-                  marginRight: '16px',
+                  paddingRight: '16px',
                 }}
               >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                <h1>Documentos</h1>
                 <AnchorButton
                   type='button'
                   icon='add'
@@ -215,8 +227,9 @@ class Documents extends React.Component {
                   text='Nuevo documento'
                   href='/documento'
                 />
+                </div>
                 <ul style={{
-                  margin: '32px 0',
+                  margin: '8px 0 32px',
                   padding: '0',
                   listStyle: 'none'
                 }}>
@@ -225,13 +238,14 @@ class Documents extends React.Component {
               </div>
               <div
                 style={{
-                  width: '30%',
-                  marginLeft: '16px',
+                  width: '20%',
+                  minWidth: '200px',
                 }}
               >
                 <Card
                   style={{
                     padding: '1px 16px 16px',
+                    marginTop: '81px',
                     marginBottom: '12px',
                   }}
                 >

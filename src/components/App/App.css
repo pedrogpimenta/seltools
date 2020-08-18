@@ -5,6 +5,7 @@
 :root {
   --c-primary: #F87361;
   --c-primary-light: #FF8B7B;
+  --c-primary-lightest: rgb(255, 232, 230);
 }
 
 a {
@@ -39,6 +40,12 @@ a:hover {
 .bp3-button.bp3-intent-primary:disabled,
 .bp3-button.bp3-intent-primary.bp3-disabled {
   background-color: var(--c-primary-light);
+}
+
+/* Navbar */
+.bp3-navbar {
+  background-color: var(--c-primary-lightest);
+  box-shadow: none;
 }
 
 
