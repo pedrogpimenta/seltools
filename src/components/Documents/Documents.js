@@ -186,6 +186,11 @@ class Documents extends React.Component {
               paddingTop: '70px',
             }}
           >
+            <div
+              style={{
+                display: 'flex'
+              }}
+            ></div>
             <span style={{marginRight: '16px'}}>
               Alumnos:
             </span>
@@ -199,6 +204,7 @@ class Documents extends React.Component {
               text='Añadir alumno'
               onClick={(e) => this.handleAddStudent(e)}
             />
+            <Link to='/documento' isNew={true}>Nuevo documento</Link>
             <ul style={{
               margin: '32px 0',
               padding: '0',

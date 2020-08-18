@@ -72,12 +72,6 @@ class DocumentStudent extends React.Component {
           }
 
           // TODO: Improve so much dispatches
-
-          this.props.dispatch({
-            type: 'CHANGE_DOCUMENT_SHAREDWITH',
-            sharedWith: data[0].sharedWith,
-          })
-
           this.props.dispatch({
             type: 'CHANGE_DOCUMENT_ID',
             id: this.props.match.params.id,
@@ -97,6 +91,10 @@ class DocumentStudent extends React.Component {
   }
 
   handleSaveDocumentStudent = () => {
+    this.props.dispatch({
+      type: 'DOCUMENT_IS_SAVING',
+    })
+
     let documentObject = {}
 
     let filesHaveChanged = false
@@ -130,7 +128,6 @@ class DocumentStudent extends React.Component {
       }
     }
 
-
     const requestOptions = {
       method: !this.props.id ? 'POST' : 'PUT',
       headers: {'Content-Type': 'application/json'},
@@ -144,11 +141,6 @@ class DocumentStudent extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.props.dispatch({
-          type: 'CHANGE_DOCUMENT_ID',
-          id: data.id,
-        })
-
         this.props.dispatch({
           type: 'DOCUMENT_SAVED',
         })
@@ -202,8 +194,8 @@ class DocumentStudent extends React.Component {
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
               <Button
-                intent={this.props.isSaved ? null : Intent.PRIMARY}
-                className={this.props.isSaved ? Classes.MINIMAL : null}
+                intent={this.props.isSaving ? Intent.WARNING : this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
+                className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
                 icon="floppy-disk"
                 onClick={(e) => this.handleSaveDocumentStudent(e)}
               />
@@ -261,6 +253,7 @@ function mapStateToProps(state, ownProps) {
     filesOnLoad: state.filesOnLoad,
     dragging: state.dragging,
     isSaved: state.isSaved,
+    isSaving: state.isSaving,
     documentIsLoading: state.documentIsLoading,
   }
 }

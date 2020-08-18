@@ -38,7 +38,7 @@ class Student extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    if (this.state.documents.length < 1) return <div>Aun no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
+    if (this.state.documents.length < 1) return <div>Aun no tienes ningun documento.</div>
 
     return this.state.documents.map(document => (
       <li key={document._id}>
@@ -48,7 +48,7 @@ class Student extends React.Component {
             marginBottom: '12px',
           }}
         >
-            <Link to={`/documento/${document._id}`}>{document.name}</Link>
+            <Link to={`/alumno/documento/${document._id}`}>{document.name}</Link>
         </Card>
       </li>
     ))

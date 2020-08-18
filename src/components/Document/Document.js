@@ -53,6 +53,10 @@ class Document extends React.Component {
 
     if (!this.props.match.params.id) {
       this.props.dispatch({
+        type: 'DOCUMENT_IS_LOADED',
+      })
+
+      this.props.dispatch({
         type: 'LOAD_FILES',
         files: [],
       })
@@ -150,7 +154,7 @@ class Document extends React.Component {
       type: 'CHANGE_DOCUMENT_NAME',
       name: e,
     })
-    
+
     this.props.dispatch({
       type: "DOCUMENT_UNSAVED",
     }) 
@@ -163,6 +167,13 @@ class Document extends React.Component {
   handleNameInputClose = () => {
     this.setState({
       showEditDialog: false,
+    })
+  }
+
+  handleBreadcrumbInputChange = (e) => {
+    this.props.dispatch({
+      type: 'CHANGE_DOCUMENT_NAME',
+      name: e,
     })
   }
 
@@ -290,9 +301,13 @@ class Document extends React.Component {
     return (
       <Breadcrumb>
         <EditableText
+          style={{color: 'black'}}
           defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
+          placeholder='Nuevo documento'
+          // value={this.props.name}
           confirmOnEnterKey={true}
           onConfirm={(e) => this.handleNameInputChange(e)}
+          // onChange={(e) => this.handleBreadcrumbInputChange(e)}
         >
           {/* {text} */}
         </EditableText>
@@ -368,8 +383,8 @@ class Document extends React.Component {
                 </ul>
               </Popover>
               <Button
-                intent={this.props.isSaved ? null : Intent.PRIMARY}
-                className={this.props.isSaved ? Classes.MINIMAL : null}
+                intent={this.props.isSaving ? Intent.WARNING : this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
+                className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
                 style={{marginRight: '8px', marginLeft: '8px'}}
                 icon="floppy-disk"
                 onClick={(e) => this.handleSaveDocument(e)}
