@@ -111,7 +111,6 @@ class Document extends React.Component {
           }) 
         })
     }
-
   }
 
   handleFileInputChange = async (e) => {

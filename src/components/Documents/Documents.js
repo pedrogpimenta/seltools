@@ -4,9 +4,12 @@ import { store } from '../../store/store'
 
 import {
   Alignment,
+  AnchorButton,
   Breadcrumbs,
   Button,
   Card,
+  Icon,
+  Intent,
   Navbar,
   NavbarDivider,
   NavbarGroup,
@@ -107,8 +110,16 @@ class Documents extends React.Component {
     if (this.state.students < 1) return <div>No tienes estudiantes, añade uno:</div>
 
     return this.state.students.map(student => (
-      <li key={student._id} style={{display: 'inline-block', marginRight: '8px'}}>
-        <div>{student.name}</div>
+      <li key={student._id}>
+        <div
+          style={{padding: '4px 0'}}
+        >
+          <Icon
+            icon='user'
+            style={{marginRight: '6px'}}
+          />
+            {student.name}
+          </div>
       </li>
     ))
   }
@@ -190,28 +201,55 @@ class Documents extends React.Component {
               style={{
                 display: 'flex'
               }}
-            ></div>
-            <span style={{marginRight: '16px'}}>
-              Alumnos:
-            </span>
-            <span style={{marginRight: '16px', display: 'inline-block'}}>
-              <ul style={{margin: '0', padding: '0', listStyle: 'none'}}>
-                {this.renderStudents()}
-              </ul>
-            </span>
-            <Button
-              type='button'
-              text='Añadir alumno'
-              onClick={(e) => this.handleAddStudent(e)}
-            />
-            <Link to='/documento' isNew={true}>Nuevo documento</Link>
-            <ul style={{
-              margin: '32px 0',
-              padding: '0',
-              listStyle: 'none'
-            }}>
-              {this.renderDocuments()}
-            </ul>
+              >
+              <div
+                style={{
+                  width: '70%',
+                  marginRight: '16px',
+                }}
+              >
+                <AnchorButton
+                  type='button'
+                  intent={Intent.PRIMARY}
+                  text='Nuevo documento'
+                  href='/documento'
+                />
+                <ul style={{
+                  margin: '32px 0',
+                  padding: '0',
+                  listStyle: 'none'
+                }}>
+                  {this.renderDocuments()}
+                </ul>
+              </div>
+              <div
+                style={{
+                  width: '30%',
+                  marginLeft: '16px',
+                }}
+              >
+                <Card
+                  style={{
+                    padding: '1px 16px 16px',
+                    marginBottom: '12px',
+                  }}
+                >
+                  <h3>Alumnos</h3>
+                  <div>
+                    <ul style={{margin: '0', padding: '0', listStyle: 'none'}}>
+                      {this.renderStudents()}
+                    </ul>
+                  </div>
+                  <Button
+                    type='button'
+                    intent={Intent.PRIMARY}
+                    text='Añadir alumno'
+                    onClick={(e) => this.handleAddStudent(e)}
+                    style={{marginTop: '16px'}}
+                    />
+                </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
