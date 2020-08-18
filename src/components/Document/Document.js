@@ -177,6 +177,10 @@ class Document extends React.Component {
   }
 
   handleSaveDocument = () => {
+    this.props.dispatch({
+      type: 'DOCUMENT_IS_SAVING',
+    })
+
     let documentObject = {}
 
     let filesHaveChanged = false
@@ -348,7 +352,7 @@ class Document extends React.Component {
                   currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
                   items={[
                     { href: '/documentos',
-                      icon: 'folder-close',
+                      icon: 'arrow-left',
                       text: 'Documentos',
                     },
                     {
@@ -367,8 +371,10 @@ class Document extends React.Component {
             <NavbarGroup align={Alignment.RIGHT}>
               <Popover>
                 <Button 
-                  className={Classes.MINIMAL} 
-                  icon="document-share"
+                  // className={Classes.MINIMAL} 
+                  intent={Intent.PRIMARY}
+                  icon="share"
+                  text="Compartir"
                   style={{marginRight: '2px', marginLeft: '2px'}}
                 />
                 <ul
@@ -382,10 +388,12 @@ class Document extends React.Component {
                 </ul>
               </Popover>
               <Button
-                intent={this.props.isSaving ? Intent.WARNING : this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
-                className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
+                intent={this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
+                loading={this.props.isSaving}
+                // className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
                 style={{marginRight: '8px', marginLeft: '8px'}}
                 icon="floppy-disk"
+                text="Guardar"
                 onClick={(e) => this.handleSaveDocument(e)}
               />
               <NavbarDivider />
@@ -502,6 +510,7 @@ function mapStateToProps(state, ownProps) {
     files: state.files,
     filesOnLoad: state.filesOnLoad,
     isSaved: state.isSaved,
+    isSaving: state.isSaving,
     dragging: state.dragging,
     documentIsLoading: state.documentIsLoading,
   }

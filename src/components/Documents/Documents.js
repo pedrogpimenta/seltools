@@ -178,7 +178,7 @@ class Documents extends React.Component {
                 <Breadcrumbs
                   // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
                   items={[
-                    { icon: 'folder-close',
+                    { icon: 'folder-open',
                       text: 'Documentos',
                     },
                   ]}
@@ -210,6 +210,7 @@ class Documents extends React.Component {
               >
                 <AnchorButton
                   type='button'
+                  icon='add'
                   intent={Intent.PRIMARY}
                   text='Nuevo documento'
                   href='/documento'
@@ -242,6 +243,7 @@ class Documents extends React.Component {
                   </div>
                   <Button
                     type='button'
+                    icon='add'
                     intent={Intent.PRIMARY}
                     text='Añadir alumno'
                     onClick={(e) => this.handleAddStudent(e)}

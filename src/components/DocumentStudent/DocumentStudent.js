@@ -181,7 +181,7 @@ class DocumentStudent extends React.Component {
                   // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
                   items={[
                     { href: '/alumno/documentos',
-                      icon: 'folder-close',
+                      icon: 'arrow-left',
                       text: 'Documentos',
                     },
                     {
@@ -195,8 +195,10 @@ class DocumentStudent extends React.Component {
             <NavbarGroup align={Alignment.RIGHT}>
               <Button
                 intent={this.props.isSaving ? Intent.WARNING : this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY}
-                className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
+                // className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
+                loading={this.props.isSaving}
                 icon="floppy-disk"
+                text="Guardar"
                 onClick={(e) => this.handleSaveDocumentStudent(e)}
               />
               {/* <NavbarDivider />

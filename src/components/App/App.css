@@ -2,6 +2,46 @@
 @import "~@blueprintjs/core/lib/css/blueprint.css";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
+:root {
+  --c-primary: #F87361;
+  --c-primary-light: #FF8B7B;
+}
+
+a {
+  color: var(--c-primary);
+}
+
+a:hover {
+  color: var(--c-primary-light);
+}
+
+/* Buttons */
+.bp3-button.bp3-intent-primary {
+  background-color: var(--c-primary);
+  background-image: none;
+  box-shadow: none;
+}
+
+.bp3-button.bp3-intent-primary:hover {
+  background-color: var(--c-primary-light);
+  box-shadow: none;
+}
+
+.bp3-button.bp3-intent-success {
+  background-image: none;
+  box-shadow: none;
+}
+
+.bp3-button.bp3-intent-success:hover {
+  box-shadow: none;
+}
+
+.bp3-button.bp3-intent-primary:disabled,
+.bp3-button.bp3-intent-primary.bp3-disabled {
+  background-color: var(--c-primary-light);
+}
+
+
 /* :root {
   --c-primary: #F87361;
   --c-white: #FFF;
