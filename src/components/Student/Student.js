@@ -97,7 +97,7 @@ class Student extends React.Component {
                 <Breadcrumbs
                   // currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
                   items={[
-                    { icon: 'folder-close',
+                    { icon: 'folder-open',
                       text: 'Documentos',
                     },
                   ]}
