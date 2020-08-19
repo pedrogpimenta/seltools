@@ -10,6 +10,7 @@
     "lodash": "^4.17.20",
     "pdfjs-dist": "^2.4.456",
     "react": "^16.13.1",
+    "react-beforeunload": "^2.2.2",
     "react-contenteditable": "^3.3.5",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",

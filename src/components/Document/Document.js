@@ -1,6 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { Beforeunload } from 'react-beforeunload';
 
 import {
   Alignment,
@@ -8,7 +9,6 @@ import {
   Breadcrumbs,
   Breadcrumb,
   Button,
-  Dialog,
   Classes,
   EditableText,
   Popover,
@@ -16,8 +16,6 @@ import {
   NavbarDivider,
   NavbarGroup,
   NavbarHeading,
-  FormGroup,
-  InputGroup,
   Switch,
 } from "@blueprintjs/core"
 
@@ -335,6 +333,9 @@ class Document extends React.Component {
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
+        {!this.props.isSaved &&
+          <Beforeunload onBeforeunload={() => "No has guardado tus cambios!"} />
+        }
         <div
           style={{
             width: '100%',
@@ -474,46 +475,6 @@ class Document extends React.Component {
             </div>
           </div>
         </div>
-        <Dialog
-          title="Cambiar nombre del documento"
-          isOpen={this.state.showEditDialog}
-          onOpened={(e) => {this.fileNameInput.current.focus()}}
-          onClose={this.handleNameInputClose}
-          canOutsideClickClose={true}
-          canEscapeKeyClose={true}
-        >
-          <div className={Classes.DIALOG_BODY}>
-            <form onSubmit={(e) => this.handleNameInputChange(e)}>
-              <FormGroup
-                label="Nombre del documento"
-                labelFor="text-input"
-              >
-                <InputGroup
-                  id="text-input"
-                  defaultValue={this.props.name}
-                  placeholder="Ejercicio 1"
-                  inputRef={this.fileNameInput}
-                />
-              </FormGroup>
-            </form>
-          </div>
-          <div className={Classes.DIALOG_FOOTER}>
-            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-              <Button
-                ref={this.editNameDialogSaveButton}
-                intent={Intent.PRIMARY}
-                onClick={(e) => this.handleNameInputChange(e)}
-              >
-                Guardar cambios
-              </Button>
-              <Button
-                onClick={this.handleNameInputClose}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </Dialog>
       </div>
     );
   }
