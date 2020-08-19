@@ -34,6 +34,10 @@ class Markers extends React.Component {
       x: xPercent,
       y: yPercent,
     }) 
+
+    store.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
   }
 
   setNotEditing = (e) => {
@@ -60,6 +64,10 @@ class Markers extends React.Component {
 
     store.dispatch({
       type: "NOT_DRAGGING",
+    }) 
+
+    store.dispatch({
+      type: "DOCUMENT_UNSAVED",
     }) 
   }
 

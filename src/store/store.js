@@ -1,7 +1,14 @@
 import { createStore } from 'redux'
+import { cloneDeep } from 'lodash'
 
 const initialState = {
   files: [],
+  filesOnLoad: [],
+  documents: [],
+  students: [],
+  isSaved: true,
+  isSaving: false,
+  documentIsLoading: true,
 }
 
 function reducer(state = initialState, action) {
@@ -9,16 +16,38 @@ function reducer(state = initialState, action) {
   let filesForLS = []
 
   switch(action.type) {
-    case 'ADD_FILES':
-      localStorage.setItem('files', JSON.stringify(action.files))
+    case 'LOAD_FILES':
+      // localStorage.setItem('files', JSON.stringify(action.files))
+
+      const filesOnLoad = cloneDeep(action.files)
+      
+      for (let file in filesOnLoad) {
+        delete filesOnLoad[file].content
+      }
 
       return {
         ...state,
         files: action.files,
+        filesOnLoad: filesOnLoad,
+      }
+
+    case 'ADD_FILES':
+      // localStorage.setItem('files', JSON.stringify(action.files))
+
+      // const files = cloneDeep(action.files)
+      const files = cloneDeep(state.files)
+      
+      for (let file in action.files) {
+        files.push(action.files[file])
+      }
+
+      return {
+        ...state,
+        files: files,
       }
 
     case 'DELETE_ALL_FILES':
-      localStorage.setItem('files', JSON.stringify([]))
+      // localStorage.setItem('files', JSON.stringify([]))
 
       return {
         ...state,
@@ -32,16 +61,50 @@ function reducer(state = initialState, action) {
         }
       }
 
-      filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
-      }
+      // filesForLS = updatedFiles.slice()
+      // for (let file in filesForLS) {
+      //   filesForLS[file].hasRendered = false
+      // }
 
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
         files: updatedFiles,
+      }
+
+    case 'RESET_DOCUMENT':
+      return {
+        ...state,
+        id: '',
+        name: '',
+        files: [],
+        filesOnLoad: [],
+        sharedWith: [],
+      }
+
+    case 'CHANGE_DOCUMENT_NAME':
+      // localStorage.setItem('name', JSON.stringify(action.name))
+
+      return {
+        ...state,
+        name: action.name,
+      }
+
+    case 'CHANGE_DOCUMENT_ID':
+      // localStorage.setItem('id', JSON.stringify(action.id))
+
+      return {
+        ...state,
+        id: action.id,
+      }
+
+    case 'CHANGE_DOCUMENT_SHAREDWITH':
+      // localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
+
+      return {
+        ...state,
+        sharedWith: action.sharedWith,
       }
 
     case 'FILE_HAS_RENDERED':
@@ -64,7 +127,7 @@ function reducer(state = initialState, action) {
         filesForLS[file].hasRendered = false
       }
 
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -81,7 +144,7 @@ function reducer(state = initialState, action) {
         filesForLS[file].hasRendered = false
       }
 
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -104,7 +167,7 @@ function reducer(state = initialState, action) {
       for (let file in filesForLS) {
         filesForLS[file].hasRendered = false
       }
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -134,7 +197,7 @@ function reducer(state = initialState, action) {
       for (let file in filesForLS) {
         filesForLS[file].hasRendered = false
       }
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
@@ -156,11 +219,58 @@ function reducer(state = initialState, action) {
       for (let file in filesForLS) {
         filesForLS[file].hasRendered = false
       }
-      localStorage.setItem('files', JSON.stringify(filesForLS))
+      // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
         ...state,
         files: updatedFiles,
+      }
+
+    case 'CHANGE_SHAREDWITH':
+      const currentSharedWith = state.sharedWith || []
+
+      let studentHasFile = false
+
+      for (let student in currentSharedWith) {
+        if (currentSharedWith[student]._id === action.sharedWithStudent) {
+          studentHasFile = student
+        }
+      }
+
+      if (studentHasFile) {
+        currentSharedWith.splice(studentHasFile, 1)
+      } else {
+        currentSharedWith.push({_id: action.sharedWithStudent})
+      }
+
+      return {
+        ...state,
+        sharedWith: currentSharedWith,
+      }
+
+    case 'DOCUMENT_IS_SAVING':
+      return {
+        ...state,
+        isSaving: true,
+      }
+    
+    case 'DOCUMENT_UNSAVED':
+      return {
+        ...state,
+        isSaved: false,
+      }
+    
+    case 'DOCUMENT_SAVED':
+      return {
+        ...state,
+        isSaved: true,
+        isSaving: false,
+      }
+
+    case 'DOCUMENT_IS_LOADED':
+      return {
+        ...state,
+        documentIsLoading: false,
       }
 
     case 'IS_DRAGGING':
