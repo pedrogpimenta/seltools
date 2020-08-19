@@ -89,7 +89,23 @@ class Student extends React.Component {
         >
           <Navbar fixedToTop={true}>
             <NavbarGroup align={Alignment.LEFT}>
-              <NavbarHeading>Seltools</NavbarHeading>
+              <NavbarHeading
+                style={{
+                  marginRight: '8px'
+                }}
+              >
+                <div style={{
+                  maxHeight: '44px'
+                }}>
+                  <img 
+                    style={{
+                      maxHeight: '44px'
+                    }}
+                    src="/assets/images/logo-seltools.png"
+                    alt= "Seltools"
+                  />
+                </div>
+              </NavbarHeading>
               <NavbarDivider />
               <div
                 style={{marginLeft: '8px'}}
