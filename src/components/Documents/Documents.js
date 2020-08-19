@@ -36,7 +36,7 @@ class Documents extends React.Component {
   auth = () => {
     if (this.state.isUserAllowed) return null
 
-    const pass = window.prompt('Cual es tu contraseña?')
+    const pass = window.prompt('¿Cuál es tu contraseña?')
 
     if (pass === 'amor') {
       this.setState({isUserAllowed: true})
@@ -88,7 +88,7 @@ class Documents extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    if (this.state.documents.length < 1) return <div>Aun no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
+    if (this.state.documents.length < 1) return <div>Aún no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
 
     return this.state.documents.map(document => (
       <li key={document._id}>
@@ -170,7 +170,22 @@ class Documents extends React.Component {
         >
           <Navbar fixedToTop={true}>
             <NavbarGroup align={Alignment.LEFT}>
-              <NavbarHeading>Seltools</NavbarHeading>
+              <NavbarHeading
+                style={{
+                  marginRight: '8px'
+                }}
+              >
+                <div style={{
+                  maxHeight: '44px'
+                }}>
+                  <img 
+                    style={{
+                      maxHeight: '44px'
+                    }}
+                    src="/assets/images/logo-seltools.png"
+                  />
+                </div>
+              </NavbarHeading>
               <NavbarDivider />
               <div
                 style={{marginLeft: '8px'}}
@@ -208,7 +223,7 @@ class Documents extends React.Component {
               >
               <div
                 style={{
-                  width: '70%',
+                  width: '75%',
                   paddingRight: '16px',
                 }}
               >
