@@ -386,7 +386,9 @@ class Document extends React.Component {
               </div>
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
-              <Popover>
+              <Popover
+                boundary='viewport'
+              >
                 <Button 
                   // className={Classes.MINIMAL} 
                   intent={Intent.PRIMARY}
