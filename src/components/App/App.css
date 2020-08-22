@@ -78,7 +78,11 @@ a:hover {
 
 /* Text editor */
 
-.marker .highlight {
+body .marker p {
+  margin: 0;
+}
+
+body .marker .highlight {
   background-color: var(--c-highlight);
   padding-bottom: 2px;
 }
