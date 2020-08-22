@@ -1,12 +1,8 @@
 import React from 'react'
-// import ContentEditable from 'react-contenteditable'
-// import Draggable from 'react-draggable'
-// import { connect } from 'react-redux'
-// import { store } from '../../store/store'
-// import { findDOMNode } from 'react-dom'
+
 import MediumEditor from 'medium-editor/dist/js/medium-editor.js'
 import Rangy from 'rangy/lib/rangy-core.js'
-import RangyClassApplier from 'rangy/lib/rangy-classapplier.js'
+import 'rangy/lib/rangy-classapplier.js'
 import 'medium-editor/dist/css/medium-editor.css'
 import 'medium-editor/dist/css/themes/bootstrap.css'
 
@@ -14,6 +10,101 @@ class Editor extends React.Component {
   componentDidMount = () => {
     Rangy.init()
     const thisComponent = this
+    
+    var BoldButton = MediumEditor.Extension.extend({
+      name: 'bold',
+
+      init: function () {
+        
+        this.classApplier = Rangy.createClassApplier('bold', {
+          elementTagName: 'strong',
+          normalize: true
+        })
+
+        this.button = this.document.createElement('button')
+        this.button.classList.add('medium-editor-action')
+        this.button.innerHTML = '<span icon="bold" class="bp3-icon bp3-icon-bold"><svg data-icon="bold" width="16" height="16" viewBox="0 0 16 16"><desc>bold</desc><path d="M11.7 7c.2-.4.3-1 .3-1.5v-.4V5c0-.1 0-.2-.1-.3v-.1C11.4 3.1 10.1 2 8.5 2H4c-.5 0-1 .4-1 1v10c0 .5.4 1 1 1h5c2.2 0 4-1.8 4-4 0-1.2-.5-2.3-1.3-3zM6 5h2c.6 0 1 .4 1 1s-.4 1-1 1H6V5zm3 6H6V9h3c.6 0 1 .4 1 1s-.4 1-1 1z" fill-rule="evenodd"></path></svg></span>'
+        this.button.title = 'Bold'
+
+        this.on(this.button, 'click', this.handleClick.bind(this))
+      },
+    
+      getButton: function () {
+        return this.button
+      },
+
+      handleClick: function (event) {
+        this.classApplier.toggleSelection()
+    
+        // Ensure the editor knows about an html change so watchers are notified
+        // ie: <textarea> elements depend on the editableInput event to stay synchronized
+        this.base.checkContentChanged()
+      },
+      
+      isAlreadyApplied: function (node) {
+        return node.nodeName.toLowerCase() === 'strong';
+      },
+    
+      isActive: function () {
+        return this.button.classList.contains('medium-editor-button-active');
+      },
+    
+      setInactive: function () {
+        this.button.classList.remove('medium-editor-button-active');
+      },
+    
+      setActive: function () {
+        this.button.classList.add('medium-editor-button-active');
+      },
+    })
+
+    var UnderlineButton = MediumEditor.Extension.extend({
+      name: 'underline',
+
+      init: function () {
+        
+        this.classApplier = Rangy.createClassApplier('underline', {
+          elementTagName: 'u',
+          normalize: true
+        })
+
+        this.button = this.document.createElement('button')
+        this.button.classList.add('medium-editor-action')
+        this.button.innerHTML = '<span icon="underline" class="bp3-icon bp3-icon-underline"><svg data-icon="underline" width="16" height="16" viewBox="0 0 16 16"><desc>underline</desc><path d="M8 14c2.8 0 5-2.2 5-5V3c0-.6-.4-1-1-1s-1 .4-1 1v6c0 1.7-1.3 3-3 3s-3-1.3-3-3V3c0-.6-.4-1-1-1s-1 .4-1 1v6c0 2.8 2.2 5 5 5zM13.5 15h-11c-.3 0-.5.2-.5.5s.2.5.5.5h11c.3 0 .5-.2.5-.5s-.2-.5-.5-.5z" fill-rule="evenodd"></path></svg></span>'
+        this.button.title = 'Underline'
+
+        this.on(this.button, 'click', this.handleClick.bind(this))
+      },
+    
+      getButton: function () {
+        return this.button
+      },
+
+      handleClick: function (event) {
+        this.classApplier.toggleSelection()
+    
+        // Ensure the editor knows about an html change so watchers are notified
+        // ie: <textarea> elements depend on the editableInput event to stay synchronized
+        this.base.checkContentChanged()
+      },
+      
+      isAlreadyApplied: function (node) {
+        return node.nodeName.toLowerCase() === 'u';
+      },
+    
+      isActive: function () {
+        return this.button.classList.contains('medium-editor-button-active');
+      },
+    
+      setInactive: function () {
+        this.button.classList.remove('medium-editor-button-active');
+      },
+    
+      setActive: function () {
+        this.button.classList.add('medium-editor-button-active');
+      },
+    })
+
 
     var HighlighterButton = MediumEditor.Extension.extend({
       name: 'highlighter',
@@ -27,7 +118,7 @@ class Editor extends React.Component {
 
         this.button = this.document.createElement('button')
         this.button.classList.add('medium-editor-action')
-        this.button.innerHTML = '<b>H</b>'
+        this.button.innerHTML = '<span icon="text-highlight" class="bp3-icon bp3-icon-text-highlight"><svg data-icon="text-highlight" width="16" height="16" viewBox="0 0 16 16"><desc>text-highlight</desc><path d="M9 10H2V6h7V4H1c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h8v-2zm4 3h-1V3h1c.55 0 1-.45 1-1s-.45-1-1-1h-1c-.37 0-.7.11-1 .28-.3-.17-.63-.28-1-.28H9c-.55 0-1 .45-1 1s.45 1 1 1h1v10H9c-.55 0-1 .45-1 1s.45 1 1 1h1c.37 0 .7-.11 1-.28.3.17.63.28 1 .28h1c.55 0 1-.45 1-1s-.45-1-1-1zm2-9h-2v2h1v4h-1v2h2c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1z" fill-rule="evenodd"></path></svg></span>'
         this.button.title = 'Highlight'
 
         this.on(this.button, 'click', this.handleClick.bind(this))
@@ -74,7 +165,7 @@ class Editor extends React.Component {
 
         this.button = this.document.createElement('button')
         this.button.classList.add('medium-editor-action')
-        this.button.innerHTML = '<s>S</s>'
+        this.button.innerHTML = '<span icon="strikethrough" class="bp3-icon bp3-icon-strikethrough"><svg data-icon="strikethrough" width="16" height="16" viewBox="0 0 16 16"><desc>strikethrough</desc><path d="M14 7H8.65c-.38-.09-.73-.18-1.04-.26-.31-.08-.49-.13-.54-.14-.43-.11-.79-.29-1.05-.52-.27-.23-.4-.55-.4-.95 0-.29.07-.53.21-.72s.32-.34.54-.46c.22-.11.46-.19.72-.24.26-.05.52-.07.77-.07.74 0 1.36.15 1.84.46.32.2.55.5.68.9h2.22c-.06-.33-.17-.64-.32-.92-.25-.45-.59-.84-1.02-1.15-.43-.31-.93-.54-1.49-.7S8.59 2 7.95 2c-.55 0-1.1.07-1.63.2-.54.13-1.02.34-1.45.62-.42.28-.76.63-1.02 1.05-.26.42-.39.92-.39 1.5 0 .3.04.59.13.88.08.26.21.51.39.75H2c-.55 0-1 .45-1 1s.45 1 1 1h7.13c.25.07.49.14.71.22.25.09.48.23.7.44.21.21.32.53.32.97 0 .21-.05.43-.14.63-.09.21-.24.39-.45.55-.21.16-.48.29-.81.39-.33.1-.73.15-1.2.15-.44 0-.84-.05-1.21-.14-.37-.09-.7-.24-.99-.43-.29-.2-.51-.45-.67-.76-.01 0-.01-.01-.02-.02H3.14a3.68 3.68 0 001.39 2.03c.46.34 1 .58 1.62.74.61.15 1.27.23 1.97.23.61 0 1.2-.07 1.79-.2.58-.13 1.11-.34 1.56-.63.46-.29.83-.66 1.11-1.11.28-.45.42-1 .42-1.64 0-.3-.05-.6-.15-.9-.05-.19-.13-.36-.22-.52H14c.55 0 1-.45 1-1s-.45-1-1-1z" fill-rule="evenodd"></path></svg></span>'
         this.button.title = 'Striker'
 
         this.on(this.button, 'click', this.handleClick.bind(this))
@@ -108,11 +199,14 @@ class Editor extends React.Component {
         this.button.classList.add('medium-editor-button-active');
       },
     })
+
     var editor = new MediumEditor(`.editable-${thisComponent.props.parentId}`, {
       toolbar: {
           buttons: ['bold', 'underline', 'striker', 'highlighter']
       },
       extensions: {
+          'bold': new BoldButton(),
+          'underline': new UnderlineButton(),
           'highlighter': new HighlighterButton(),
           'striker': new StrikerButton(),
       },
@@ -131,9 +225,7 @@ class Editor extends React.Component {
 
     return (
       <div>
-        <div className={`editable-${this.props.parentId}`}>
-          {/* {this.props.content} */}
-        </div>
+        <div className={`editable-${this.props.parentId}`}></div>
       </div>
     )
   }
