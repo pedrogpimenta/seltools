@@ -23,7 +23,7 @@ a:hover {
 }
 
 /* Buttons */
-.bp3-button.bp3-intent-primary {
+.bp3-button.bp3-intent-primary:not(.bp3-minimal) {
   background-color: var(--c-primary);
   background-image: none;
   box-shadow: none;
@@ -32,6 +32,15 @@ a:hover {
 .bp3-button.bp3-intent-primary:hover {
   background-color: var(--c-primary-light);
   box-shadow: none;
+}
+
+.bp3-button.bp3-intent-primary.bp3-minimal {
+  color: var(--c-primary);
+}
+
+.bp3-button.bp3-intent-primary.bp3-minimal:hover {
+  color: var(--c-primary-dark);
+  background-color: var(--c-primary-lightest);
 }
 
 .bp3-button.bp3-intent-success {
@@ -56,6 +65,16 @@ a:hover {
   box-shadow: none;
 }
 
+
+/* Documents list */
+.document-item .button__delete-document {
+  transition: all 100ms ease-out;
+  opacity: 0;
+}
+
+.document-item:hover .button__delete-document {
+  opacity: 1;
+}
 
 /* Text editor */
 

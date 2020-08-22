@@ -7,6 +7,7 @@ import {
   AnchorButton,
   Breadcrumbs,
   Button,
+  Classes,
   Card,
   Icon,
   Intent,
@@ -67,7 +68,7 @@ class Documents extends React.Component {
   }
 
   handleAddStudent = () => {
-    const studentName = window.prompt('Como se llama tu nuevo alumno?')
+    const studentName = window.prompt('¿Cómo se llama tu nuevo alumno?')
 
     if (!!studentName && studentName.length > 0) {
       const requestOptions = {
@@ -85,20 +86,59 @@ class Documents extends React.Component {
     }
   }
 
+  handleDeleteDocument = (documentId) => {
+    const confirmDelete = window.confirm('¿Quieres eliminar el documento?')
+
+    if (confirmDelete) {
+      const requestOptions = {
+        method: 'DELETE',
+      }
+
+      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
+
+      fetch(fetchUrl, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          console.log('documentId:', documentId)
+          const currentDocuments = [...this.state.documents]
+          const index = currentDocuments.findIndex((document) => document._id === documentId)
+
+          if (index !== -1) {
+            currentDocuments.splice(index, 1)
+          }
+
+          this.setState({
+            documents: currentDocuments,
+          })
+        })
+    }
+  }
+
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
     if (this.state.documents.length < 1) return <div>Aún no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
 
     return this.state.documents.map(document => (
-      <li key={document._id}>
+      <li className='document-item' key={document._id}>
         <Card
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             padding: '8px',
             marginBottom: '12px',
           }}
         >
-            <Link to={`/documento/${document._id}`}>{document.name}</Link>
+          <Link to={`/documento/${document._id}`}>{document.name}</Link>
+          <Button
+            type='button'
+            icon='delete'
+            intent={Intent.PRIMARY}
+            className={`button__delete-document ${Classes.MINIMAL}`}
+            text='Eliminar'
+            onClick={(e) => this.handleDeleteDocument(document._id)}
+          />
         </Card>
       </li>
     ))
