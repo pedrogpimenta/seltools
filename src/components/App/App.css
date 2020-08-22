@@ -61,6 +61,10 @@ a:hover {
 }
 
 /* Text editor */
+body .medium-editor-element {
+  min-height: 0;
+}
+
 body .medium-editor-toolbar {
   background-color: var(--c-primary);
   border: 1px solid var(--c-primary-dark);
