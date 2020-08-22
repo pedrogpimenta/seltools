@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Beforeunload } from 'react-beforeunload';
+import { Beforeunload } from 'react-beforeunload'
 
 import {
   Alignment,
@@ -413,7 +413,7 @@ class Document extends React.Component {
                 style={{marginRight: '8px', marginLeft: '8px'}}
                 disabled={!this.props.name}
                 icon="floppy-disk"
-                text="Guardar"
+                text={this.props.isSaved ? "¡Guardado!" : "Guardar"}
                 onClick={(e) => this.handleSaveDocument(e)}
               />
               <NavbarDivider />
