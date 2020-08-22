@@ -149,7 +149,7 @@ class Documents extends React.Component {
 
     if (this.state.students < 1) return <div>No tienes estudiantes, añade uno:</div>
 
-    return this.state.students.map(student => (
+    return this.state.students.sort((a, b) => a.name > b.name ? 1 : -1).map(student => (
       <li key={student._id}>
         <div
           style={{padding: '4px 0'}}
