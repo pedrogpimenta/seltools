@@ -56,11 +56,14 @@ a:hover {
   box-shadow: none;
 }
 
-.marker .highlight {
-  background-color: var(--c-highlight);
-}
 
 /* Text editor */
+
+.marker .highlight {
+  background-color: var(--c-highlight);
+  padding-bottom: 2px;
+}
+
 body .medium-editor-element {
   min-height: 0;
 }

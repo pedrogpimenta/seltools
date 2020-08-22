@@ -3,6 +3,9 @@ import Draggable from 'react-draggable'
 import { connect } from 'react-redux'
 import { store } from '../../store/store'
 import { findDOMNode } from 'react-dom'
+import {
+  Icon,
+} from "@blueprintjs/core"
 import Editor from '../Editor/Editor'
 
 class Marker extends React.Component {
@@ -129,7 +132,7 @@ class Marker extends React.Component {
             display: 'inline-flex',
             alignItems: 'center',
             position: 'absolute',
-            padding: '4px 6px 4px 4px',
+            padding: '2px 6px 4px 6px',
             borderRadius: '40px',
             background: '#DDD',
             boxSizing: 'border-box',
@@ -143,12 +146,26 @@ class Marker extends React.Component {
           <div
             className='handle'
             style={{
-              display: 'inline-flex',
-              marginRight: '4px',
+              position: 'absolute',
+              top: '0',
+              left: '-28px',
+              paddingRight: '4px',
               cursor: this.props.dragging ? 'grabbing' : 'grab',
+              opacity: this.state.hover ? '1' : '0',
+              transition: 'all 100ms ease-out',
             }}
           >
-            <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="3" fill="black" /></g></svg>
+            <div
+              style={{
+                background: '#DDD',
+                borderRadius: '40px',
+                fontSize: '0',
+                padding: '4px',
+              }}
+            >
+              {/* <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="3" fill="black" /></g></svg> */}
+              <Icon icon='move' />
+            </div>
           </div>
           <Editor
             content={this.props.content}
@@ -170,25 +187,31 @@ class Marker extends React.Component {
             }}
           /> */}
           <div
-            className='delete'
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
               position: 'absolute',
-              left: this.state.hover ? 'calc(100% - 26px)' : 'calc(100% - 44px)',
+              left: '100%',
               top: '0',
               fontSize: 0,
-              padding: '0 4px 0 28px',
-              height: '100%',
-              background: '#DDD',
-              borderRadius: '40px',
-              zIndex: '-1',
+              paddingLeft: '4px',
+              // zIndex: '-1',
               opacity: this.state.hover ? '1' : '0',
               transition: 'all 100ms ease-out',
             }}
-            onClick={this.handleDelete}
           >
-            <svg height="20" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round" transform="translate(2 2)"><circle cx="8.5" cy="8.5" r="8"/><g transform="matrix(0 1 -1 0 17 0)"><path d="m5.5 11.5 6-6"/><path d="m5.5 5.5 6 6"/></g></g></svg>
+            <div
+              className='delete'
+              style={{
+                fontSize: 0,
+                padding: '4px',
+                height: '100%',
+                background: '#DDD',
+                borderRadius: '40px',
+              }}
+              onClick={this.handleDelete}
+            >
+              {/* <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round" transform="translate(2 2)"><circle cx="8.5" cy="8.5" r="8"/><g transform="matrix(0 1 -1 0 17 0)"><path d="m5.5 11.5 6-6"/><path d="m5.5 5.5 6 6"/></g></g></svg> */}
+              <Icon icon='delete' />
+            </div>
           </div>
         </div>
       </Draggable>
