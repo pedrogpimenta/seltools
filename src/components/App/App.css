@@ -6,6 +6,11 @@
   --c-primary: #F87361;
   --c-primary-light: #FF8B7B;
   --c-primary-lightest: rgb(255, 232, 230);
+
+  --c-success: #45C491;
+  --c-success-light: #73D3AD;
+
+  --c-highlight: #FDE74C;
 }
 
 a {
@@ -29,11 +34,13 @@ a:hover {
 }
 
 .bp3-button.bp3-intent-success {
+  background-color: var(--c-success);
   background-image: none;
   box-shadow: none;
 }
 
 .bp3-button.bp3-intent-success:hover {
+  background-color: var(--c-success-light);
   box-shadow: none;
 }
 
@@ -46,6 +53,10 @@ a:hover {
 .bp3-navbar {
   background-color: var(--c-primary-lightest);
   box-shadow: none;
+}
+
+.marker .highlight {
+  background-color: var(--c-highlight);
 }
 
 

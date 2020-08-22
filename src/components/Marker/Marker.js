@@ -4,6 +4,7 @@ import Draggable from 'react-draggable'
 import { connect } from 'react-redux'
 import { store } from '../../store/store'
 import { findDOMNode } from 'react-dom'
+import Editor from '../Editor/Editor'
 
 class Marker extends React.Component {
   constructor(props) {
@@ -24,11 +25,12 @@ class Marker extends React.Component {
   }
 
   handleChange = (e) => {
+    console.log('id: ', e.parentNode.parentNode.classList[1])
     store.dispatch({
       type: "EDIT_MARKER",
       fileId: this.props.fileId,
-      id: this.props.id,
-      content: e.target.value,
+      id: e.parentNode.parentNode.classList[1],
+      content: e.innerHTML,
     }) 
 
     store.dispatch({
@@ -66,27 +68,31 @@ class Marker extends React.Component {
     }) 
   }
 
-  componentDidMount = () => {
-    if (this.props.editing === this.props.id) {
-      // TODO: WHY setTimout, WHY?
-      setTimeout(() => {
-        let range, selection
-        
-        if (document.body.createTextRange) {
-          range = document.body.createTextRange()
-          range.moveToElementText(this.contentEditable.current)
-          range.select()
-        } else if (window.getSelection) {
-          selection = window.getSelection()
-          range = document.createRange()
-          range.selectNodeContents(this.contentEditable.current)
-          selection.removeAllRanges()
-          selection.addRange(range)
-        }
-      }, 1)
+  // onEditorChange = (e) => {
+  //   console.log('editor:', e)
+  // }
 
-      this.props.setNotEditing()
-    }
+  componentDidMount = () => {
+    // if (this.props.editing === this.props.id) {
+    //   // TODO: WHY setTimout, WHY?
+    //   setTimeout(() => {
+    //     let range, selection
+        
+    //     if (document.body.createTextRange) {
+    //       range = document.body.createTextRange()
+    //       range.moveToElementText(this.contentEditable.current)
+    //       range.select()
+    //     } else if (window.getSelection) {
+    //       selection = window.getSelection()
+    //       range = document.createRange()
+    //       range.selectNodeContents(this.contentEditable.current)
+    //       selection.removeAllRanges()
+    //       selection.addRange(range)
+    //     }
+    //   }, 1)
+
+    //   this.props.setNotEditing()
+    // }
 
     const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
     const thisInfo = findDOMNode(this.draggable.current)
@@ -119,7 +125,7 @@ class Marker extends React.Component {
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <div
-          className={this.props.id}
+          className={`marker ${this.props.id}`}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -145,7 +151,13 @@ class Marker extends React.Component {
           >
             <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="3" fill="black" /></g></svg>
           </div>
-          <ContentEditable
+          <Editor
+            content={this.props.content}
+            // innerRef={this.contentEditable}
+            parentId={this.props.id}
+            onEditorChange={(e) => {this.handleChange(e)}}
+          />
+          {/* <ContentEditable
             innerRef={this.contentEditable}
             html={this.props.content}
             disabled={false}
@@ -157,7 +169,7 @@ class Marker extends React.Component {
               paddingRight: '2px',
               outline: 'none',
             }}
-          />
+          /> */}
           <div
             className='delete'
             style={{

@@ -175,10 +175,12 @@ function reducer(state = initialState, action) {
       }
 
     case 'EDIT_MARKER':
+      const actionId = parseInt(action.id)
+      console.log('editing:', actionId)
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
           for (let marker in updatedFiles[file].markers) {
-            if (updatedFiles[file].markers[marker].id === action.id) {
+            if (updatedFiles[file].markers[marker].id === actionId) {
               if (action.content !== undefined) {
                 updatedFiles[file].markers[marker].content = action.content
               }
