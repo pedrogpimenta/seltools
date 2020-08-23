@@ -156,9 +156,10 @@ function reducer(state = initialState, action) {
         if (updatedFiles[file].id === action.fileId) {
           updatedFiles[file].markers.push({
             id: action.id,
-            content: 'nuevo',
+            content: '',
             x: action.x,
             y: action.y,
+            hasFocus: true,
           })
         }
       }
@@ -174,9 +175,22 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
+    case 'REMOVE_MARKER_FOCUS':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let marker in updatedFiles[file].markers) {
+            delete updatedFiles[file].markers[marker].hasFocus
+          }
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
     case 'EDIT_MARKER':
       const actionId = parseInt(action.id)
-      console.log('editing:', actionId)
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
           for (let marker in updatedFiles[file].markers) {

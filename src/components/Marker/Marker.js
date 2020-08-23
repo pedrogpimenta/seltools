@@ -16,6 +16,7 @@ class Marker extends React.Component {
       hover: false,
       parentInfo: null,
       thisInfo: null,
+      hasFocus: false,
     }
 
     this.draggable = React.createRef()
@@ -74,26 +75,38 @@ class Marker extends React.Component {
   //   console.log('editor:', e)
   // }
 
+  // onClick = (e) => {
+
+  // }
+
+  onInputFocus = (e) => {
+    this.setState({hasFocus: true})
+  }
+
+  onInputBlur = (e) => {
+    this.setState({hasFocus: false})
+  }
+
   componentDidMount = () => {
     // if (this.props.editing === this.props.id) {
-    //   // TODO: WHY setTimout, WHY?
-    //   setTimeout(() => {
-    //     let range, selection
+      // TODO: WHY setTimout, WHY?
+      // setTimeout(() => {
+      //   let range, selection
         
-    //     if (document.body.createTextRange) {
-    //       range = document.body.createTextRange()
-    //       range.moveToElementText(this.contentEditable.current)
-    //       range.select()
-    //     } else if (window.getSelection) {
-    //       selection = window.getSelection()
-    //       range = document.createRange()
-    //       range.selectNodeContents(this.contentEditable.current)
-    //       selection.removeAllRanges()
-    //       selection.addRange(range)
-    //     }
-    //   }, 1)
+      //   if (document.body.createTextRange) {
+      //     range = document.body.createTextRange()
+      //     range.moveToElementText(this.contentEditable.current)
+      //     range.select()
+      //   } else if (window.getSelection) {
+      //     selection = window.getSelection()
+      //     range = document.createRange()
+      //     range.selectNodeContents(this.contentEditable.current)
+      //     selection.removeAllRanges()
+      //     selection.addRange(range)
+      //   }
+      // }, 1)
 
-    //   this.props.setNotEditing()
+      // this.props.setNotEditing()
     // }
 
     const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
@@ -132,13 +145,17 @@ class Marker extends React.Component {
             display: 'inline-flex',
             alignItems: 'center',
             position: 'absolute',
-            padding: '2px 6px 4px 6px',
+            padding: '3px 6px 4px 6px',
             borderRadius: '40px',
+            boxShadow: this.state.hasFocus ? '0 0 0 2px var(--c-primary-dark)' : 'none',
             background: '#DDD',
             boxSizing: 'border-box',
             zIndex: '1',
             userSelect: 'none',
+            minWidth: '16px',
+            minHeight: '19px',
           }}
+          // onClick={(e) => e.onClick()}
           onDoubleClick={(e) => e.stopPropagation()}
           onMouseEnter={(e) => this.handleOnMouseEnter(e)}
           onMouseLeave={(e) => this.handleOnMouseLeave(e)}
@@ -160,7 +177,9 @@ class Marker extends React.Component {
                 background: '#DDD',
                 borderRadius: '40px',
                 fontSize: '0',
-                padding: '4px',
+                padding: '5px',
+                width: '26px',
+                height: '26px',
               }}
             >
               {/* <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="3" fill="black" /></g></svg> */}
@@ -171,7 +190,11 @@ class Marker extends React.Component {
             content={this.props.content}
             // innerRef={this.contentEditable}
             parentId={this.props.id}
+            fileId={this.props.fileId}
+            hasFocus={this.props.hasFocus}
             onEditorChange={(e) => {this.handleChange(e)}}
+            onInputFocus={(e) => {this.onInputFocus(e)}}
+            onInputBlur={(e) => {this.onInputBlur(e)}}
           />
           {/* <ContentEditable
             innerRef={this.contentEditable}
@@ -202,10 +225,12 @@ class Marker extends React.Component {
               className='delete'
               style={{
                 fontSize: 0,
-                padding: '4px',
                 height: '100%',
                 background: '#DDD',
                 borderRadius: '40px',
+                padding: '5px',
+                width: '26px',
+                height: '26px',
               }}
               onClick={this.handleDelete}
             >

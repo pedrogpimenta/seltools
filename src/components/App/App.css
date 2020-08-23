@@ -87,8 +87,12 @@ body .marker .highlight {
   padding-bottom: 2px;
 }
 
-body .medium-editor-element {
+/* body .medium-editor-element {
   min-height: 0;
+} */
+
+body .medium-editor-element:focus {
+  outline: none;
 }
 
 body .medium-editor-toolbar {
@@ -98,8 +102,8 @@ body .medium-editor-toolbar {
 
 body .medium-editor-toolbar li button {
   border-right: 1px solid var(--c-primary-dark);
-  height: 40px;
-  min-width: 40px;
+  height: 30px;
+  min-width: 30px;
   padding: 6px;
 }
 
@@ -113,7 +117,7 @@ body .medium-editor-toolbar li .medium-editor-button-active {
 
 body .medium-toolbar-arrow-under::after {
   border-color: var(--c-primary-dark) transparent transparent transparent;
-  top: 40px;
+  top: 30px;
 }
 
 

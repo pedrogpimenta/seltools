@@ -1,4 +1,5 @@
 import React from 'react'
+import { store } from '../../store/store'
 
 import MediumEditor from 'medium-editor/dist/js/medium-editor.js'
 import Rangy from 'rangy/lib/rangy-core.js'
@@ -7,6 +8,16 @@ import 'medium-editor/dist/css/medium-editor.css'
 import 'medium-editor/dist/css/themes/bootstrap.css'
 
 class Editor extends React.Component {
+  constructor() {
+    super()
+
+    this.editableInput = React.createRef()
+  }
+
+  onBlur = () => {
+    this.props.onInputBlur()
+  }
+
   componentDidMount = () => {
     Rangy.init()
     const thisComponent = this
@@ -105,7 +116,6 @@ class Editor extends React.Component {
       },
     })
 
-
     var HighlighterButton = MediumEditor.Extension.extend({
       name: 'highlighter',
 
@@ -118,7 +128,7 @@ class Editor extends React.Component {
 
         this.button = this.document.createElement('button')
         this.button.classList.add('medium-editor-action')
-        this.button.innerHTML = '<span icon="text-highlight" class="bp3-icon bp3-icon-text-highlight"><svg data-icon="text-highlight" width="16" height="16" viewBox="0 0 16 16"><desc>text-highlight</desc><path d="M9 10H2V6h7V4H1c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h8v-2zm4 3h-1V3h1c.55 0 1-.45 1-1s-.45-1-1-1h-1c-.37 0-.7.11-1 .28-.3-.17-.63-.28-1-.28H9c-.55 0-1 .45-1 1s.45 1 1 1h1v10H9c-.55 0-1 .45-1 1s.45 1 1 1h1c.37 0 .7-.11 1-.28.3.17.63.28 1 .28h1c.55 0 1-.45 1-1s-.45-1-1-1zm2-9h-2v2h1v4h-1v2h2c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1z" fill-rule="evenodd"></path></svg></span>'
+        this.button.innerHTML = '<span icon="highlight" class="bp3-icon bp3-icon-highlight"><svg data-icon="highlight" width="16" height="16" viewBox="0 0 16 16"><desc>highlight</desc><path d="M9.12 11.07l2-2.02.71.71 4-4.04L10.17 0l-4 4.04.71.71-2 2.02 4.24 4.3zM2 12.97h4c.28 0 .53-.11.71-.3l1-1.01-3.42-3.45-3 3.03c-.18.18-.29.44-.29.72 0 .55.45 1.01 1 1.01zm13 1.01H1c-.55 0-1 .45-1 1.01S.45 16 1 16h14c.55 0 1-.45 1-1.01s-.45-1.01-1-1.01z" fill-rule="evenodd"></path></svg></span>'
         this.button.title = 'Highlight'
 
         this.on(this.button, 'click', this.handleClick.bind(this))
@@ -201,16 +211,21 @@ class Editor extends React.Component {
     })
 
     var editor = new MediumEditor(`.editable-${thisComponent.props.parentId}`, {
+      disableDoubleReturn: true,
+      disableExtraSpaces: true,
+      placeholder: {text: ''},
       toolbar: {
-          buttons: ['bold', 'underline', 'striker', 'highlighter']
+        diffTop: -14,
+        buttons: ['bold', 'underline', 'striker', 'highlighter']
       },
       extensions: {
-          'bold': new BoldButton(),
-          'underline': new UnderlineButton(),
-          'highlighter': new HighlighterButton(),
-          'striker': new StrikerButton(),
+        'bold': new BoldButton(),
+        'underline': new UnderlineButton(),
+        'highlighter': new HighlighterButton(),
+        'striker': new StrikerButton(),
       },
     })
+    console.log('editor:', editor)
 
     editor.setContent(this.props.content)
 
@@ -218,14 +233,28 @@ class Editor extends React.Component {
       thisComponent.props.onEditorChange(editable)
     })
 
-
+    if (this.props.hasFocus) {
+      this.editableInput.current.focus()
+    }
   }
 
   render() {
 
     return (
       <div>
-        <div className={`editable-${this.props.parentId}`}></div>
+        <div
+          ref={this.editableInput}
+          className={`editable-${this.props.parentId}`}
+          onFocus={(e) => this.props.onInputFocus()}
+          onBlur={(e) => this.onBlur()}
+          style={{
+            minWidth: '16px',
+            minHeight: '19px',
+            cursor: 'text',
+            textAlign: 'center',
+          }}
+        >
+        </div>
       </div>
     )
   }

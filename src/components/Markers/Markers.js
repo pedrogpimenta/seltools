@@ -10,7 +10,6 @@ class Markers extends React.Component {
     this.state = {
       x: 0,
       y: 0,
-      editing: null,
       width: 0,
       height: 0,
     }
@@ -25,8 +24,6 @@ class Markers extends React.Component {
     const xPercent = ((e.clientX - markersInfo.x) * 100) / markersInfo.width
     const yPercent = ((e.clientY - markersInfo.y) * 100) / markersInfo.height
 
-    this.setState({editing: newId})
-
     store.dispatch({
       type: "ADD_MARKER",
       fileId: this.props.fileId,
@@ -40,8 +37,8 @@ class Markers extends React.Component {
     }) 
   }
 
-  setNotEditing = (e) => {
-    this.setState({editing: null})
+  onClick = () => {
+    console.log('put')
   }
 
   editMarkerPosition = (e, markerId) => {
@@ -92,9 +89,9 @@ class Markers extends React.Component {
           width: '100%',
           height: '100%',
           cursor: this.props.dragging ? 'grabbing' : 'default',
-          userSelect: 'none',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
+        onClick={(e) => this.onClick(e)}
       >
         {this.state.width > 0 && this.props.markers.map((marker) => {
           return(
@@ -107,8 +104,7 @@ class Markers extends React.Component {
               y={marker.y}
               content={marker.content}
               editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
-              setNotEditing={(e) => this.setNotEditing(e)}
-              editing={this.state.editing}
+              hasFocus={marker.hasFocus}
             />
           )
         })}
