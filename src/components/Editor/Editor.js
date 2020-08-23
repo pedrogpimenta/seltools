@@ -1,5 +1,4 @@
 import React from 'react'
-import { store } from '../../store/store'
 
 import MediumEditor from 'medium-editor/dist/js/medium-editor.js'
 import Rangy from 'rangy/lib/rangy-core.js'

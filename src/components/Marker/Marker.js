@@ -225,7 +225,6 @@ class Marker extends React.Component {
               className='delete'
               style={{
                 fontSize: 0,
-                height: '100%',
                 background: '#DDD',
                 borderRadius: '40px',
                 padding: '5px',
