@@ -11,12 +11,16 @@ import Documents from '../Documents/Documents'
 import Document from '../Document/Document'
 import DocumentStudent from '../DocumentStudent/DocumentStudent'
 import Student from '../Student/Student'
+import TestFile from '../TestFile/TestFile'
 
 class App extends React.Component {
   render() {
     return (
       <Router>
         <Switch>
+          <Route path="/testfile">
+            <TestFile />
+          </Route>
           <Route path="/alumno/documento/:id">
             <DocumentStudent />
           </Route>

@@ -8,7 +8,7 @@ class Image extends React.Component {
         userSelect: 'none',
         }}>
         <img
-          src={`data:image/jpeg;base64,${btoa(this.props.file.content)}`}
+          src={this.props.file.url}
           alt={this.props.file.id}
           style={{
             maxWidth: '100%',

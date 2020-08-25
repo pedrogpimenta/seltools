@@ -2,6 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Beforeunload } from 'react-beforeunload'
+import axios from 'axios'
 
 import {
   Alignment,
@@ -24,7 +25,7 @@ import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import FileWrapper from '../FileWrapper/FileWrapper'
 
-import { loadFile } from '../../helpers/render-docs'
+// import { loadFile } from '../../helpers/render-docs'
 
 class Document extends React.Component {
   constructor() {
@@ -43,6 +44,8 @@ class Document extends React.Component {
       isLoadingStudents: true,
       students: [],
       showEditDialog: false,
+      fileUrls: [],
+      uploadingFiles: false,
     }
   }
 
@@ -110,40 +113,103 @@ class Document extends React.Component {
     }
   }
 
-  handleFileInputChange = async (e) => {
-    const filesLoaded = e.target.files
-    const numberOfFiles = filesLoaded.length
+  handleFileInputChange = (e) => {
+    this.setState({uploadingFiles: true})
 
+    const files = e.target.files
     const filesForState = []
 
-    for (let i = 0; i < numberOfFiles; i++) {
-      try {
-        const fileContents = await loadFile(filesLoaded[i])  
-        const ext = filesLoaded[i].name.split('.').pop().toLowerCase()
-        
-        filesForState.push(
-          {
-            id: `${filesLoaded[i].name}-${Math.floor((Math.random() * 100000) + 1)}`,
-            name: filesLoaded[i].name,
-            type: ext,
-            content: fileContents,
-            markers: [],
-          }
-        )
-      } catch (e) {
-          console.warn(e.message)
-      }
-    }
-    
-    this.props.dispatch({
-      type: "ADD_FILES",
-      files: filesForState
-    }) 
+    for (let i = 0; i < files.length; i++) {
+      let fileParts = files[i].name.split('.')
+      let fileName = fileParts[0]
+      let fileType = fileParts[1]
 
-    this.props.dispatch({
-      type: "DOCUMENT_UNSAVED",
-    }) 
+      axios.post(`${REACT_APP_SERVER_BASE_URL}/sign_s3`, {
+        fileName: fileName,
+        fileType: fileType,
+      })
+        .then(response => {
+          const returnData = response.data.data.returnData
+          const signedRequest = returnData.signedRequest
+          const url = returnData.url
+
+          // this.setState({fileUrl: url})
+
+          filesForState.push({
+            id: `${fileName}-${Math.floor((Math.random() * 100000) + 1)}`,
+            name: fileName,
+            type: fileType,
+            url: url,
+            markers: [],
+          })
+
+          const options = {
+            headers: {
+              'Content-Type': fileType,
+              'Expires': 500,
+            }
+          }
+
+          axios.put(signedRequest,files[i],options)
+            .then(result => {
+              console.log("Response from s3")
+              this.setState({uploadingFiles: false})
+              if (i === files.length - 1) {
+                this.props.dispatch({
+                  type: "ADD_FILES",
+                  files: filesForState
+                }) 
+            
+                this.props.dispatch({
+                  type: "DOCUMENT_UNSAVED",
+                }) 
+              }
+            })
+            .catch(error => {
+              alert("ERROR " + JSON.stringify(error))
+            })
+        })
+        .catch(error => {
+          alert(JSON.stringify(error));
+        })
+    }
+
   }
+
+  // handleFileInputChange = async (e) => {
+  //   const filesLoaded = e.target.files
+  //   const numberOfFiles = filesLoaded.length
+
+  //   const filesForState = []
+
+  //   for (let i = 0; i < numberOfFiles; i++) {
+  //     try {
+  //       const fileContents = await loadFile(filesLoaded[i])  
+  //       const ext = filesLoaded[i].name.split('.').pop().toLowerCase()
+        
+  //       filesForState.push(
+  //         {
+  //           id: `${filesLoaded[i].name}-${Math.floor((Math.random() * 100000) + 1)}`,
+  //           name: filesLoaded[i].name,
+  //           type: ext,
+  //           content: fileContents,
+  //           markers: [],
+  //         }
+  //       )
+  //     } catch (e) {
+  //         console.warn(e.message)
+  //     }
+  //   }
+    
+  //   this.props.dispatch({
+  //     type: "ADD_FILES",
+  //     files: filesForState
+  //   }) 
+
+  //   this.props.dispatch({
+  //     type: "DOCUMENT_UNSAVED",
+  //   }) 
+  // }
 
   handleNameInputChange = (e) => {
     this.props.dispatch({
@@ -460,6 +526,7 @@ class Document extends React.Component {
               <Button
                 intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
                 className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+                loading={this.state.uploadingFiles}
                 icon='add'
                 text='Añadir archivos'
                 onClick={(e) => this.fileInput.current.click()}
