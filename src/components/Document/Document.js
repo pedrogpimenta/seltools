@@ -121,8 +121,8 @@ class Document extends React.Component {
 
     for (let i = 0; i < files.length; i++) {
       let fileParts = files[i].name.split('.')
-      let fileName = fileParts[0]
-      let fileType = fileParts[1]
+      let fileName = files[i].name.replace(/\s+/gi, '-').replace(/[^a-zA-Z0-9\-]/gi, '_')
+      let fileType = fileParts[fileParts.length - 1]
 
       axios.post(`${REACT_APP_SERVER_BASE_URL}/sign_s3`, {
         fileName: fileName,
