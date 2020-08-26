@@ -37,10 +37,6 @@ class Markers extends React.Component {
     }) 
   }
 
-  onClick = () => {
-    console.log('put')
-  }
-
   editMarkerPosition = (e, markerId) => {
     const c = this.markersRef.current
     const markersInfo = c.getBoundingClientRect()
@@ -91,7 +87,6 @@ class Markers extends React.Component {
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
-        onClick={(e) => this.onClick(e)}
       >
         {this.state.width > 0 && this.props.markers.map((marker) => {
           return(

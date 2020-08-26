@@ -224,7 +224,6 @@ class Editor extends React.Component {
         'striker': new StrikerButton(),
       },
     })
-    console.log('editor:', editor)
 
     editor.setContent(this.props.content)
 
