@@ -255,8 +255,8 @@ class Document extends React.Component {
         {
           filesHaveChanged = true
         }
-    }
-
+      }
+      
     if (filesHaveChanged) {
       documentObject = {
         name: this.props.name,
@@ -277,6 +277,11 @@ class Document extends React.Component {
       }
     }
 
+    for (let file in documentObject.files) {
+      for (let marker in documentObject.files[file].markers) {
+        delete documentObject.files[file].markers[marker].hasFocus
+      }
+    }
 
     const requestOptions = {
       method: !this.props.id ? 'POST' : 'PUT',

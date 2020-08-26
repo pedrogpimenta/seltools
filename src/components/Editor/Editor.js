@@ -232,7 +232,9 @@ class Editor extends React.Component {
     })
 
     if (this.props.hasFocus) {
-      this.editableInput.current.focus()
+      window.setTimeout(() => {
+        this.editableInput.current.focus()
+      }, 1)
     }
   }
 

@@ -85,6 +85,7 @@ class Markers extends React.Component {
           width: '100%',
           height: '100%',
           cursor: this.props.dragging ? 'grabbing' : 'default',
+          // userSelect: 'none',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
       >
