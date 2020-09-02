@@ -120,6 +120,7 @@ class Marker extends React.Component {
   render() {
     let x = 0
     let y = 0
+    const markerShadow = 'rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 2px 8px 0px'
 
     if (!!this.state.parentInfo) {
       const width = this.state.parentInfo.getBoundingClientRect().width
@@ -146,9 +147,11 @@ class Marker extends React.Component {
             alignItems: 'center',
             position: 'absolute',
             padding: '3px 6px 4px 6px',
-            borderRadius: '40px',
-            boxShadow: this.state.hasFocus ? '0 0 0 2px var(--c-primary-dark)' : 'none',
-            background: '#DDD',
+            borderRadius: '14px',
+            boxShadow: this.state.hasFocus
+              ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
+              : markerShadow,
+            background: 'white',
             boxSizing: 'border-box',
             zIndex: '1',
             userSelect: 'none',
@@ -174,12 +177,13 @@ class Marker extends React.Component {
           >
             <div
               style={{
-                background: '#DDD',
+                background: 'white',
                 borderRadius: '40px',
                 fontSize: '0',
                 padding: '5px',
                 width: '26px',
                 height: '26px',
+                boxShadow: markerShadow,
               }}
             >
               {/* <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="3" fill="black" /></g></svg> */}
@@ -225,11 +229,12 @@ class Marker extends React.Component {
               className='delete'
               style={{
                 fontSize: 0,
-                background: '#DDD',
+                background: 'white',
                 borderRadius: '40px',
                 padding: '5px',
                 width: '26px',
                 height: '26px',
+                boxShadow: markerShadow,
               }}
               onClick={this.handleDelete}
             >
