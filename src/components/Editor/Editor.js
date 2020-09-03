@@ -209,19 +209,67 @@ class Editor extends React.Component {
       },
     })
 
+    var RedTextButton = MediumEditor.Extension.extend({
+      name: 'redtext',
+
+      init: function () {
+        
+        this.classApplier = Rangy.createClassApplier('redtext', {
+          elementTagName: 'span',
+          normalize: true
+        })
+
+        this.button = this.document.createElement('button')
+        this.button.classList.add('medium-editor-action')
+        this.button.innerHTML = '<span icon="full-circle" class="bp3-icon bp3-icon-full-circle"><svg data-icon="full-circle" width="16" height="16" viewBox="0 0 16 16"> <defs><clipPath id="cut-off-bottom"><path d="M8 0a8 8 0 100 16A8 8 0 108 0z"></path></clipPath></defs><desc>full-circle</desc><path d="M8 0a8 8 0 100 16A8 8 0 108 0z" stroke="white" stroke-width="3px" fill="var(--c-redtext)" fill-rule="evenodd" clip-path="url(#cut-off-bottom)" ></path></svg></span>'
+        this.button.title = 'Red text'
+
+        this.on(this.button, 'click', this.handleClick.bind(this))
+      },
+    
+      getButton: function () {
+        return this.button
+      },
+
+      handleClick: function (event) {
+        this.classApplier.toggleSelection()
+    
+        // Ensure the editor knows about an html change so watchers are notified
+        // ie: <textarea> elements depend on the editableInput event to stay synchronized
+        this.base.checkContentChanged()
+      },
+      
+      isAlreadyApplied: function (node) {
+        return node.nodeName.toLowerCase() === 'span';
+      },
+    
+      isActive: function () {
+        return this.button.classList.contains('medium-editor-button-active');
+      },
+    
+      setInactive: function () {
+        this.button.classList.remove('medium-editor-button-active');
+      },
+    
+      setActive: function () {
+        this.button.classList.add('medium-editor-button-active');
+      },
+    })
+
     var editor = new MediumEditor(`.editable-${thisComponent.props.parentId}`, {
       disableDoubleReturn: true,
       disableExtraSpaces: true,
       placeholder: {text: ''},
       toolbar: {
         diffTop: -14,
-        buttons: ['bold', 'underline', 'striker', 'highlighter']
+        buttons: ['bold', 'underline', 'striker', 'highlighter', 'redtext']
       },
       extensions: {
         'bold': new BoldButton(),
         'underline': new UnderlineButton(),
         'highlighter': new HighlighterButton(),
         'striker': new StrikerButton(),
+        'redtext': new RedTextButton(),
       },
     })
 

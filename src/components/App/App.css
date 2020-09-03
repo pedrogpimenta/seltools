@@ -12,6 +12,7 @@
   --c-success-light: #73D3AD;
 
   --c-highlight: #FDE74C;
+  --c-redtext: #FF0000;
 }
 
 a {
@@ -86,6 +87,10 @@ body .marker .highlight {
   background-color: var(--c-highlight);
   padding-bottom: 2px;
   border-radius: 6px;
+}
+
+body .marker .redtext {
+  color: var(--c-redtext)
 }
 
 /* body .medium-editor-element {
