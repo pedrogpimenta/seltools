@@ -59,6 +59,10 @@ class Marker extends React.Component {
       id: this.props.id,
       background: background,
     })
+
+    store.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
   }
 
   handleOnMouseEnter = () => {
