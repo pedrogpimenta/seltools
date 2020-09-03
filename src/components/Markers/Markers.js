@@ -30,6 +30,7 @@ class Markers extends React.Component {
       id: newId,
       x: xPercent,
       y: yPercent,
+      background: 'white',
     }) 
 
     store.dispatch({
@@ -85,7 +86,6 @@ class Markers extends React.Component {
           width: '100%',
           height: '100%',
           cursor: this.props.dragging ? 'grabbing' : 'default',
-          // userSelect: 'none',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
       >
@@ -99,7 +99,9 @@ class Markers extends React.Component {
               x={marker.x}
               y={marker.y}
               content={marker.content}
+              background={marker.background}
               editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
+              isStudent={this.props.isStudent}
               hasFocus={marker.hasFocus}
             />
           )

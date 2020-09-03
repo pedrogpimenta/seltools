@@ -28,8 +28,7 @@ class Marker extends React.Component {
   }
 
   handleChange = (e) => {
-    console.log('id: ', e.parentNode.parentNode.classList[1])
-    store.dispatch({
+   store.dispatch({
       type: "EDIT_MARKER",
       fileId: this.props.fileId,
       id: e.parentNode.parentNode.classList[1],
@@ -51,6 +50,15 @@ class Marker extends React.Component {
     store.dispatch({
       type: "DOCUMENT_UNSAVED",
     }) 
+  }
+
+  handleMarkerBackground = (background) => {
+    store.dispatch({
+      type: "CHANGE_MARKER_BACKGROUND",
+      fileId: this.props.fileId,
+      id: this.props.id,
+      background: background,
+    })
   }
 
   handleOnMouseEnter = () => {
@@ -151,14 +159,13 @@ class Marker extends React.Component {
             boxShadow: this.state.hasFocus
               ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
               : markerShadow,
-            background: 'white',
+            background: this.props.background || 'white',
             boxSizing: 'border-box',
             zIndex: '1',
             userSelect: 'none',
             minWidth: '16px',
             minHeight: '19px',
           }}
-          // onClick={(e) => e.onClick()}
           onDoubleClick={(e) => e.stopPropagation()}
           onMouseEnter={(e) => this.handleOnMouseEnter(e)}
           onMouseLeave={(e) => this.handleOnMouseLeave(e)}
@@ -168,7 +175,7 @@ class Marker extends React.Component {
             style={{
               position: 'absolute',
               top: '0',
-              left: '-28px',
+              left: '-30px',
               paddingRight: '4px',
               cursor: this.props.dragging ? 'grabbing' : 'grab',
               opacity: this.state.hover ? '1' : '0',
@@ -186,13 +193,11 @@ class Marker extends React.Component {
                 boxShadow: markerShadow,
               }}
             >
-              {/* <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="3" fill="black" /></g></svg> */}
               <Icon icon='move' />
             </div>
           </div>
           <Editor
             content={this.props.content}
-            // innerRef={this.contentEditable}
             parentId={this.props.id}
             fileId={this.props.fileId}
             hasFocus={this.props.hasFocus}
@@ -200,27 +205,14 @@ class Marker extends React.Component {
             onInputFocus={(e) => {this.onInputFocus(e)}}
             onInputBlur={(e) => {this.onInputBlur(e)}}
           />
-          {/* <ContentEditable
-            innerRef={this.contentEditable}
-            html={this.props.content}
-            disabled={false}
-            onChange={(e) => this.handleChange(e)}
-            onMouseDown={(e) => e.stopPropagation()}
-            onDoubleClick={(e) => e.stopPropagation()}
-            style={{
-              background: '#DDD',
-              paddingRight: '2px',
-              outline: 'none',
-            }}
-          /> */}
           <div
             style={{
               position: 'absolute',
+              display: 'flex',
               left: '100%',
               top: '0',
               fontSize: 0,
               paddingLeft: '4px',
-              // zIndex: '-1',
               opacity: this.state.hover ? '1' : '0',
               transition: 'all 100ms ease-out',
             }}
@@ -234,13 +226,53 @@ class Marker extends React.Component {
                 padding: '5px',
                 width: '26px',
                 height: '26px',
+                marginRight: '4px',
                 boxShadow: markerShadow,
               }}
               onClick={this.handleDelete}
             >
-              {/* <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round" transform="translate(2 2)"><circle cx="8.5" cy="8.5" r="8"/><g transform="matrix(0 1 -1 0 17 0)"><path d="m5.5 11.5 6-6"/><path d="m5.5 5.5 6 6"/></g></g></svg> */}
               <Icon icon='delete' />
             </div>
+            {!this.props.isStudent &&
+              <>
+                <div
+                  className='markerBackground'
+                  style={{
+                    position: 'relative',
+                    fontSize: 0,
+                    background: 'white',
+                    borderRadius: '40px',
+                    padding: '5px',
+                    width: '26px',
+                    height: '26px',
+                    marginRight: '4px',
+                    boxShadow: markerShadow,
+                  }}
+                  onClick={() => this.handleMarkerBackground('var(--c-marker-background-teacher)')}
+                >
+                  <Icon icon='full-circle' color="var(--c-marker-background-teacher)" />
+                  <Icon icon='circle' style={{position: 'absolute', top: '5px', left: '5px'}} />
+                </div>
+                <div
+                  className='markerBackground'
+                  style={{
+                    position: 'relative',
+                    fontSize: 0,
+                    background: 'white',
+                    borderRadius: '40px',
+                    padding: '5px',
+                    width: '26px',
+                    height: '26px',
+                    marginRight: '4px',
+                    boxShadow: markerShadow,
+                  }}
+                  onClick={() => this.handleMarkerBackground('white')}
+                >
+                  <Icon icon='full-circle' color="white" />
+                  <Icon icon='circle' style={{position: 'absolute', top: '5px', left: '5px'}} />
+                </div>
+              </>
+            }
           </div>
         </div>
       </Draggable>

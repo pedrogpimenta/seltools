@@ -235,7 +235,27 @@ function reducer(state = initialState, action) {
       for (let file in filesForLS) {
         filesForLS[file].hasRendered = false
       }
-      // localStorage.setItem('files', JSON.stringify(filesForLS))
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'CHANGE_MARKER_BACKGROUND':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let marker in updatedFiles[file].markers) {
+            if (updatedFiles[file].markers[marker].id === action.id) {
+              updatedFiles[file].markers[marker].background = action.background
+            }
+          }
+        }
+      }
+
+      filesForLS = updatedFiles.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
 
       return {
         ...state,
