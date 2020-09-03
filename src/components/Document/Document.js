@@ -322,15 +322,11 @@ class Document extends React.Component {
   }
 
   handleStudentShare = (e, studentId) => {
-    console.log('e:', e)
-
     this.props.dispatch({
       type: 'CHANGE_SHAREDWITH',
       sharedWithStudent: studentId,
     })
 
-    console.log('current shared:', this.props.sharedWith)
-    
     const documentObject = {
       _id: this.props.id,
       name: this.props.name,

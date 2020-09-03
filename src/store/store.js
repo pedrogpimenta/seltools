@@ -104,7 +104,7 @@ function reducer(state = initialState, action) {
 
       return {
         ...state,
-        sharedWith: action.sharedWith,
+        sharedWith: action.sharedWith || [],
       }
 
     case 'FILE_HAS_RENDERED':
@@ -261,7 +261,7 @@ function reducer(state = initialState, action) {
 
       return {
         ...state,
-        sharedWith: currentSharedWith,
+        sharedWith: currentSharedWith || [],
       }
 
     case 'DOCUMENT_IS_SAVING':
