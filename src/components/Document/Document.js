@@ -23,6 +23,7 @@ import {
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
+import AudioFile from '../AudioFile/AudioFile'
 import FileWrapper from '../FileWrapper/FileWrapper'
 
 // import { loadFile } from '../../helpers/render-docs'
@@ -244,38 +245,39 @@ class Document extends React.Component {
       type: 'DOCUMENT_IS_SAVING',
     })
 
-    let documentObject = {}
+    // let documentObject = {}
 
-    let filesHaveChanged = false
+    // let filesHaveChanged = false
 
-    for (let fileOnLoad in this.props.files) {
-      if (
-        (this.props.files.length !== this.props.filesOnLoad.length)
-        || (this.props.files[fileOnLoad].id !== this.props.filesOnLoad[fileOnLoad].id))
-        {
-          filesHaveChanged = true
-        }
-      }
+    // for (let fileOnLoad in this.props.files) {
+    //   if (
+    //     (this.props.files.length !== this.props.filesOnLoad.length)
+    //     || (this.props.files[fileOnLoad].id !== this.props.filesOnLoad[fileOnLoad].id))
+    //     {
+    //       filesHaveChanged = true
+    //     }
+    //   }
       
-    if (filesHaveChanged) {
-      documentObject = {
+    // if (filesHaveChanged) {
+      const documentObject = {
         name: this.props.name,
         files: this.props.files,
       }
-    } else {
-      const filesForSave = this.props.files.map(file => {
-        return {
-          id: file.id,
-          name: file.name,
-          markers: file.markers,
-        }
-      })
+    // } else {
+    //   const filesForSave = this.props.files.map(file => {
+    //     return {
+    //       id: file.id,
+    //       type: file.type,
+    //       name: file.name,
+    //       markers: file.markers,
+    //     }
+    //   })
 
-      documentObject = {
-        name: this.props.name,
-        files: filesForSave,
-      }
-    }
+    //   documentObject = {
+    //     name: this.props.name,
+    //     files: filesForSave,
+    //   }
+    // }
 
     for (let file in documentObject.files) {
       for (let marker in documentObject.files[file].markers) {
@@ -505,6 +507,10 @@ class Document extends React.Component {
                     <Canvas file={file} fileHasRendered={this.fileHasRendered} />
                   </FileWrapper>
                 )
+              } else if (file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') {
+                return(
+                  <AudioFile key={file.id} file={file} />
+                )
               } else {
                 return(
                   <FileWrapper
@@ -535,8 +541,9 @@ class Document extends React.Component {
               <input
                 ref={this.fileInput}
                 multiple
-                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif'
+                // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif'
                 // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
+                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, audio/aac, audio/mpeg, audio/ogg, audio/opus, audio/wav, audio/webm'
                 type='file'
                 onChange={(e) => this.handleFileInputChange(e)}
                 style={{display: 'none'}}
