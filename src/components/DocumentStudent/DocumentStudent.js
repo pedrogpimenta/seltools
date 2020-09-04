@@ -94,7 +94,7 @@ class DocumentStudent extends React.Component {
   handleUnsaveDocument = () => {
     window.setInterval(() => {
       if (!this.props.isSaved) {
-        this.handleSaveDocument()
+        this.handleSaveDocumentStudent()
       }
     }, 60000)
   }
