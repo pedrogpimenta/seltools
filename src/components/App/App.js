@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect,
 } from "react-router-dom"
 import './App.css'
 
@@ -26,6 +27,9 @@ class App extends React.Component {
           </Route>
           <Route path="/alumno/documentos">
             <Student />
+          </Route>
+          <Route path="/alumno">
+            <Redirect to="/alumno/documentos" />
           </Route>
           <Route path="/documento/:id">
             <Document />
