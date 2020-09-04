@@ -16,6 +16,7 @@ import {
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
+import AudioFile from '../AudioFile/AudioFile'
 import FileWrapper from '../FileWrapper/FileWrapper'
 
 class DocumentStudent extends React.Component {
@@ -244,6 +245,10 @@ class DocumentStudent extends React.Component {
                   >
                     <Canvas file={file} fileHasRendered={this.fileHasRendered} />
                   </FileWrapper>
+                )
+              } else if (file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') {
+                return(
+                  <AudioFile key={file.id} file={file} />
                 )
               } else {
                 return(
