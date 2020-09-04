@@ -49,7 +49,7 @@ class FileWrapper extends React.Component {
               position: 'absolute',
               top: '0',
               left: '100%',
-              height: '100%',
+              // height: '100%',
               width: '40px',
             }}
           >

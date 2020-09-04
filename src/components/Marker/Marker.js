@@ -153,130 +153,150 @@ class Marker extends React.Component {
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <div
-          className={`marker ${this.props.id}`}
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
             position: 'absolute',
-            padding: '3px 6px 4px 6px',
-            borderRadius: '14px',
-            boxShadow: this.state.hasFocus
-              ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
-              : markerShadow,
-            background: this.props.background || 'white',
-            boxSizing: 'border-box',
-            zIndex: '1',
-            userSelect: 'none',
-            minWidth: '16px',
-            minHeight: '19px',
           }}
-          onDoubleClick={(e) => e.stopPropagation()}
-          onMouseEnter={(e) => this.handleOnMouseEnter(e)}
-          onMouseLeave={(e) => this.handleOnMouseLeave(e)}
         >
           <div
-            className='handle'
+            className={`marker ${this.props.id}`}
             style={{
-              position: 'absolute',
-              top: '0',
-              left: '-30px',
-              paddingRight: '4px',
-              cursor: this.props.dragging ? 'grabbing' : 'grab',
-              opacity: this.state.hover ? '1' : '0',
-              transition: 'all 100ms ease-out',
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '3px 6px 4px 6px',
+              borderRadius: '14px',
+              boxShadow: this.state.hasFocus
+                ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
+                : markerShadow,
+              background: this.props.background || 'white',
+              boxSizing: 'border-box',
+              zIndex: '1',
+              userSelect: 'none',
+              minWidth: '16px',
+              minHeight: '19px',
             }}
+            onDoubleClick={(e) => e.stopPropagation()}
+            onMouseEnter={(e) => this.handleOnMouseEnter(e)}
+            onMouseLeave={(e) => this.handleOnMouseLeave(e)}
           >
-            <div
-              style={{
-                background: 'white',
-                borderRadius: '40px',
-                fontSize: '0',
-                padding: '5px',
-                width: '26px',
-                height: '26px',
-                boxShadow: markerShadow,
-              }}
-            >
-              <Icon icon='move' />
+            {this.props.background === 'var(--c-marker-background-teacher)' &&
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-11px',
+                  right: '-16px',
+                  width: '30px',
+                  height: '30px',
+                  backgroundImage: 'url("/assets/images/selen-sm.png")',
+                  backgroundSize: '30px',
+                  zIndex: '-1',
+                }}
+              >
             </div>
-          </div>
-          <Editor
-            content={this.props.content}
-            parentId={this.props.id}
-            fileId={this.props.fileId}
-            hasFocus={this.props.hasFocus}
-            onEditorChange={(e) => {this.handleChange(e)}}
-            onInputFocus={(e) => {this.onInputFocus(e)}}
-            onInputBlur={(e) => {this.onInputBlur(e)}}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              display: 'flex',
-              left: '100%',
-              top: '0',
-              fontSize: 0,
-              paddingLeft: '4px',
-              opacity: this.state.hover ? '1' : '0',
-              transition: 'all 100ms ease-out',
-            }}
-          >
-            <div
-              className='delete'
-              style={{
-                fontSize: 0,
-                background: 'white',
-                borderRadius: '40px',
-                padding: '5px',
-                width: '26px',
-                height: '26px',
-                marginRight: '4px',
-                boxShadow: markerShadow,
-              }}
-              onClick={this.handleDelete}
-            >
-              <Icon icon='delete' />
-            </div>
-            {!this.props.isStudent &&
-              <>
-                <div
-                  className='markerBackground'
-                  style={{
-                    position: 'relative',
-                    fontSize: 0,
-                    background: 'white',
-                    borderRadius: '40px',
-                    padding: '5px',
-                    width: '26px',
-                    height: '26px',
-                    marginRight: '4px',
-                    boxShadow: markerShadow,
-                  }}
-                  onClick={() => this.handleMarkerBackground('var(--c-marker-background-teacher)')}
-                >
-                  <Icon icon='full-circle' color="var(--c-marker-background-teacher)" />
-                  <Icon icon='circle' style={{position: 'absolute', top: '5px', left: '5px'}} />
-                </div>
-                <div
-                  className='markerBackground'
-                  style={{
-                    position: 'relative',
-                    fontSize: 0,
-                    background: 'white',
-                    borderRadius: '40px',
-                    padding: '5px',
-                    width: '26px',
-                    height: '26px',
-                    marginRight: '4px',
-                    boxShadow: markerShadow,
-                  }}
-                  onClick={() => this.handleMarkerBackground('white')}
-                >
-                  <Icon icon='full-circle' color="white" />
-                  <Icon icon='circle' style={{position: 'absolute', top: '5px', left: '5px'}} />
-                </div>
-              </>
             }
+            <div
+              className='handle'
+              style={{
+                position: 'absolute',
+                top: '0',
+                left: '-30px',
+                paddingRight: '4px',
+                cursor: this.props.dragging ? 'grabbing' : 'grab',
+                opacity: this.state.hover ? '1' : '0',
+                transition: 'all 100ms ease-out',
+              }}
+            >
+              <div
+                style={{
+                  background: 'white',
+                  borderRadius: '40px',
+                  fontSize: '0',
+                  padding: '5px',
+                  width: '26px',
+                  height: '26px',
+                  boxShadow: markerShadow,
+                }}
+              >
+                <Icon icon='move' />
+              </div>
+            </div>
+            <Editor
+              content={this.props.content}
+              parentId={this.props.id}
+              fileId={this.props.fileId}
+              hasFocus={this.props.hasFocus}
+              onEditorChange={(e) => {this.handleChange(e)}}
+              onInputFocus={(e) => {this.onInputFocus(e)}}
+              onInputBlur={(e) => {this.onInputBlur(e)}}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                display: 'flex',
+                left: '100%',
+                top: '0',
+                fontSize: 0,
+                paddingLeft: '4px',
+                opacity: this.state.hover ? '1' : '0',
+                transition: 'all 100ms ease-out',
+              }}
+            >
+              <div
+                className='delete'
+                style={{
+                  fontSize: 0,
+                  background: 'white',
+                  borderRadius: '40px',
+                  padding: '5px',
+                  width: '26px',
+                  height: '26px',
+                  marginRight: '4px',
+                  boxShadow: markerShadow,
+                }}
+                onClick={this.handleDelete}
+              >
+                <Icon icon='delete' />
+              </div>
+              {!this.props.isStudent &&
+                <>
+                  <div
+                    className='markerBackground'
+                    style={{
+                      position: 'relative',
+                      fontSize: 0,
+                      background: 'white',
+                      borderRadius: '40px',
+                      padding: '5px',
+                      width: '26px',
+                      height: '26px',
+                      marginRight: '4px',
+                      boxShadow: markerShadow,
+                    }}
+                    onClick={() => this.handleMarkerBackground('var(--c-marker-background-teacher)')}
+                  >
+                    <Icon icon='full-circle' color="var(--c-marker-background-teacher)" />
+                    <Icon icon='circle' style={{position: 'absolute', top: '5px', left: '5px'}} />
+                  </div>
+                  <div
+                    className='markerBackground'
+                    style={{
+                      position: 'relative',
+                      fontSize: 0,
+                      background: 'white',
+                      borderRadius: '40px',
+                      padding: '5px',
+                      width: '26px',
+                      height: '26px',
+                      marginRight: '4px',
+                      boxShadow: markerShadow,
+                    }}
+                    onClick={() => this.handleMarkerBackground('white')}
+                  >
+                    <Icon icon='full-circle' color="white" />
+                    <Icon icon='circle' style={{position: 'absolute', top: '5px', left: '5px'}} />
+                  </div>
+                </>
+              }
+            </div>
           </div>
         </div>
       </Draggable>
