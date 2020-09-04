@@ -52,6 +52,7 @@ class Document extends React.Component {
 
   componentDidMount() {
     this.getUser()
+    this.handleUnsaveDocument()
 
     if (!this.props.match.params.id) {
       this.props.dispatch({
@@ -134,8 +135,6 @@ class Document extends React.Component {
           const signedRequest = returnData.signedRequest
           const url = returnData.url
 
-          // this.setState({fileUrl: url})
-
           filesForState.push({
             id: `${fileName}-${Math.floor((Math.random() * 100000) + 1)}`,
             name: fileName,
@@ -174,43 +173,7 @@ class Document extends React.Component {
           alert(JSON.stringify(error));
         })
     }
-
   }
-
-  // handleFileInputChange = async (e) => {
-  //   const filesLoaded = e.target.files
-  //   const numberOfFiles = filesLoaded.length
-
-  //   const filesForState = []
-
-  //   for (let i = 0; i < numberOfFiles; i++) {
-  //     try {
-  //       const fileContents = await loadFile(filesLoaded[i])  
-  //       const ext = filesLoaded[i].name.split('.').pop().toLowerCase()
-        
-  //       filesForState.push(
-  //         {
-  //           id: `${filesLoaded[i].name}-${Math.floor((Math.random() * 100000) + 1)}`,
-  //           name: filesLoaded[i].name,
-  //           type: ext,
-  //           content: fileContents,
-  //           markers: [],
-  //         }
-  //       )
-  //     } catch (e) {
-  //         console.warn(e.message)
-  //     }
-  //   }
-    
-  //   this.props.dispatch({
-  //     type: "ADD_FILES",
-  //     files: filesForState
-  //   }) 
-
-  //   this.props.dispatch({
-  //     type: "DOCUMENT_UNSAVED",
-  //   }) 
-  // }
 
   handleNameInputChange = (e) => {
     this.props.dispatch({
@@ -240,44 +203,23 @@ class Document extends React.Component {
     })
   }
 
+  handleUnsaveDocument = () => {
+    window.setInterval(() => {
+      if (!this.props.isSaved) {
+        this.handleSaveDocument()
+      }
+    }, 60000)
+  }
+
   handleSaveDocument = () => {
     this.props.dispatch({
       type: 'DOCUMENT_IS_SAVING',
     })
 
-    // let documentObject = {}
-
-    // let filesHaveChanged = false
-
-    // for (let fileOnLoad in this.props.files) {
-    //   if (
-    //     (this.props.files.length !== this.props.filesOnLoad.length)
-    //     || (this.props.files[fileOnLoad].id !== this.props.filesOnLoad[fileOnLoad].id))
-    //     {
-    //       filesHaveChanged = true
-    //     }
-    //   }
-      
-    // if (filesHaveChanged) {
-      const documentObject = {
-        name: this.props.name,
-        files: this.props.files,
-      }
-    // } else {
-    //   const filesForSave = this.props.files.map(file => {
-    //     return {
-    //       id: file.id,
-    //       type: file.type,
-    //       name: file.name,
-    //       markers: file.markers,
-    //     }
-    //   })
-
-    //   documentObject = {
-    //     name: this.props.name,
-    //     files: filesForSave,
-    //   }
-    // }
+    const documentObject = {
+      name: this.props.name,
+      files: this.props.files,
+    }
 
     for (let file in documentObject.files) {
       for (let marker in documentObject.files[file].markers) {
@@ -373,12 +315,9 @@ class Document extends React.Component {
           style={{color: 'black'}}
           defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
           placeholder='Nuevo documento'
-          // value={this.props.name}
           confirmOnEnterKey={true}
           onConfirm={(e) => this.handleNameInputChange(e)}
-          // onChange={(e) => this.handleBreadcrumbInputChange(e)}
         >
-          {/* {text} */}
         </EditableText>
       </Breadcrumb>
     )
@@ -446,11 +385,6 @@ class Document extends React.Component {
                     },
                   ]}
                 />
-                {/* <Button
-                  className={Classes.MINIMAL}
-                  icon="edit"
-                  onClick={(e) => this.openEditNameDialog(e)}
-                /> */}
               </div>
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
@@ -458,7 +392,6 @@ class Document extends React.Component {
                 boundary='viewport'
               >
                 <Button 
-                  // className={Classes.MINIMAL} 
                   intent={Intent.PRIMARY}
                   icon="share"
                   text="Compartir"
@@ -477,7 +410,6 @@ class Document extends React.Component {
               <Button
                 intent={this.props.name ? this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
                 loading={this.props.isSaving}
-                // className={this.props.isSaving ? Classes.DEFAULT : this.props.isSaved ? Classes.MINIMAL : null}
                 style={{marginRight: '8px', marginLeft: '8px'}}
                 disabled={!this.props.name}
                 icon="floppy-disk"

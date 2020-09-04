@@ -37,6 +37,7 @@ class DocumentStudent extends React.Component {
   }
 
   componentDidMount() {
+    this.handleUnsaveDocument()
 
     if (!this.props.match.params.id) {
       this.props.dispatch({
@@ -88,6 +89,14 @@ class DocumentStudent extends React.Component {
         })
     }
 
+  }
+
+  handleUnsaveDocument = () => {
+    window.setInterval(() => {
+      if (!this.props.isSaved) {
+        this.handleSaveDocument()
+      }
+    }, 60000)
   }
 
   handleSaveDocumentStudent = () => {
