@@ -258,7 +258,7 @@ class Editor extends React.Component {
 
     var editor = new MediumEditor(`.editable-${thisComponent.props.parentId}`, {
       disableDoubleReturn: true,
-      disableExtraSpaces: true,
+      // disableExtraSpaces: true,
       placeholder: {text: ''},
       toolbar: {
         diffTop: -14,
