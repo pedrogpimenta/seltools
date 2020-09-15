@@ -221,7 +221,7 @@ class Editor extends React.Component {
 
         this.button = this.document.createElement('button')
         this.button.classList.add('medium-editor-action')
-        this.button.innerHTML = '<span icon="full-circle" class="bp3-icon bp3-icon-full-circle"><svg data-icon="full-circle" width="16" height="16" viewBox="0 0 16 16"> <defs><clipPath id="cut-off-bottom"><path d="M8 0a8 8 0 100 16A8 8 0 108 0z"></path></clipPath></defs><desc>full-circle</desc><path d="M8 0a8 8 0 100 16A8 8 0 108 0z" stroke="white" stroke-width="3px" fill="var(--c-redtext)" fill-rule="evenodd" clip-path="url(#cut-off-bottom)" ></path></svg></span>'
+        this.button.innerHTML = '<span icon="full-circle" class="bp3-icon bp3-icon-full-circle"><svg data-icon="full-circle" width="16" height="16" viewBox="0 0 16 16"> <defs><clipPath id="cut-off-bottom-'+thisComponent.props.parentId+'"><path d="M8 0a8 8 0 100 16A8 8 0 108 0z"></path></clipPath></defs><desc>full-circle</desc><path d="M8 0a8 8 0 100 16A8 8 0 108 0z" stroke="white" stroke-width="3px" fill="var(--c-redtext)" fill-rule="evenodd" clip-path="url(#cut-off-bottom-'+thisComponent.props.parentId+')" ></path></svg></span>'
         this.button.title = 'Red text'
 
         this.on(this.button, 'click', this.handleClick.bind(this))
