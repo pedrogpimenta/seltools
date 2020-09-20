@@ -287,6 +287,24 @@ function reducer(state = initialState, action) {
         files: filesForLS,
       }
 
+    case 'ADD_NEW_HIGHLIGHT':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          updatedFiles[file].highlights.push({
+            id: action.id,
+            x: action.x,
+            y: action.y,
+            width: action.width,
+            height: action.height,
+          })
+        }
+      }
+
+      return {
+        ...state,
+        // files: filesForLS,
+      }
+
     case 'CHANGE_SHAREDWITH':
       const currentSharedWith = state.sharedWith || []
 

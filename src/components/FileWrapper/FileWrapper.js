@@ -1,13 +1,14 @@
 import React from 'react';
 import { store } from '../../store/store'
 import Markers from '../Markers/Markers'
+import Highlights from '../Highlights/Highlights'
 
 class FileWrapper extends React.Component {
   constructor() {
     super()
 
     this.state = {
-      hover: false
+      hover: false,
     }
   }
 
@@ -34,6 +35,8 @@ class FileWrapper extends React.Component {
     return (
       <div
         style={{
+          display: 'inline-block',
+          textAlign: 'left',
           position: 'relative',
           marginBottom: '20px',
         }}
@@ -46,6 +49,14 @@ class FileWrapper extends React.Component {
             markers={this.props.markers}
             isStudent={this.props.isStudent}
             hasRendered={this.props.hasRendered}
+          />
+        }
+        {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
+          <Highlights
+            fileId={this.props.id}
+            highlights={this.props.highlights || []}
+            // isStudent={this.props.isStudent}
+            // hasRendered={this.props.hasRendered}
           />
         }
         {this.props.children}

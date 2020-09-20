@@ -474,7 +474,7 @@ class Document extends React.Component {
           </Navbar>
           <div
             style={{
-              maxWidth: '800px',
+              maxWidth: 'var(--doc-width)',
               margin: '0 auto',
               paddingTop: '70px',
             }}
@@ -485,12 +485,17 @@ class Document extends React.Component {
             {this.props.files.map((file, i) => {
               if (file.type === 'pdf') {
                 return(
-                  <div>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
                       key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={file.markers}
+                      highlights={file.highlights}
                       hasRendered={file.hasRendered}
                     >
                       <Canvas file={file} fileHasRendered={this.fileHasRendered} />
@@ -500,12 +505,17 @@ class Document extends React.Component {
                 )
               } else if (file.type === 'txt') {
                 return(
-                  <div>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
                       key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={[]}
+                      highlights={file.highlights}
                       hasRendered={file.hasRendered}
                     >
                       <TextFile file={file} />
@@ -515,12 +525,17 @@ class Document extends React.Component {
                 )
               } else if (file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') {
                 return(
-                  <div>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
                       key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={file.markers}
+                      highlights={file.highlights}
                       hasRendered={file.hasRendered}
                     >
                       <AudioFile file={file} />
@@ -530,12 +545,17 @@ class Document extends React.Component {
                 )
               } else {
                 return(
-                  <div>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
                       key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={file.markers}
+                      highlights={file.highlights}
                       hasRendered={file.hasRendered}
                     >
                       <Image file={file} />
