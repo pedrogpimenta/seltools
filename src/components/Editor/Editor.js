@@ -310,14 +310,16 @@ class Editor extends React.Component {
       buttonLabels: 'fontawesome',
       toolbar: {
         diffTop: -14,
-        buttons: ['bold', 'underline', 'striker', 'highlighter', 'redtext', ,'justifyLeft', 'justifyCenter', 'justifyRight']
+        buttons: this.props.fileType === 'txt' ?
+          ['bold', 'underline', 'striker', 'highlighter', 'justifyLeft', 'justifyCenter', 'justifyRight'] :
+          ['bold', 'underline', 'striker', 'highlighter', 'redtext'],
       },
       extensions: {
         'bold': new BoldButton(),
         'underline': new UnderlineButton(),
         'highlighter': new HighlighterButton(),
         'striker': new StrikerButton(),
-        'redtext': this.props.fileType === 'txt' ? false : new RedTextButton(),
+        'redtext': new RedTextButton(),
       },
     })
 

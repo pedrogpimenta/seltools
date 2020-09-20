@@ -115,6 +115,10 @@ body .medium-editor-toolbar li button {
   padding: 6px;
 }
 
+body .medium-editor-element p:last-child {
+  margin-bottom: 0;
+}
+
 body .medium-editor-toolbar li button:hover {
   background-color: var(--c-primary-dark);
 }
@@ -127,6 +131,7 @@ body .medium-toolbar-arrow-under::after {
   border-color: var(--c-primary-dark) transparent transparent transparent;
   top: 30px;
 }
+
 
 
 /* :root {

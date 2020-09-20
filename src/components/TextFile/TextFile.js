@@ -34,14 +34,13 @@ class TextFile extends React.Component {
         className={`text-editor ${this.props.file.id}`}
         style={{
           display: 'flex',
-          // justifyContent: 'center',
           marginBottom: '20px',
-          // userSelect: 'none',
           width: '100%',
           maxWidth: '100%',
           padding: '8px',
           margin: '0 auto',
           boxShadow: '0 2px 10px 0 rgba(0, 0, 0, .1)',
+          borderRadius: '6px',
 
         }}
       >
