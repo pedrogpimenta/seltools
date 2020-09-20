@@ -81,7 +81,12 @@ class Documents extends React.Component {
 
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
-        .then(data => {
+        .then((data) => {
+          const updatedStudents = this.state.students.slice()
+          updatedStudents.push({_id: data._id, name: data.name})
+          this.setState({
+            students: updatedStudents,
+          })
         })
     }
   }
@@ -99,7 +104,6 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then(data => {
-          console.log('documentId:', documentId)
           const currentDocuments = [...this.state.documents]
           const index = currentDocuments.findIndex((document) => document._id === documentId)
 
@@ -165,8 +169,6 @@ class Documents extends React.Component {
   }
 
   componentDidMount = () => {
-    // if (localStorage.getItem('isUserAllowed')) this.setState({isUserAllowed: true})
-
     store.dispatch({
       type: 'LOAD_FILES',
       files: [],

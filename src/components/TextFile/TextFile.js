@@ -6,7 +6,6 @@ import Editor from '../Editor/Editor'
 class TextFile extends React.Component {
 
   handleChange = (e, fileId) => {
-    console.log('edit1:', e.parentNode.parentNode.classList[1])
     store.dispatch({
       type: "EDIT_TEXT_FILE",
       fileId: this.props.file.id,
@@ -28,7 +27,6 @@ class TextFile extends React.Component {
   }
 
   render() {
-    console.log('file: id:', this.props.file.id, 'content:', this.props.file.content)
     return (
       <div
         className={`text-editor ${this.props.file.id} bp3-running-text`}

@@ -53,7 +53,6 @@ export function renderDocs(file, canvas, callback) {
         canvasContext: canvas,
         viewport: page.getViewport({scale: 2})
       })
-      // console.log(canvas.toDataURL('image/jpeg'))
     }, reason => {
       window.alert('Hubo un error: ' + reason)
     }).then(() => callback(file.id))

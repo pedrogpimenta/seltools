@@ -303,7 +303,6 @@ class Document extends React.Component {
   }
 
   handleAddFile = (e, fileIndex) => {
-    console.log('file index -1', fileIndex)
     this.setState({
       addFileIndex: fileIndex,
     })
