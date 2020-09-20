@@ -264,7 +264,7 @@ class Editor extends React.Component {
       toolbar: {
         diffTop: -20,
         buttons: this.props.fileType === 'txt' ?
-          ['bold', 'underline', 'striker', 'highlighter', 'redtext', 'justifyLeft', 'justifyCenter', 'justifyRight'] :
+          ['h2', 'h3', 'bold', 'underline', 'striker', 'highlighter', 'redtext', 'justifyLeft', 'justifyCenter', 'justifyRight'] :
           ['bold', 'underline', 'striker', 'highlighter', 'redtext'],
         static: true,
       },

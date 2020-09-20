@@ -81,10 +81,6 @@ a:hover {
 
 /* Text editor */
 
-body .redtext {
-  color: var(--c-redtext)
-}
-
 body .marker p {
   margin: 0;
 }
@@ -98,6 +94,28 @@ body .marker .highlight {
 /* body .medium-editor-element {
   min-height: 0;
 } */
+
+body .medium-editor-element p {
+  margin: 0;
+}
+
+/* body .medium-editor-element p:last-child {
+  margin-bottom: 0;
+} */
+
+body .medium-editor-element h2, 
+body .medium-editor-element h3 {
+  margin-top: 20px;
+}
+
+body .medium-editor-element h2:first-child, 
+body .medium-editor-element h3:first-child {
+  margin-top: 10px;
+}
+
+body .medium-editor-element .redtext {
+  color: var(--c-redtext)
+}
 
 body .medium-editor-element:focus {
   outline: none;
@@ -114,10 +132,6 @@ body .medium-editor-toolbar li button {
   height: 30px;
   min-width: 30px;
   padding: 6px;
-}
-
-body .medium-editor-element p:last-child {
-  margin-bottom: 0;
 }
 
 body .medium-editor-toolbar li button:hover {

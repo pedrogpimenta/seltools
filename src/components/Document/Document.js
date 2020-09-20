@@ -209,7 +209,7 @@ class Document extends React.Component {
       if (!this.props.isSaved) {
         this.handleSaveDocument()
       }
-    }, 60000)
+    }, 30000)
   }
 
   handleSaveDocument = () => {
