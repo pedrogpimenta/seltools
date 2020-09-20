@@ -17,8 +17,6 @@ function reducer(state = initialState, action) {
 
   switch(action.type) {
     case 'LOAD_FILES':
-      // localStorage.setItem('files', JSON.stringify(action.files))
-
       const filesOnLoad = cloneDeep(action.files)
       
       for (let file in filesOnLoad) {
@@ -32,13 +30,10 @@ function reducer(state = initialState, action) {
       }
 
     case 'ADD_FILES':
-      // localStorage.setItem('files', JSON.stringify(action.files))
-
-      // const files = cloneDeep(action.files)
       const files = cloneDeep(state.files)
       
       for (let file in action.files) {
-        files.push(action.files[file])
+        files.splice(action.position + 1 + parseInt(file), 0, action.files[file])
       }
 
       return {
@@ -47,8 +42,6 @@ function reducer(state = initialState, action) {
       }
 
     case 'DELETE_ALL_FILES':
-      // localStorage.setItem('files', JSON.stringify([]))
-
       return {
         ...state,
         files: [],
@@ -260,6 +253,38 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         files: updatedFiles,
+      }
+
+    case 'ADD_TEXT_FILE':
+      filesForLS = updatedFiles.slice()
+      const fileToAdd = {
+        id: `text-file-${Math.floor((Math.random() * 100000) + 1)}`,
+        type: 'txt',
+        content: '',
+      }
+
+      filesForLS.splice(action.position + 1, 0, fileToAdd)
+
+      return {
+        ...state,
+        files: filesForLS,
+      }
+
+    case 'EDIT_TEXT_FILE':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.id) {
+          updatedFiles[file].content = action.content
+        }
+      }
+
+      filesForLS = updatedFiles.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      return {
+        ...state,
+        files: filesForLS,
       }
 
     case 'CHANGE_SHAREDWITH':
