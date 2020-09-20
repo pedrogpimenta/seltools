@@ -24,6 +24,7 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
+import TextFile from '../TextFile/TextFile'
 import FileWrapper from '../FileWrapper/FileWrapper'
 
 // import { loadFile } from '../../helpers/render-docs'
@@ -152,12 +153,12 @@ class Document extends React.Component {
 
           axios.put(signedRequest,files[i],options)
             .then(result => {
-              console.log("Response from s3")
               this.setState({uploadingFiles: false})
               if (i === files.length - 1) {
                 this.props.dispatch({
                   type: "ADD_FILES",
-                  files: filesForState
+                  files: filesForState,
+                  position: this.state.addFileIndex,
                 }) 
             
                 this.props.dispatch({
@@ -290,6 +291,25 @@ class Document extends React.Component {
       })
   }
 
+  handleAddTextFile = (fileIndex) => {
+    this.props.dispatch({
+      type: "ADD_TEXT_FILE",
+      position: fileIndex,
+    })
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    })  
+  }
+
+  handleAddFile = (e, fileIndex) => {
+    console.log('file index -1', fileIndex)
+    this.setState({
+      addFileIndex: fileIndex,
+    })
+    this.fileInput.current.click(e)
+  }
+
   renderStudents = () => {
     if (this.state.isLoadingStudents) return <div>Cargando...</div>
 
@@ -328,6 +348,36 @@ class Document extends React.Component {
       type: "FILE_HAS_RENDERED",
       fileId: fileId,
     }) 
+  }
+
+  renderAddButtons = (fileIndex) => {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '18px auto',
+        opacity: '.6',
+      }}>
+        <Button
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          icon='new-text-box'
+          large={true}
+          // text='Añadir texto'
+          onClick={() => this.handleAddTextFile(fileIndex)}
+        />
+        <Button
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          loading={this.state.uploadingFiles}
+          icon='media'
+          large={true}
+          // text='Añadir archivos'
+          onClick={(e) => this.handleAddFile(e, fileIndex)}
+        />
+      </div>
+    )
   }
 
   render() {
@@ -427,60 +477,81 @@ class Document extends React.Component {
               paddingTop: '70px',
             }}
           >
-            {this.props.files.map((file) => {
+            {this.props.files.length === 0 &&
+              this.renderAddButtons()
+            }
+            {this.props.files.map((file, i) => {
               if (file.type === 'pdf') {
                 return(
-                  <FileWrapper
-                    key={file.id}
-                    id={file.id}
-                    markers={file.markers}
-                    hasRendered={file.hasRendered}
-                  >
-                    <Canvas file={file} fileHasRendered={this.fileHasRendered} />
-                  </FileWrapper>
+                  <div>
+                    <FileWrapper
+                      key={file.id}
+                      id={file.id}
+                      fileType={file.type}
+                      markers={file.markers}
+                      hasRendered={file.hasRendered}
+                    >
+                      <Canvas file={file} fileHasRendered={this.fileHasRendered} />
+                    </FileWrapper>
+                    {this.renderAddButtons(i)}
+                  </div>
+                )
+              } else if (file.type === 'txt') {
+                return(
+                  <div>
+                    <FileWrapper
+                      key={file.id}
+                      id={file.id}
+                      fileType={file.type}
+                      markers={[]}
+                      hasRendered={file.hasRendered}
+                    >
+                      <TextFile file={file} />
+                    </FileWrapper>
+                    {this.renderAddButtons(i)}
+                  </div>
                 )
               } else if (file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') {
                 return(
-                  <AudioFile key={file.id} file={file} />
+                  <div>
+                    <FileWrapper
+                      key={file.id}
+                      id={file.id}
+                      fileType={file.type}
+                      markers={file.markers}
+                      hasRendered={file.hasRendered}
+                    >
+                      <AudioFile file={file} />
+                    </FileWrapper>
+                    {this.renderAddButtons(i)}
+                  </div>
                 )
               } else {
                 return(
-                  <FileWrapper
-                    key={file.id}
-                    id={file.id}
-                    markers={file.markers}
-                    hasRendered={file.hasRendered}
-                  >
-                    <Image file={file} />
-                  </FileWrapper>
+                  <div>
+                    <FileWrapper
+                      key={file.id}
+                      id={file.id}
+                      fileType={file.type}
+                      markers={file.markers}
+                      hasRendered={file.hasRendered}
+                    >
+                      <Image file={file} />
+                    </FileWrapper>
+                    {this.renderAddButtons(i)}
+                  </div>
                 )
               }
             })}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '48px auto',
-            }}>
-              <Button
-                intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
-                className={this.props.files.length > 0 ? Classes.MINIMAL : null}
-                loading={this.state.uploadingFiles}
-                icon='add'
-                text='Añadir archivos'
-                onClick={(e) => this.fileInput.current.click()}
-              />
-              <input
-                ref={this.fileInput}
-                multiple
-                // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif'
-                // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
-                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, audio/aac, audio/mpeg, audio/ogg, audio/opus, audio/wav, audio/webm'
-                type='file'
-                onChange={(e) => this.handleFileInputChange(e)}
-                style={{display: 'none'}}
-              />
-            </div>
+            <input
+              ref={this.fileInput}
+              multiple
+              // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
+              accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, audio/aac, audio/mpeg, audio/ogg, audio/opus, audio/wav, audio/webm'
+              type='file'
+              onChange={(e) => this.handleFileInputChange(e)}
+              style={{display: 'none'}}
+            />
           </div>
         </div>
       </div>

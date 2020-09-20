@@ -257,7 +257,7 @@ class Editor extends React.Component {
     })
 
     var editor = new MediumEditor(`.editable-${thisComponent.props.parentId}`, {
-      disableDoubleReturn: true,
+      // disableDoubleReturn: true,
       // disableExtraSpaces: true,
       placeholder: {text: ''},
       toolbar: {
@@ -269,7 +269,7 @@ class Editor extends React.Component {
         'underline': new UnderlineButton(),
         'highlighter': new HighlighterButton(),
         'striker': new StrikerButton(),
-        'redtext': new RedTextButton(),
+        'redtext': this.props.fileType === 'txt' ? false : new RedTextButton(),
       },
     })
 
@@ -289,17 +289,22 @@ class Editor extends React.Component {
   render() {
 
     return (
-      <div>
+      <div
+        style ={{
+          width: '100%',
+        }}
+      >
         <div
           ref={this.editableInput}
           className={`editable-${this.props.parentId}`}
           onFocus={(e) => this.props.onInputFocus()}
           onBlur={(e) => this.onBlur()}
           style={{
+            width: '100%',
             minWidth: '16px',
             minHeight: '19px',
             cursor: 'text',
-            textAlign: 'center',
+            // textAlign: 'center',
           }}
         >
         </div>
