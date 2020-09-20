@@ -360,6 +360,7 @@ class Document extends React.Component {
         opacity: '.6',
       }}>
         <Button
+          style={{margin: '0 8px'}}
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           icon='new-text-box'
@@ -368,6 +369,7 @@ class Document extends React.Component {
           onClick={() => this.handleAddTextFile(fileIndex)}
         />
         <Button
+          style={{margin: '0 8px'}}
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           loading={this.state.uploadingFiles}

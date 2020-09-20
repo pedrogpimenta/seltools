@@ -31,7 +31,7 @@ class TextFile extends React.Component {
     console.log('file: id:', this.props.file.id, 'content:', this.props.file.content)
     return (
       <div
-        className={`text-editor ${this.props.file.id}`}
+        className={`text-editor ${this.props.file.id} bp3-running-text`}
         style={{
           display: 'flex',
           marginBottom: '20px',
@@ -41,7 +41,7 @@ class TextFile extends React.Component {
           margin: '0 auto',
           boxShadow: '0 2px 10px 0 rgba(0, 0, 0, .1)',
           borderRadius: '6px',
-
+          fontSize: '16px',
         }}
       >
         <Editor
