@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 class AudioFile extends React.Component {
   render() {

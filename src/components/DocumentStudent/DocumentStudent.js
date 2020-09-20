@@ -7,6 +7,7 @@ import {
   Intent,
   Breadcrumbs,
   Button,
+  Classes,
   Navbar,
   NavbarDivider,
   NavbarGroup,
@@ -17,6 +18,7 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
+import TextFile from '../TextFile/TextFile'
 import FileWrapper from '../FileWrapper/FileWrapper'
 
 class DocumentStudent extends React.Component {
@@ -162,11 +164,43 @@ class DocumentStudent extends React.Component {
       })
   }
 
+  handleAddTextFile = (fileIndex) => {
+    this.props.dispatch({
+      type: "ADD_TEXT_FILE",
+      position: fileIndex,
+    })
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    })  
+  }
+
   fileHasRendered = (fileId) => {
     this.props.dispatch({
       type: "FILE_HAS_RENDERED",
       fileId: fileId,
     }) 
+  }
+
+  renderAddButtons = (fileIndex) => {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '18px auto',
+        opacity: '.6',
+      }}>
+        <Button
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          icon='new-text-box'
+          large={true}
+          // text='Añadir texto'
+          onClick={() => this.handleAddTextFile(fileIndex)}
+        />
+      </div>
+    )
   }
 
   render() {
@@ -242,34 +276,58 @@ class DocumentStudent extends React.Component {
               paddingTop: '70px',
             }}
           >
-            {this.props.files.map((file) => {
+            {this.props.files.map((file, i) => {
               if (file.type === 'pdf') {
                 return(
-                  <FileWrapper
-                    key={file.id}
-                    id={file.id}
-                    markers={file.markers}
-                    hasRendered={file.hasRendered}
-                    isStudent={true}
-                  >
-                    <Canvas file={file} fileHasRendered={this.fileHasRendered} />
-                  </FileWrapper>
+                  <div>
+                    <FileWrapper
+                      key={file.id}
+                      id={file.id}
+                      markers={file.markers}
+                      hasRendered={file.hasRendered}
+                      isStudent={true}
+                    >
+                      <Canvas file={file} fileHasRendered={this.fileHasRendered} />
+                    </FileWrapper>
+                    {this.renderAddButtons(i)}
+                  </div>
+                )
+              } else if (file.type === 'txt') {
+                return(
+                  <div>
+                    <FileWrapper
+                      key={file.id}
+                      id={file.id}
+                      fileType={file.type}
+                      markers={[]}
+                      hasRendered={file.hasRendered}
+                    >
+                      <TextFile file={file} />
+                    </FileWrapper>
+                    {this.renderAddButtons(i)}
+                  </div>
                 )
               } else if (file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') {
                 return(
-                  <AudioFile key={file.id} file={file} />
+                  <div>
+                    <AudioFile key={file.id} file={file} />
+                    {this.renderAddButtons(i)}
+                  </div>
                 )
               } else {
                 return(
-                  <FileWrapper
-                    key={file.id}
-                    id={file.id}
-                    markers={file.markers}
-                    hasRendered={file.hasRendered}
-                    isStudent={true}
-                  >
-                    <Image file={file} />
-                  </FileWrapper>
+                  <div>
+                    <FileWrapper
+                      key={file.id}
+                      id={file.id}
+                      markers={file.markers}
+                      hasRendered={file.hasRendered}
+                      isStudent={true}
+                    >
+                      <Image file={file} />
+                    </FileWrapper>
+                    {this.renderAddButtons(i)}
+                  </div>
                 )
               }
             })}

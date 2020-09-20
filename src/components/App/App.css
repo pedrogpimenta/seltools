@@ -14,7 +14,7 @@
   --c-highlight: #FDE74C;
   --c-redtext: #FF0000;
 
-  --c-marker-background-teacher: #FEC4BC;
+  --c-marker-background-teacher: #FCDEDA;
 }
 
 a {
@@ -91,13 +91,31 @@ body .marker .highlight {
   border-radius: 6px;
 }
 
-body .marker .redtext {
-  color: var(--c-redtext)
-}
-
 /* body .medium-editor-element {
   min-height: 0;
 } */
+
+body .medium-editor-element p {
+  margin: 0;
+}
+
+/* body .medium-editor-element p:last-child {
+  margin-bottom: 0;
+} */
+
+body .medium-editor-element h2, 
+body .medium-editor-element h3 {
+  margin-top: 20px;
+}
+
+body .medium-editor-element h2:first-child, 
+body .medium-editor-element h3:first-child {
+  margin-top: 10px;
+}
+
+body .medium-editor-element .redtext {
+  color: var(--c-redtext)
+}
 
 body .medium-editor-element:focus {
   outline: none;
@@ -105,6 +123,7 @@ body .medium-editor-element:focus {
 
 body .medium-editor-toolbar {
   background-color: var(--c-primary);
+  margin-top: -10px;
   border: 1px solid var(--c-primary-dark);
 }
 
@@ -127,6 +146,7 @@ body .medium-toolbar-arrow-under::after {
   border-color: var(--c-primary-dark) transparent transparent transparent;
   top: 30px;
 }
+
 
 
 /* :root {

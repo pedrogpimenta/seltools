@@ -66,12 +66,13 @@ class Markers extends React.Component {
   }
 
   componentDidMount = () => {
+    // TODO: Fix timeout: check if all images have loaded and then set
     window.setTimeout(() => {
       this.setState({
         width: this.markersRef.current.offsetWidth,
         height: this.markersRef.current.offsetHeight,
       })
-    }, 100)
+    }, 1000)
   }
 
   render() {
@@ -81,10 +82,12 @@ class Markers extends React.Component {
         className='markers'
         style={{
           position: 'absolute',
+          display: 'flex',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
+          // minHeight: '1000px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
