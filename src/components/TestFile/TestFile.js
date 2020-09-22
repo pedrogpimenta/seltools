@@ -40,7 +40,6 @@ class TestFile extends React.Component {
         };
         axios.put(signedRequest,file,options)
         .then(result => {
-          console.log("Response from s3")
           this.setState({success: true});
         })
         .catch(error => {
