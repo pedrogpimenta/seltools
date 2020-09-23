@@ -50,12 +50,13 @@ class Highlights extends React.Component {
 
     const c = this.highlightsRef.current
     const fileInfo = c.getBoundingClientRect()
+    // debugger;
     const xPercentStart = ((this.state.mouseDownX - fileInfo.x) * 100) / fileInfo.width
     const yPercentStart = ((this.state.mouseDownY - fileInfo.y) * 100) / fileInfo.height
     const xPercentEnd = ((e.clientX - fileInfo.x) * 100) / fileInfo.width
     const yPercentEnd = ((e.clientY - fileInfo.y) * 100) / fileInfo.height
 
-    if ((e.clientX > this.state.mouseDownX + 20) && (e.clientY > this.state.mouseDownY + 20)) {
+    if ((e.clientX > this.state.mouseDownX) && (e.clientY > this.state.mouseDownY)) {
       console.log('yeah')
       this.handleNewHighlight(xPercentStart, yPercentStart, xPercentEnd, yPercentEnd)
     }
@@ -82,6 +83,11 @@ class Highlights extends React.Component {
     }) 
   }
 
+  componentDidMount = () => {
+    const c = this.highlightsRef.current
+    const fileInfo = c.getBoundingClientRect()
+    // debugger;
+  }
 
   render() {
     return (
@@ -98,23 +104,28 @@ class Highlights extends React.Component {
         onMouseUp={(e) => this.handleMouseUp(e)}
       >
         {this.props.highlights.map(highlight => {
-          // const c = this.highlightsRef.current
-          // const width = c.getBoundingClientRect().width
-          // const height = c.getBoundingClientRect().height
+          const c = this.highlightsRef.current
+          const fileInfo = c.getBoundingClientRect()
+          // debugger;
+          const width = c.getBoundingClientRect().width
+          const height = c.getBoundingClientRect().height
 
-          // const x = (this.props.xPercent * width) / 100
-          // const y = (this.props.yPercent * height) / 100
+          const highlightX = (highlight.xPercent * width) / 100
+          const highlightY = (highlight.yPercent * height) / 100
+          const highlightWidth = (highlight.width * width) / 100
+          const highlightHeight = (highlight.height * height) / 100
 
           return (
             <div
               key={highlight.id}
               style={{
                 position: 'absolute',
-                top: `${highlight.x}px`,
-                left: `${highlight.y}px`,
-                width: `${highlight.width}px`,
-                height: `${highlight.height}px`,
-                background: 'red',
+                top: `${highlightY}px`,
+                left: `${highlightX}px`,
+                width: `${highlightWidth}px`,
+                height: `${highlightHeight}px`,
+                background: 'var(--c-highlight)',
+                opacity: '.7',
               }}
             ></div>
           )

@@ -290,10 +290,13 @@ function reducer(state = initialState, action) {
     case 'ADD_NEW_HIGHLIGHT':
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
+          if (!updatedFiles[file].highlights) {
+            updatedFiles[file].highlights = []
+          }
           updatedFiles[file].highlights.push({
             id: action.id,
-            x: action.x,
-            y: action.y,
+            xPercent: action.xPercent,
+            yPercent: action.yPercent,
             width: action.width,
             height: action.height,
           })
