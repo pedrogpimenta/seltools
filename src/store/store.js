@@ -305,7 +305,23 @@ function reducer(state = initialState, action) {
 
       return {
         ...state,
-        // files: filesForLS,
+        files: updatedFiles,
+      }
+
+    case 'DELETE_HIGHLIGHT':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let highlight in updatedFiles[file].highlights) {
+            if (updatedFiles[file].highlights[highlight].id === action.id) {
+              updatedFiles[file].highlights.splice(highlight, 1)
+            }
+          }
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
       }
 
     case 'CHANGE_SHAREDWITH':

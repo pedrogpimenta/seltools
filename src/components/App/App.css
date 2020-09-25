@@ -16,7 +16,7 @@
 
   --c-marker-background-teacher: #FCDEDA;
 
-  --doc-width: 800px;
+  --doc-width: 840px;
 }
 
 a {
@@ -149,8 +149,18 @@ body .medium-toolbar-arrow-under::after {
   top: 30px;
 }
 
+.tools-menu {
+  min-width: 0;
+}
 
+.tools-menu .bp3-menu-item > * {
+  margin-right: 0;
+  margin-bottom: 2px;
+}
 
+.highlight:hover .delete {
+  opacity: 1 !important;
+}
 /* :root {
   --c-primary: #F87361;
   --c-white: #FFF;

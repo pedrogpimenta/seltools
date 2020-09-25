@@ -24,15 +24,15 @@ class FileWrapper extends React.Component {
     const confirmDelete = window.confirm('¿Quieres eliminar el archivo?')
 
     if (confirmDelete) {
-    store.dispatch({
-      type: "DELETE_FILE",
-      fileId: this.props.id,
-    }) 
-
-    store.dispatch({
-      type: "DOCUMENT_UNSAVED",
-    }) 
-  }
+      store.dispatch({
+        type: "DELETE_FILE",
+        fileId: this.props.id,
+      }) 
+  
+      store.dispatch({
+        type: "DOCUMENT_UNSAVED",
+      }) 
+    }
   }
 
   render() {
@@ -48,17 +48,19 @@ class FileWrapper extends React.Component {
         onMouseLeave={this.handleMouseLeave}
       >
         {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
-          <Markers 
+          <Markers
             fileId={this.props.id}
             markers={this.props.markers}
             isStudent={this.props.isStudent}
             hasRendered={this.props.hasRendered}
+            isActive={this.props.mode === 'marker'}
           />
         }
         {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
           <Highlights
             fileId={this.props.id}
             highlights={this.props.highlights || []}
+            isActive={this.props.mode === 'highlight'}
             // isStudent={this.props.isStudent}
             // hasRendered={this.props.hasRendered}
           />
