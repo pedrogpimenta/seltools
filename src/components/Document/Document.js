@@ -489,7 +489,7 @@ class Document extends React.Component {
           </Navbar>
           <div
             style={{
-              position: 'absolute',
+              position: 'fixed',
               top: '70px',
               left: '10px',
             }}
