@@ -21,6 +21,9 @@ class FileWrapper extends React.Component {
   }
 
   handleDelete = () => {
+    const confirmDelete = window.confirm('¿Quieres eliminar el archivo?')
+
+    if (confirmDelete) {
     store.dispatch({
       type: "DELETE_FILE",
       fileId: this.props.id,
@@ -29,6 +32,7 @@ class FileWrapper extends React.Component {
     store.dispatch({
       type: "DOCUMENT_UNSAVED",
     }) 
+  }
   }
 
   render() {
