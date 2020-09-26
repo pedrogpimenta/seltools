@@ -33,7 +33,7 @@ class TextFile extends React.Component {
         style={{
           display: 'flex',
           marginBottom: '20px',
-          width: '100%',
+          width: 'var(--doc-width)',
           maxWidth: '100%',
           padding: '8px',
           margin: '0 auto',

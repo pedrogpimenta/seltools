@@ -13,6 +13,9 @@ import {
   Classes,
   EditableText,
   Popover,
+  Menu,
+  MenuItem,
+  MenuDivider,
   Navbar,
   NavbarDivider,
   NavbarGroup,
@@ -48,6 +51,7 @@ class Document extends React.Component {
       showEditDialog: false,
       fileUrls: [],
       uploadingFiles: false,
+      activeMode: 'marker',
     }
   }
 
@@ -309,6 +313,18 @@ class Document extends React.Component {
     this.fileInput.current.click(e)
   }
 
+  changeModeToMarkers = () => {
+    this.setState({
+      activeMode: 'marker'
+    })
+  }
+
+  changeModeToHighlight = () => {
+    this.setState({
+      activeMode: 'highlight'
+    })
+  }
+
   renderStudents = () => {
     if (this.state.isLoadingStudents) return <div>Cargando...</div>
 
@@ -473,9 +489,34 @@ class Document extends React.Component {
           </Navbar>
           <div
             style={{
-              maxWidth: '800px',
+              position: 'fixed',
+              top: '70px',
+              left: '10px',
+            }}
+          >
+            <Menu className={`tools-menu ${Classes.ELEVATION_1}`}>
+              <MenuItem
+                active={this.state.activeMode === 'marker'}
+                icon="widget"
+                onClick={this.changeModeToMarkers}
+                text="Notas"
+              />
+              <MenuDivider />
+              <MenuItem
+                active={this.state.activeMode === 'highlight'}
+                icon="highlight"
+                onClick={this.changeModeToHighlight}
+                text="Resaltar"
+               />
+            </Menu>
+          </div>
+          <div
+            style={{
+              maxWidth: 'var(--doc-width)',
               margin: '0 auto',
               paddingTop: '70px',
+              paddingRight: '10px',
+              paddingLeft: '60px',
             }}
           >
             {this.props.files.length === 0 &&
@@ -484,13 +525,19 @@ class Document extends React.Component {
             {this.props.files.map((file, i) => {
               if (file.type === 'pdf') {
                 return(
-                  <div>
+                  <div
+                    key={file.id}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
-                      key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={file.markers}
+                      highlights={file.highlights}
                       hasRendered={file.hasRendered}
+                      mode={this.state.activeMode}
                     >
                       <Canvas file={file} fileHasRendered={this.fileHasRendered} />
                     </FileWrapper>
@@ -499,13 +546,19 @@ class Document extends React.Component {
                 )
               } else if (file.type === 'txt') {
                 return(
-                  <div>
+                  <div
+                    key={file.id}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
-                      key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={[]}
+                      highlights={[]}
                       hasRendered={file.hasRendered}
+                      mode={this.state.activeMode}
                     >
                       <TextFile file={file} />
                     </FileWrapper>
@@ -514,13 +567,19 @@ class Document extends React.Component {
                 )
               } else if (file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') {
                 return(
-                  <div>
+                  <div
+                    key={file.id}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
-                      key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={file.markers}
+                      highlights={[]}
                       hasRendered={file.hasRendered}
+                      mode={this.state.activeMode}
                     >
                       <AudioFile file={file} />
                     </FileWrapper>
@@ -529,13 +588,19 @@ class Document extends React.Component {
                 )
               } else {
                 return(
-                  <div>
+                  <div
+                    key={file.id}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
                     <FileWrapper
-                      key={file.id}
                       id={file.id}
                       fileType={file.type}
                       markers={file.markers}
+                      highlights={file.highlights}
                       hasRendered={file.hasRendered}
+                      mode={this.state.activeMode}
                     >
                       <Image file={file} />
                     </FileWrapper>

@@ -287,6 +287,43 @@ function reducer(state = initialState, action) {
         files: filesForLS,
       }
 
+    case 'ADD_NEW_HIGHLIGHT':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          if (!updatedFiles[file].highlights) {
+            updatedFiles[file].highlights = []
+          }
+          updatedFiles[file].highlights.push({
+            id: action.id,
+            xPercent: action.xPercent,
+            yPercent: action.yPercent,
+            width: action.width,
+            height: action.height,
+          })
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'DELETE_HIGHLIGHT':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let highlight in updatedFiles[file].highlights) {
+            if (updatedFiles[file].highlights[highlight].id === action.id) {
+              updatedFiles[file].highlights.splice(highlight, 1)
+            }
+          }
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
     case 'CHANGE_SHAREDWITH':
       const currentSharedWith = state.sharedWith || []
 

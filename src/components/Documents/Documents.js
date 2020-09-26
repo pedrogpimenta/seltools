@@ -134,7 +134,9 @@ class Documents extends React.Component {
             marginBottom: '12px',
           }}
         >
-          <Link to={`/documento/${document._id}`}>{document.name}</Link>
+          <Link to={`/documento/${document._id}`}>
+            {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
+          </Link>
           <Button
             type='button'
             icon='delete'
