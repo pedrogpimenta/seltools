@@ -499,12 +499,14 @@ class Document extends React.Component {
                 active={this.state.activeMode === 'marker'}
                 icon="widget"
                 onClick={this.changeModeToMarkers}
+                text="Notas"
               />
               <MenuDivider />
               <MenuItem
                 active={this.state.activeMode === 'highlight'}
                 icon="highlight"
                 onClick={this.changeModeToHighlight}
+                text="Resaltar"
                />
             </Menu>
           </div>
@@ -554,7 +556,7 @@ class Document extends React.Component {
                       id={file.id}
                       fileType={file.type}
                       markers={[]}
-                      highlights={file.highlights}
+                      highlights={[]}
                       hasRendered={file.hasRendered}
                       mode={this.state.activeMode}
                     >
@@ -575,7 +577,7 @@ class Document extends React.Component {
                       id={file.id}
                       fileType={file.type}
                       markers={file.markers}
-                      highlights={file.highlights}
+                      highlights={[]}
                       hasRendered={file.hasRendered}
                       mode={this.state.activeMode}
                     >

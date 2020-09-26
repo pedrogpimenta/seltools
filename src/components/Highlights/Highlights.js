@@ -156,8 +156,6 @@ class Highlights extends React.Component {
   }
 
   componentDidMount = () => {
-    const c = this.highlightsRef.current
-
     window.setTimeout(() => {
       this.setState({
         componentIsReady: true,

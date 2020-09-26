@@ -153,9 +153,23 @@ body .medium-toolbar-arrow-under::after {
   min-width: 0;
 }
 
-.tools-menu .bp3-menu-item > * {
+.tools-menu .bp3-menu-item > .bp3-icon {
   margin-right: 0;
   margin-bottom: 2px;
+}
+
+.tools-menu .bp3-icon + div {
+  opacity: 0;
+  width: 0;
+  padding-left: 0;
+  overflow: hidden;
+  transition: all 100ms ease-out;
+}
+
+.tools-menu:hover .bp3-icon + div {
+  opacity: 1;
+  width: 100%;
+  padding-left: 8px;
 }
 
 .highlight:hover .delete {
