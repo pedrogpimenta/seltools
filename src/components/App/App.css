@@ -172,7 +172,12 @@ body .medium-toolbar-arrow-under::after {
   padding-left: 8px;
 }
 
-.highlight:hover .delete {
+.highlights .ghost-highlight,
+.highlights .highlight {
+  opacity: .3;
+}
+
+.highlights .highlight:hover .delete {
   opacity: 1 !important;
 }
 /* :root {

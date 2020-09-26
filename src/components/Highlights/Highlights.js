@@ -179,6 +179,7 @@ class Highlights extends React.Component {
       >
         <div
           key='ghost-highlight'
+          className='ghost-highlight'
           style={{
             position: 'absolute',
             display: !!this.state.ghostWidth ? 'block' : 'none',
@@ -186,8 +187,7 @@ class Highlights extends React.Component {
             left: `${this.state.ghostX}px`,
             width: `${this.state.ghostWidth}px`,
             height: `${this.state.ghostHeight}px`,
-            background: 'var(--c-highlight)',
-            opacity: '.7',
+            background: 'yellow',
           }}
         ></div>
         {this.state.componentIsReady && this.props.highlights.map(highlight => {
@@ -211,8 +211,7 @@ class Highlights extends React.Component {
                 left: `${highlightX}px`,
                 width: `${highlightWidth}px`,
                 height: `${highlightHeight}px`,
-                background: 'var(--c-highlight)',
-                opacity: '.7',
+                background: 'yellow',
               }}
             >
               <div
