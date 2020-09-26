@@ -37,7 +37,6 @@ class Highlights extends React.Component {
   }
 
   handleMouseDown = (e) => {
-    console.log('mouse down:, x:', e.clientX, 'y:', e.clientY)
     this.setState({
       mouseDown: true,
       mouseDownX: e.clientX,
@@ -83,7 +82,6 @@ class Highlights extends React.Component {
   }
 
   handleMouseUp = (e) => {
-    // console.log('mouse up:, x:', e.clientX, 'y:', e.clientY)
     this.setState({
       mouseDown: false,
       ghostX: 0,
@@ -99,10 +97,7 @@ class Highlights extends React.Component {
     const xPercentEnd = ((e.clientX - fileInfo.x) * 100) / fileInfo.width
     const yPercentEnd = ((e.clientY - fileInfo.y) * 100) / fileInfo.height
 
-    // if (e.clientX < 0)
-
     if (((e.clientX > this.state.mouseDownX + 5) && (e.clientY > this.state.mouseDownY + 5)) || ((e.clientX < this.state.mouseDownX - 5) && (e.clientY < this.state.mouseDownY - 5))) {
-      console.log('yeah')
       this.handleNewHighlight(xPercentStart, yPercentStart, xPercentEnd, yPercentEnd)
     }
   }
