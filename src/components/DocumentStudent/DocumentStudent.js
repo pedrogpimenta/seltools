@@ -135,6 +135,7 @@ class DocumentStudent extends React.Component {
           name: file.name,
           markers: file.markers,
           highlights: file.highlights,
+          content: file.content,
         }
       })
 
