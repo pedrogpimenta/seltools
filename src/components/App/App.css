@@ -66,6 +66,9 @@ a:hover {
 
 /* Navbar */
 .bp3-navbar {
+  display: flex;
+  overflow: auto;
+  justify-content: space-between;
   background-color: var(--c-primary-lightest);
   box-shadow: none;
 }
@@ -82,6 +85,22 @@ a:hover {
 }
 
 /* Text editor */
+
+body .marker {
+  transform: scale(.6)
+}
+
+@media screen and (min-width: 600px) {
+  body .marker {
+    transform: scale(.8)
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  body .marker {
+    transform: scale(1)
+  }
+}
 
 body .marker p {
   margin: 0;
@@ -172,14 +191,19 @@ body .medium-toolbar-arrow-under::after {
   padding-left: 8px;
 }
 
-.highlights .ghost-highlight,
-.highlights .highlight {
+.highlights .ghost-highlight {
   opacity: .3;
 }
 
 .highlights .highlight:hover .delete {
   opacity: 1 !important;
 }
+
+.file:hover .fileButtons {
+  opacity: .6 !important;
+}
+
+
 /* :root {
   --c-primary: #F87361;
   --c-white: #FFF;

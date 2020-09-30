@@ -11,6 +11,7 @@ class TextFile extends React.Component {
       fileId: this.props.file.id,
       id: e.parentNode.parentNode.classList[1],
       content: e.innerHTML,
+      name: null,
     }) 
 
     store.dispatch({
@@ -35,7 +36,7 @@ class TextFile extends React.Component {
           marginBottom: '20px',
           width: 'var(--doc-width)',
           maxWidth: '100%',
-          padding: '8px',
+          padding: '8px 16px',
           margin: '0 auto',
           boxShadow: '0 2px 10px 0 rgba(0, 0, 0, .1)',
           borderRadius: '6px',

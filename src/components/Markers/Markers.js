@@ -88,6 +88,7 @@ class Markers extends React.Component {
           width: '100%',
           height: '100%',
           // minHeight: '1000px',
+          // marginTop: '34px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
           zIndex: this.props.isActive ? '5' : '1',
         }}

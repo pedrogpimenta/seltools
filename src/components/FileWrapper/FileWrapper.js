@@ -20,21 +20,6 @@ class FileWrapper extends React.Component {
     this.setState({hover: false})
   }
 
-  handleDelete = () => {
-    const confirmDelete = window.confirm('¿Quieres eliminar el archivo?')
-
-    if (confirmDelete) {
-      store.dispatch({
-        type: "DELETE_FILE",
-        fileId: this.props.id,
-      }) 
-  
-      store.dispatch({
-        type: "DOCUMENT_UNSAVED",
-      }) 
-    }
-  }
-
   render() {
     return (
       <div
@@ -42,65 +27,38 @@ class FileWrapper extends React.Component {
           display: 'inline-block',
           textAlign: 'left',
           position: 'relative',
-          marginBottom: '20px',
+          marginBottom: '15px',
+          maxWidth: '100%',
         }}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
-          <Markers
-            fileId={this.props.id}
-            markers={this.props.markers}
-            isStudent={this.props.isStudent}
-            hasRendered={this.props.hasRendered}
-            isActive={this.props.mode === 'marker'}
-          />
-        }
-        {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
-          <Highlights
-            fileId={this.props.id}
-            highlights={this.props.highlights || []}
-            isActive={this.props.mode === 'highlight'}
-            // isStudent={this.props.isStudent}
-            // hasRendered={this.props.hasRendered}
-          />
-        }
-        {this.props.children}
-        {!this.props.isStudent &&
-          <div
-            style={{
-              position: 'absolute',
-              top: '0',
-              left: '100%',
-              // height: '100%',
-              width: '40px',
-            }}
-          >
-            <div
-              className='delete'
-              style={{
-                display: 'inline-flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                position: 'absolute',
-                left: '8px',
-                // left: this.state.hover ? 'calc(100% - 26px)' : 'calc(100% - 44px)',
-                top: '0',
-                fontSize: 0,
-                // padding: '4px 0 0 0',
-                width: '30px',
-                height: '30px',
-                background: '#DDD',
-                borderRadius: '40px',
-                opacity: this.state.hover ? '1' : '0',
-                transition: 'all 100ms ease-out',
-              }}
-              onClick={this.handleDelete}
-            >
-              <svg height="20" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd" stroke="#2a2e3b" strokeLinecap="round" strokeLinejoin="round" transform="translate(2 2)"><circle cx="8.5" cy="8.5" r="8"/><g transform="matrix(0 1 -1 0 17 0)"><path d="m5.5 11.5 6-6"/><path d="m5.5 5.5 6 6"/></g></g></svg>
-            </div>
-          </div>
-        }
+        {this.props.fileButtons}
+        <div
+          style={{
+            position: 'relative',
+          }}
+        >
+          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
+            <Markers
+              fileId={this.props.id}
+              markers={this.props.markers}
+              isStudent={this.props.isStudent}
+              hasRendered={this.props.hasRendered}
+              isActive={this.props.mode === 'marker'}
+            />
+          }
+          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
+            <Highlights
+              fileId={this.props.id}
+              highlights={this.props.highlights || []}
+              isActive={this.props.mode === 'highlight'}
+              // isStudent={this.props.isStudent}
+              // hasRendered={this.props.hasRendered}
+            />
+          }
+          {this.props.children}
+        </div>
       </div>
     )
   }
