@@ -1,5 +1,4 @@
 import React from 'react';
-import { store } from '../../store/store'
 import Markers from '../Markers/Markers'
 import Highlights from '../Highlights/Highlights'
 

@@ -3,22 +3,10 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import {
-  Alignment,
-  Intent,
-  Breadcrumbs,
-  Breadcrumb,
-  Button,
   Classes,
-  EditableText,
-  Popover,
   Menu,
   MenuItem,
   MenuDivider,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
-  Switch,
 } from "@blueprintjs/core"
 
 class Toolbar extends React.Component {

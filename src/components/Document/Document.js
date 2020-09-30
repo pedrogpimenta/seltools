@@ -5,22 +5,9 @@ import { Beforeunload } from 'react-beforeunload'
 import axios from 'axios'
 
 import {
-  Alignment,
   Intent,
-  Breadcrumbs,
-  Breadcrumb,
   Button,
   Classes,
-  EditableText,
-  Popover,
-  Menu,
-  MenuItem,
-  MenuDivider,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
-  Switch,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
