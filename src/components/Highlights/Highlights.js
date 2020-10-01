@@ -97,9 +97,13 @@ class Highlights extends React.Component {
     const xPercentEnd = ((e.clientX - fileInfo.x) * 100) / fileInfo.width
     const yPercentEnd = ((e.clientY - fileInfo.y) * 100) / fileInfo.height
 
-    // if (((e.clientX > this.state.mouseDownX + 5) && (e.clientY > this.state.mouseDownY + 5)) || ((e.clientX < this.state.mouseDownX - 5) && (e.clientY < this.state.mouseDownY - 5))) {
+    if (
+      ((e.clientX > this.state.mouseDownX + 5) && (e.clientY > this.state.mouseDownY + 5)) ||
+      ((e.clientX > this.state.mouseDownX + 5) && (e.clientY < this.state.mouseDownY - 5)) ||
+      ((e.clientX < this.state.mouseDownX - 5) && (e.clientY > this.state.mouseDownY + 5)) ||
+      ((e.clientX < this.state.mouseDownX - 5) && (e.clientY < this.state.mouseDownY - 5))) {
       this.handleNewHighlight(xPercentStart, yPercentStart, xPercentEnd, yPercentEnd)
-    // }
+    }
   }
 
   handleNewHighlight = (xPercentStart, yPercentStart, xPercentEnd, yPercentEnd) => {

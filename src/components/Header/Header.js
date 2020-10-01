@@ -10,6 +10,7 @@ import {
   Button,
   Classes,
   EditableText,
+  Icon,
   Popover,
   Navbar,
   NavbarDivider,
@@ -108,7 +109,7 @@ class Header extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        this.props.history.push(`/documento/${data.id}`)
+        this.props.history.push(this.props.isStudent? `/alumno/documento/${data.id}` : `/documento/${data.id}`)
       })
 
   }
@@ -116,6 +117,7 @@ class Header extends React.Component {
   renderCurrentBreadcrumb = ({ text, ...restProps }) => {
     return (
       <Breadcrumb>
+        <Icon icon='document' color='#182026' />
         <EditableText
           style={{color: 'black'}}
           defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
@@ -176,7 +178,7 @@ class Header extends React.Component {
             style={{marginLeft: '8px'}}
           >
             <Breadcrumbs
-              currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
+              currentBreadcrumbRenderer={this.props.isStudent ? null : this.renderCurrentBreadcrumb}
               items={[
                 { href: '/documentos',
                   icon: 'arrow-left',
@@ -191,25 +193,27 @@ class Header extends React.Component {
           </div>
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
-          <Popover
-            boundary='viewport'
-          >
-            <Button 
-              intent={Intent.PRIMARY}
-              icon="share"
-              text="Compartir"
-              style={{marginRight: '2px', marginLeft: '2px'}}
-            />
-            <ul
-              style={{
-                listStyle: 'none',
-                margin: 0,
-                padding: '16px',
-              }}
+          {!this.props.isStudent &&
+            <Popover
+              boundary='viewport'
             >
-              {this.renderStudents()}
-            </ul>
-          </Popover>
+              <Button 
+                intent={Intent.PRIMARY}
+                icon="share"
+                text="Compartir"
+                style={{marginRight: '2px', marginLeft: '2px'}}
+              />
+              <ul
+                style={{
+                  listStyle: 'none',
+                  margin: 0,
+                  padding: '16px',
+                }}
+              >
+                {this.renderStudents()}
+              </ul>
+            </Popover>
+          }
           <Button
             intent={this.props.name ? this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
             loading={this.props.isSaving}

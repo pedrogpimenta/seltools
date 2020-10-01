@@ -298,7 +298,9 @@ function reducer(state = initialState, action) {
       const fileToAdd = {
         id: `text-file-${Math.floor((Math.random() * 100000) + 1)}`,
         type: 'txt',
+        name: null,
         content: '',
+        creator: action.creator,
       }
 
       filesForLS.splice(action.position + 1, 0, fileToAdd)

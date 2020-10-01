@@ -43,7 +43,9 @@ class Document extends React.Component {
   }
 
   componentDidMount() {
-    this.getUser()
+    if (!this.props.isStudent) {
+      this.getUser()
+    }
 
     if (!this.props.match.params.id) {
       this.props.dispatch({
@@ -84,10 +86,12 @@ class Document extends React.Component {
 
           // TODO: Improve so much dispatches
 
-          this.props.dispatch({
-            type: 'CHANGE_DOCUMENT_SHAREDWITH',
-            sharedWith: data[0].sharedWith,
-          })
+          if (!this.props.isStudent) {
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_SHAREDWITH',
+              sharedWith: data[0].sharedWith,
+            })
+          }
 
           this.props.dispatch({
             type: 'CHANGE_DOCUMENT_ID',
@@ -179,7 +183,6 @@ class Document extends React.Component {
     })
   }
 
-
   getUser = () => {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/Selen`)
       .then(response => response.json())
@@ -214,10 +217,11 @@ class Document extends React.Component {
     })  
   }
 
-  handleAddTextFile = (fileIndex) => {
+  handleAddTextFile = (fileIndex, creator) => {
     this.props.dispatch({
       type: "ADD_TEXT_FILE",
       position: fileIndex,
+      creator: creator,
     })
 
     this.props.dispatch({
@@ -271,26 +275,30 @@ class Document extends React.Component {
           opacity: '0',
         }}
       >
-        <Button
-          style={{margin: '0 4px'}}
-          intent={Intent.DEFAULT}
-          className={Classes.MINIMAL}
-          icon='chevron-up'
-          onClick={() => this.handleMoveOneUp(i)}
-        />
-        <Button
-          style={{margin: '0 4px'}}
-          intent={Intent.DEFAULT}
-          className={Classes.MINIMAL}
-          icon='chevron-down'
-          onClick={() => this.handleMoveOneDown(i)}
-        />
+        {!this.props.isStudent &&
+          <Button
+            style={{margin: '0 4px'}}
+            intent={Intent.DEFAULT}
+            className={Classes.MINIMAL}
+            icon='chevron-up'
+            onClick={() => this.handleMoveOneUp(i)}
+          />
+        }
+        {!this.props.isStudent &&
+          <Button
+            style={{margin: '0 4px'}}
+            intent={Intent.DEFAULT}
+            className={Classes.MINIMAL}
+            icon='chevron-down'
+            onClick={() => this.handleMoveOneDown(i)}
+          />
+        }
         <Button
           style={{margin: '0 4px'}}
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
           icon='new-text-box'
-          onClick={() => this.handleAddTextFile(i - 1)}
+          onClick={() => this.handleAddTextFile(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 4px'}}
@@ -302,11 +310,21 @@ class Document extends React.Component {
         />
         <Button
           style={{margin: '0 4px'}}
-          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
-          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
-          icon='delete'
-          onClick={() => this.handleDeleteFile(fileIndex)}
+          intent={Intent.DEFAULT}
+          className={Classes.MINIMAL}
+          loading={this.state.uploadingFiles}
+          icon='music'
+          onClick={(e) => this.handleAddFile(e, i - 1)}
         />
+        {(!this.props.isStudent ? true : this.props.files[i].creator === localStorage.getItem('studentName')) &&
+          <Button
+            style={{margin: '0 4px'}}
+            intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+            className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+            icon='delete'
+            onClick={() => this.handleDeleteFile(fileIndex)}
+          />
+        }
       </div>
     )
   }
@@ -363,13 +381,14 @@ class Document extends React.Component {
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Header />
+          <Header isStudent={this.props.isStudent} />
           <div
             className='document'
             style={{
               position: 'relative',
               marginTop: '50px',
               padding: '20px',
+              backgroundColor: 'rgb(250, 250, 250)'
             }}
           >
             <Toolbar />
@@ -379,7 +398,7 @@ class Document extends React.Component {
                 margin: '0 auto',
                 // paddingTop: '70px',
                 // paddingRight: '10px',
-                paddingLeft: '43px',
+                // paddingLeft: '43px',
               }}
             >
               {this.props.files.map((file, i) => {
@@ -397,6 +416,7 @@ class Document extends React.Component {
                       markers={file.markers}
                       highlights={file.highlights}
                       hasRendered={file.hasRendered}
+                      isStudent={this.props.isStudent}
                       mode={this.props.editMode}
                       fileButtons={this.renderFileButtons(i, file.id)}
                     >

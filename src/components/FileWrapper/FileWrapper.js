@@ -38,7 +38,7 @@ class FileWrapper extends React.Component {
             position: 'relative',
           }}
         >
-          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
+          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' &&
             <Markers
               fileId={this.props.id}
               markers={this.props.markers}
