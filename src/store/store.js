@@ -99,8 +99,6 @@ function reducer(state = initialState, action) {
       }
 
     case 'CHANGE_DOCUMENT_NAME':
-      // localStorage.setItem('name', JSON.stringify(action.name))
-
       return {
         ...state,
         name: action.name,
@@ -299,6 +297,7 @@ function reducer(state = initialState, action) {
         id: `text-file-${Math.floor((Math.random() * 100000) + 1)}`,
         type: 'txt',
         name: null,
+        markers: [],
         content: '',
         creator: action.creator,
       }

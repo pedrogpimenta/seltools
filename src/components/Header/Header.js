@@ -48,7 +48,9 @@ class Header extends React.Component {
       })
   }
 
-  handleNameInputChange = (e) => {
+  handleNameInputConfirm = (e) => {
+    if (e.trim() === '') return
+
     this.props.dispatch({
       type: 'CHANGE_DOCUMENT_NAME',
       name: e,
@@ -123,7 +125,7 @@ class Header extends React.Component {
           defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
           placeholder='Nuevo documento'
           confirmOnEnterKey={true}
-          onConfirm={(e) => this.handleNameInputChange(e)}
+          onConfirm={(e) => this.handleNameInputConfirm(e)}
         >
         </EditableText>
       </Breadcrumb>

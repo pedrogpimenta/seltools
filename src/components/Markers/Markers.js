@@ -94,7 +94,7 @@ class Markers extends React.Component {
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
       >
-        {this.state.width > 0 && this.props.markers.map((marker) => {
+        {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
           return(
             <Marker
               key={marker.id}
