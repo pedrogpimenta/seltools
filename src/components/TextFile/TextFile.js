@@ -72,6 +72,7 @@ class TextFile extends React.Component {
             top: '4px',
             right: '100%',
             cursor: 'pointer',
+            opacity: this.state.editMode === 'text' ? '.9' : '.6',
           }}
         >
           <Button
