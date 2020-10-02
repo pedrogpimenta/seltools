@@ -182,7 +182,7 @@ class Header extends React.Component {
             <Breadcrumbs
               currentBreadcrumbRenderer={this.props.isStudent ? null : this.renderCurrentBreadcrumb}
               items={[
-                { href: '/documentos',
+                { href: this.props.isStudent ? '/alumno/documentos' : '/documentos',
                   icon: 'arrow-left',
                   text: 'Documentos',
                 },
