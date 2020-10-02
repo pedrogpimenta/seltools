@@ -97,7 +97,11 @@ class Highlights extends React.Component {
     const xPercentEnd = ((e.clientX - fileInfo.x) * 100) / fileInfo.width
     const yPercentEnd = ((e.clientY - fileInfo.y) * 100) / fileInfo.height
 
-    if (((e.clientX > this.state.mouseDownX + 5) && (e.clientY > this.state.mouseDownY + 5)) || ((e.clientX < this.state.mouseDownX - 5) && (e.clientY < this.state.mouseDownY - 5))) {
+    if (
+      ((e.clientX > this.state.mouseDownX + 5) && (e.clientY > this.state.mouseDownY + 5)) ||
+      ((e.clientX > this.state.mouseDownX + 5) && (e.clientY < this.state.mouseDownY - 5)) ||
+      ((e.clientX < this.state.mouseDownX - 5) && (e.clientY > this.state.mouseDownY + 5)) ||
+      ((e.clientX < this.state.mouseDownX - 5) && (e.clientY < this.state.mouseDownY - 5))) {
       this.handleNewHighlight(xPercentStart, yPercentStart, xPercentEnd, yPercentEnd)
     }
   }
@@ -169,6 +173,7 @@ class Highlights extends React.Component {
           left: '0',
           width: '100%',
           height: '100%',
+          // marginTop: '34px',
           zIndex: this.props.isActive ? '5' : '1',
         }}
         onMouseMove={(e) => this.handleMouseMove(e)}
@@ -200,7 +205,6 @@ class Highlights extends React.Component {
           const highlightWidth = (highlight.width * width) / 100
           const highlightHeight = (highlight.height * height) / 100
 
-
           return (
             <div
               key={highlight.id}
@@ -211,9 +215,20 @@ class Highlights extends React.Component {
                 left: `${highlightX}px`,
                 width: `${highlightWidth}px`,
                 height: `${highlightHeight}px`,
-                background: 'yellow',
               }}
-            >
+              >
+              <div
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  top: '0',
+                  left: '0',
+                  background: 'yellow',
+                  opacity: '.3',
+                }}
+              >
+              </div>
               <div
                 className='delete'
                 style={{

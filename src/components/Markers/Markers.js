@@ -88,12 +88,13 @@ class Markers extends React.Component {
           width: '100%',
           height: '100%',
           // minHeight: '1000px',
+          // marginTop: '34px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
           zIndex: this.props.isActive ? '5' : '1',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
       >
-        {this.state.width > 0 && this.props.markers.map((marker) => {
+        {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
           return(
             <Marker
               key={marker.id}

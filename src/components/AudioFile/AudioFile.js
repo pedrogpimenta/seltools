@@ -6,13 +6,18 @@ class AudioFile extends React.Component {
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        marginBottom: '20px',
+        width: '500px',
+        maxWidth: '100%',
+        // marginBottom: '20px',
         userSelect: 'none',
         }}>
         <audio
           controls
           src={this.props.file.url}
           id={this.props.file.id}
+          style={{
+            width: '100%',
+          }}
         >
           Your browser does not support the
           <code>audio</code> element.

@@ -5,22 +5,9 @@ import { Beforeunload } from 'react-beforeunload'
 import axios from 'axios'
 
 import {
-  Alignment,
   Intent,
-  Breadcrumbs,
-  Breadcrumb,
   Button,
   Classes,
-  EditableText,
-  Popover,
-  Menu,
-  MenuItem,
-  MenuDivider,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
-  Switch,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
@@ -29,6 +16,8 @@ import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
 import TextFile from '../TextFile/TextFile'
 import FileWrapper from '../FileWrapper/FileWrapper'
+import Header from '../Header/Header'
+import Toolbar from '../Toolbar/Toolbar'
 
 // import { loadFile } from '../../helpers/render-docs'
 
@@ -46,18 +35,17 @@ class Document extends React.Component {
       name: '',
       files: [],
       filesOnLoad: [],
-      isLoadingStudents: true,
       students: [],
       showEditDialog: false,
       fileUrls: [],
       uploadingFiles: false,
-      activeMode: 'marker',
     }
   }
 
   componentDidMount() {
-    this.getUser()
-    this.handleUnsaveDocument()
+    if (!this.props.isStudent) {
+      this.getUser()
+    }
 
     if (!this.props.match.params.id) {
       this.props.dispatch({
@@ -98,10 +86,12 @@ class Document extends React.Component {
 
           // TODO: Improve so much dispatches
 
-          this.props.dispatch({
-            type: 'CHANGE_DOCUMENT_SHAREDWITH',
-            sharedWith: data[0].sharedWith,
-          })
+          if (!this.props.isStudent) {
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_SHAREDWITH',
+              sharedWith: data[0].sharedWith,
+            })
+          }
 
           this.props.dispatch({
             type: 'CHANGE_DOCUMENT_ID',
@@ -180,21 +170,6 @@ class Document extends React.Component {
     }
   }
 
-  handleNameInputChange = (e) => {
-    this.props.dispatch({
-      type: 'CHANGE_DOCUMENT_NAME',
-      name: e,
-    })
-
-    this.props.dispatch({
-      type: "DOCUMENT_UNSAVED",
-    }) 
-
-    this.setState({
-      showEditDialog: false,
-    })
-  }
-
   handleNameInputClose = () => {
     this.setState({
       showEditDialog: false,
@@ -208,97 +183,45 @@ class Document extends React.Component {
     })
   }
 
-  handleUnsaveDocument = () => {
-    window.setInterval(() => {
-      if (!this.props.isSaved) {
-        this.handleSaveDocument()
-      }
-    }, 30000)
-  }
-
-  handleSaveDocument = () => {
-    this.props.dispatch({
-      type: 'DOCUMENT_IS_SAVING',
-    })
-
-    const documentObject = {
-      name: this.props.name,
-      files: this.props.files,
-    }
-
-    for (let file in documentObject.files) {
-      for (let marker in documentObject.files[file].markers) {
-        delete documentObject.files[file].markers[marker].hasFocus
-      }
-    }
-
-    const requestOptions = {
-      method: !this.props.id ? 'POST' : 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
-    }
-
-    const fetchUrl = !this.props.id
-      ? `${REACT_APP_SERVER_BASE_URL}/document/`
-      : `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
-
-    fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        this.props.dispatch({
-          type: 'CHANGE_DOCUMENT_ID',
-          id: data.id,
-        })
-
-        this.props.dispatch({
-          type: 'DOCUMENT_SAVED',
-        })
-
-        this.props.history.push(`/documento/${data.id}`)
-      })
-
-  }
-
   getUser = () => {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/Selen`)
       .then(response => response.json())
       .then(data => {
-        this.setState({
-          isLoadingStudents: false,
-          students: data[0].students || [],
+        this.props.dispatch({
+          type: 'LOAD_STUDENTS',
+          students: data[0].students,
+          sharedWith: [],
         })
       })
   }
 
-  handleStudentShare = (e, studentId) => {
+  handleMoveOneUp = (fileIndex) => {
     this.props.dispatch({
-      type: 'CHANGE_SHAREDWITH',
-      sharedWithStudent: studentId,
+      type: "MOVE_FILE_UP",
+      position: fileIndex,
     })
 
-    const documentObject = {
-      _id: this.props.id,
-      name: this.props.name,
-    }
-
-    const requestOptions = {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
-    }
-
-    const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/student/${studentId}/document`
-
-    fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-      })
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    })  
   }
 
-  handleAddTextFile = (fileIndex) => {
+  handleMoveOneDown = (fileIndex) => {
+    this.props.dispatch({
+      type: "MOVE_FILE_DOWN",
+      position: fileIndex,
+    })
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    })  
+  }
+
+  handleAddTextFile = (fileIndex, creator) => {
     this.props.dispatch({
       type: "ADD_TEXT_FILE",
       position: fileIndex,
+      creator: creator,
     })
 
     this.props.dispatch({
@@ -313,49 +236,23 @@ class Document extends React.Component {
     this.fileInput.current.click(e)
   }
 
-  changeModeToMarkers = () => {
-    this.setState({
-      activeMode: 'marker'
-    })
-  }
+  handleDeleteFile = (fileId) => {
+    const confirmDelete = window.confirm('¿Quieres eliminar el archivo?')
 
-  changeModeToHighlight = () => {
-    this.setState({
-      activeMode: 'highlight'
-    })
-  }
-
-  renderStudents = () => {
-    if (this.state.isLoadingStudents) return <div>Cargando...</div>
-
-    return this.state.students.map(student => (
-      <li key={student._id} style={{display: 'block'}}>
-        <Switch 
-          label={student.name}
-          defaultChecked={this.props.sharedWith.find(withStudent => withStudent._id === student._id)}
-          onChange={(e) => this.handleStudentShare(e, student._id)}
-        />
-      </li>
-    ))
+    if (confirmDelete) {
+      this.props.dispatch({
+        type: "DELETE_FILE",
+        fileId: fileId,
+      }) 
+  
+      this.props.dispatch({
+        type: "DOCUMENT_UNSAVED",
+      }) 
+    }
   }
 
   openEditNameDialog = () => {
     this.setState({showEditDialog: true})
-  }
-
-  renderCurrentBreadcrumb = ({ text, ...restProps }) => {
-    return (
-      <Breadcrumb>
-        <EditableText
-          style={{color: 'black'}}
-          defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
-          placeholder='Nuevo documento'
-          confirmOnEnterKey={true}
-          onConfirm={(e) => this.handleNameInputChange(e)}
-        >
-        </EditableText>
-      </Breadcrumb>
-    )
   }
 
   fileHasRendered = (fileId) => {
@@ -363,6 +260,73 @@ class Document extends React.Component {
       type: "FILE_HAS_RENDERED",
       fileId: fileId,
     }) 
+  }
+
+  renderFileButtons = (i, fileIndex) => {
+    return (
+      <div
+        className='fileButtons'
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          margin: '0 auto 4px',
+          transition: 'all 100ms ease-out',
+          opacity: '0',
+        }}
+      >
+        {!this.props.isStudent && i !== 0 &&
+          <Button
+            style={{margin: '0 4px'}}
+            intent={Intent.DEFAULT}
+            className={Classes.MINIMAL}
+            icon='chevron-up'
+            onClick={() => this.handleMoveOneUp(i)}
+          />
+        }
+        {!this.props.isStudent && i !== (this.props.files.length - 1) &&
+          <Button
+            style={{margin: '0 4px'}}
+            intent={Intent.DEFAULT}
+            className={Classes.MINIMAL}
+            icon='chevron-down'
+            onClick={() => this.handleMoveOneDown(i)}
+          />
+        }
+        <Button
+          style={{margin: '0 4px'}}
+          intent={Intent.DEFAULT}
+          className={Classes.MINIMAL}
+          icon='new-text-box'
+          onClick={() => this.handleAddTextFile(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+        />
+        <Button
+          style={{margin: '0 4px'}}
+          intent={Intent.DEFAULT}
+          className={Classes.MINIMAL}
+          loading={this.state.uploadingFiles}
+          icon='media'
+          onClick={(e) => this.handleAddFile(e, i - 1)}
+        />
+        <Button
+          style={{margin: '0 4px'}}
+          intent={Intent.DEFAULT}
+          className={Classes.MINIMAL}
+          loading={this.state.uploadingFiles}
+          icon='music'
+          onClick={(e) => this.handleAddFile(e, i - 1)}
+        />
+        {(!this.props.isStudent ? true : this.props.files[i].creator === localStorage.getItem('studentName')) &&
+          <Button
+            style={{margin: '0 4px'}}
+            intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+            className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+            icon='delete'
+            onClick={() => this.handleDeleteFile(fileIndex)}
+          />
+        }
+      </div>
+    )
   }
 
   renderAddButtons = (fileIndex) => {
@@ -381,7 +345,7 @@ class Document extends React.Component {
           icon='new-text-box'
           large={true}
           // text='Añadir texto'
-          onClick={() => this.handleAddTextFile(fileIndex)}
+          onClick={() => this.handleAddTextFile(this.props.files.length)}
         />
         <Button
           style={{margin: '0 8px'}}
@@ -391,7 +355,7 @@ class Document extends React.Component {
           icon='media'
           large={true}
           // text='Añadir archivos'
-          onClick={(e) => this.handleAddFile(e, fileIndex)}
+          onClick={(e) => this.handleAddFile(e, this.props.files.length)}
         />
       </div>
     )
@@ -411,122 +375,37 @@ class Document extends React.Component {
           <Beforeunload onBeforeunload={() => "No has guardado tus cambios!"} />
         }
         <div
+          className='main'
           style={{
             width: '100%',
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Navbar fixedToTop={true}>
-            <NavbarGroup align={Alignment.LEFT}>
-              <NavbarHeading
-                style={{
-                  marginRight: '8px'
-                }}
-              >
-                <div style={{
-                  maxHeight: '44px'
-                }}>
-                  <img 
-                    style={{
-                      maxHeight: '44px'
-                    }}
-                    src="/assets/images/logo-seltools.png"
-                    alt= "Seltools"
-                  />
-                </div>
-              </NavbarHeading>
-              <NavbarDivider />
-              <div
-                style={{marginLeft: '8px'}}
-              >
-                <Breadcrumbs
-                  currentBreadcrumbRenderer={this.renderCurrentBreadcrumb}
-                  items={[
-                    { href: '/documentos',
-                      icon: 'arrow-left',
-                      text: 'Documentos',
-                    },
-                    {
-                      icon: 'document',
-                      text: this.props.name,
-                    },
-                  ]}
-                />
-              </div>
-            </NavbarGroup>
-            <NavbarGroup align={Alignment.RIGHT}>
-              <Popover
-                boundary='viewport'
-              >
-                <Button 
-                  intent={Intent.PRIMARY}
-                  icon="share"
-                  text="Compartir"
-                  style={{marginRight: '2px', marginLeft: '2px'}}
-                />
-                <ul
-                  style={{
-                    listStyle: 'none',
-                    margin: 0,
-                    padding: '16px',
-                  }}
-                >
-                  {this.renderStudents()}
-                </ul>
-              </Popover>
-              <Button
-                intent={this.props.name ? this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
-                loading={this.props.isSaving}
-                style={{marginRight: '8px', marginLeft: '8px'}}
-                disabled={!this.props.name}
-                icon="floppy-disk"
-                text={this.props.isSaved ? "¡Guardado!" : "Guardar"}
-                onClick={(e) => this.handleSaveDocument(e)}
-              />
-              <NavbarDivider />
-              <Button className={Classes.MINIMAL} icon="user" />
-            </NavbarGroup>
-          </Navbar>
+          <Header isStudent={this.props.isStudent} />
           <div
+            className='document'
             style={{
-              position: 'fixed',
-              top: '70px',
-              left: '10px',
+              position: 'relative',
+              marginTop: '50px',
+              padding: '20px',
+              backgroundColor: 'rgb(250, 250, 250)'
             }}
           >
-            <Menu className={`tools-menu ${Classes.ELEVATION_1}`}>
-              <MenuItem
-                active={this.state.activeMode === 'marker'}
-                icon="widget"
-                onClick={this.changeModeToMarkers}
-                text="Notas"
-              />
-              <MenuDivider />
-              <MenuItem
-                active={this.state.activeMode === 'highlight'}
-                icon="highlight"
-                onClick={this.changeModeToHighlight}
-                text="Resaltar"
-               />
-            </Menu>
-          </div>
-          <div
-            style={{
-              maxWidth: 'var(--doc-width)',
-              margin: '0 auto',
-              paddingTop: '70px',
-              paddingRight: '10px',
-              paddingLeft: '60px',
-            }}
-          >
-            {this.props.files.length === 0 &&
-              this.renderAddButtons()
-            }
-            {this.props.files.map((file, i) => {
-              if (file.type === 'pdf') {
+            <Toolbar />
+            <div
+              style={{
+                maxWidth: 'var(--doc-width)',
+                margin: '0 auto',
+                // paddingTop: '70px',
+                // paddingRight: '10px',
+                // paddingLeft: '43px',
+              }}
+            >
+              {this.props.files.map((file, i) => {
                 return(
                   <div
                     key={file.id}
+                    className='file'
                     style={{
                       textAlign: 'center',
                     }}
@@ -537,87 +416,37 @@ class Document extends React.Component {
                       markers={file.markers}
                       highlights={file.highlights}
                       hasRendered={file.hasRendered}
-                      mode={this.state.activeMode}
+                      isStudent={this.props.isStudent}
+                      mode={this.props.editMode}
+                      fileButtons={this.renderFileButtons(i, file.id)}
                     >
-                      <Canvas file={file} fileHasRendered={this.fileHasRendered} />
+                      {file.type === 'pdf' &&
+                        <Canvas file={file} fileHasRendered={this.fileHasRendered} />
+                      }
+                      {file.type === 'txt' &&
+                        <TextFile file={file} />
+                      }
+                      {(file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') &&
+                        <AudioFile file={file} />
+                      }
+                      {(file.type === 'jpg' || file.type === 'jpeg' || file.type === 'png') &&
+                        <Image file={file} />
+                      }
                     </FileWrapper>
-                    {this.renderAddButtons(i)}
                   </div>
                 )
-              } else if (file.type === 'txt') {
-                return(
-                  <div
-                    key={file.id}
-                    style={{
-                      textAlign: 'center',
-                    }}
-                  >
-                    <FileWrapper
-                      id={file.id}
-                      fileType={file.type}
-                      markers={[]}
-                      highlights={[]}
-                      hasRendered={file.hasRendered}
-                      mode={this.state.activeMode}
-                    >
-                      <TextFile file={file} />
-                    </FileWrapper>
-                    {this.renderAddButtons(i)}
-                  </div>
-                )
-              } else if (file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') {
-                return(
-                  <div
-                    key={file.id}
-                    style={{
-                      textAlign: 'center',
-                    }}
-                  >
-                    <FileWrapper
-                      id={file.id}
-                      fileType={file.type}
-                      markers={file.markers}
-                      highlights={[]}
-                      hasRendered={file.hasRendered}
-                      mode={this.state.activeMode}
-                    >
-                      <AudioFile file={file} />
-                    </FileWrapper>
-                    {this.renderAddButtons(i)}
-                  </div>
-                )
-              } else {
-                return(
-                  <div
-                    key={file.id}
-                    style={{
-                      textAlign: 'center',
-                    }}
-                  >
-                    <FileWrapper
-                      id={file.id}
-                      fileType={file.type}
-                      markers={file.markers}
-                      highlights={file.highlights}
-                      hasRendered={file.hasRendered}
-                      mode={this.state.activeMode}
-                    >
-                      <Image file={file} />
-                    </FileWrapper>
-                    {this.renderAddButtons(i)}
-                  </div>
-                )
-              }
-            })}
-            <input
-              ref={this.fileInput}
-              multiple
-              // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
-              accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, audio/aac, audio/mpeg, audio/ogg, audio/opus, audio/wav, audio/webm'
-              type='file'
-              onChange={(e) => this.handleFileInputChange(e)}
-              style={{display: 'none'}}
-            />
+              })}
+              {this.renderAddButtons()}
+              <input
+                ref={this.fileInput}
+                multiple
+                // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
+                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, audio/aac, audio/mpeg, audio/ogg, audio/opus, audio/wav, audio/webm'
+                type='file'
+                onChange={(e) => this.handleFileInputChange(e)}
+                style={{display: 'none'}}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -629,6 +458,7 @@ function mapStateToProps(state, ownProps) {
   return {
     id: state.id,
     name: state.name,
+    students: state.students,
     sharedWith: state.sharedWith || [],
     files: state.files,
     filesOnLoad: state.filesOnLoad,
@@ -636,6 +466,7 @@ function mapStateToProps(state, ownProps) {
     isSaving: state.isSaving,
     dragging: state.dragging,
     documentIsLoading: state.documentIsLoading,
+    editMode: state.editMode,
   }
 }
 

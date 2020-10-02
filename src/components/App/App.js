@@ -10,7 +10,6 @@ import './App.css'
 import Landing from '../Landing/Landing'
 import Documents from '../Documents/Documents'
 import Document from '../Document/Document'
-import DocumentStudent from '../DocumentStudent/DocumentStudent'
 import Student from '../Student/Student'
 import TestFile from '../TestFile/TestFile'
 
@@ -23,7 +22,7 @@ class App extends React.Component {
             <TestFile />
           </Route>
           <Route path="/alumno/documento/:id">
-            <DocumentStudent />
+            <Document isStudent={true} />
           </Route>
           <Route path="/alumno/documentos">
             <Student />

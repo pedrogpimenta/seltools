@@ -155,14 +155,16 @@ class Marker extends React.Component {
         <div
           style={{
             position: 'absolute',
+            lineHeight: '0',
           }}
         >
           <div
             className={`marker ${this.props.id}`}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
+              // display: 'inline-flex',
+              // alignItems: 'center',
               padding: '3px 6px 4px 6px',
+              lineHeight: '18px',
               borderRadius: '14px',
               boxShadow: this.state.hasFocus
                 ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`

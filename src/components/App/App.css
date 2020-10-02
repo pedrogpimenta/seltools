@@ -28,6 +28,14 @@ a:hover {
 }
 
 /* Buttons */
+/* .bp3-button :-moz-focusring {
+  outline: 0 !important;
+} */
+
+button:focus {
+  outline: 0 !important;
+}
+
 .bp3-button.bp3-intent-primary:not(.bp3-minimal) {
   background-color: var(--c-primary);
   background-image: none;
@@ -66,8 +74,17 @@ a:hover {
 
 /* Navbar */
 .bp3-navbar {
+  display: flex;
+  overflow: auto;
+  justify-content: space-between;
   background-color: var(--c-primary-lightest);
   box-shadow: none;
+  z-index: 20;
+}
+
+.bp3-breadcrumb .bp3-editable-text {
+  color: #182026;
+  font-weight: 600;
 }
 
 
@@ -82,6 +99,22 @@ a:hover {
 }
 
 /* Text editor */
+
+body .marker {
+  transform: scale(.6)
+}
+
+@media screen and (min-width: 600px) {
+  body .marker {
+    transform: scale(.8)
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  body .marker {
+    transform: scale(1)
+  }
+}
 
 body .marker p {
   margin: 0;
@@ -149,6 +182,34 @@ body .medium-toolbar-arrow-under::after {
   top: 30px;
 }
 
+/* Text file */
+
+.text-editor .bp3-button {
+  display: none;
+}
+
+@media screen and (min-width: 960px) {
+  .text-editor .bp3-button {
+    display: inline-flex;
+  }
+}
+
+.file-wrapper:hover .text-editor__edit-button {
+  opacity: .6 !important;
+}
+
+/* Tools Menu */
+
+.toolbar {
+  display: none;
+}
+
+@media screen and (min-width: 960px) {
+  .toolbar {
+    display: block;
+  }
+}
+
 .tools-menu {
   min-width: 0;
 }
@@ -172,14 +233,41 @@ body .medium-toolbar-arrow-under::after {
   padding-left: 8px;
 }
 
-.highlights .ghost-highlight,
-.highlights .highlight {
+.highlights .ghost-highlight {
   opacity: .3;
 }
 
 .highlights .highlight:hover .delete {
   opacity: 1 !important;
 }
+
+.file:hover .fileButtons {
+  opacity: .6 !important;
+}
+
+
+/* Draggable stuff */
+.react-draggable:hover {
+  z-index: 20;
+}
+
+.react-draggable-dragging {
+  z-index: 20;
+}
+
+
+/* Flip icons */
+.fa-align-right,
+.fa-align-left,
+.fa-align-center {
+  transform: rotateX(180deg);
+  top: -1px;
+  position: relative;
+}
+
+
+
+
 /* :root {
   --c-primary: #F87361;
   --c-white: #FFF;

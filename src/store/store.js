@@ -6,16 +6,38 @@ const initialState = {
   filesOnLoad: [],
   documents: [],
   students: [],
+  sharedWith: [],
   isSaved: true,
   isSaving: false,
   documentIsLoading: true,
+  editMode: 'marker',
 }
+
+// TODO: this is an util
+function array_move(arr, old_index, new_index) {
+  if (new_index >= arr.length) {
+      var k = new_index - arr.length + 1;
+      while (k--) {
+          arr.push(undefined);
+      }
+  }
+  arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+  return arr; // for testing
+};
+
 
 function reducer(state = initialState, action) {
   let updatedFiles = state.files.slice()
   let filesForLS = []
 
   switch(action.type) {
+    case 'LOAD_STUDENTS':
+      return {
+        ...state,
+        students: action.students,
+        sharedWith: action.sharedWith,
+      }
+
     case 'LOAD_FILES':
       const filesOnLoad = cloneDeep(action.files)
       
@@ -77,8 +99,6 @@ function reducer(state = initialState, action) {
       }
 
     case 'CHANGE_DOCUMENT_NAME':
-      // localStorage.setItem('name', JSON.stringify(action.name))
-
       return {
         ...state,
         name: action.name,
@@ -107,6 +127,22 @@ function reducer(state = initialState, action) {
         }
       }
 
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'MOVE_FILE_UP':
+      updatedFiles = array_move(updatedFiles, action.position, action.position - 1)
+      
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'MOVE_FILE_DOWN':
+      updatedFiles = array_move(updatedFiles, action.position, action.position + 1)
+      
       return {
         ...state,
         files: updatedFiles,
@@ -260,7 +296,10 @@ function reducer(state = initialState, action) {
       const fileToAdd = {
         id: `text-file-${Math.floor((Math.random() * 100000) + 1)}`,
         type: 'txt',
-        content: '',
+        name: null,
+        markers: [],
+        content: '<p></p>',
+        creator: action.creator,
       }
 
       filesForLS.splice(action.position + 1, 0, fileToAdd)
@@ -324,8 +363,14 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
+    case 'CHANGE_ACTIVE_MODE':
+      return {
+        ...state,
+        editMode: action.editMode,
+      }
+      
     case 'CHANGE_SHAREDWITH':
-      const currentSharedWith = state.sharedWith || []
+      const currentSharedWith = state.sharedWith
 
       let studentHasFile = false
 
@@ -343,7 +388,7 @@ function reducer(state = initialState, action) {
 
       return {
         ...state,
-        sharedWith: currentSharedWith || [],
+        sharedWith: currentSharedWith,
       }
 
     case 'DOCUMENT_IS_SAVING':
