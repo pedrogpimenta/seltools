@@ -275,7 +275,7 @@ class Document extends React.Component {
           opacity: '0',
         }}
       >
-        {!this.props.isStudent &&
+        {!this.props.isStudent && i !== 0 &&
           <Button
             style={{margin: '0 4px'}}
             intent={Intent.DEFAULT}
@@ -284,7 +284,7 @@ class Document extends React.Component {
             onClick={() => this.handleMoveOneUp(i)}
           />
         }
-        {!this.props.isStudent &&
+        {!this.props.isStudent && i !== (this.props.files.length - 1) &&
           <Button
             style={{margin: '0 4px'}}
             intent={Intent.DEFAULT}
