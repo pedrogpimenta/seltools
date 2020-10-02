@@ -194,6 +194,9 @@ body .medium-toolbar-arrow-under::after {
   }
 }
 
+.file-wrapper:hover .text-editor__edit-button {
+  opacity: .6 !important;
+}
 
 /* Tools Menu */
 

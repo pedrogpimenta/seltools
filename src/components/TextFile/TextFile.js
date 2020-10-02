@@ -67,12 +67,14 @@ class TextFile extends React.Component {
         }}
       >
         <div
+          className='text-editor__edit-button'
           style={{
             position: 'absolute',
-            top: '4px',
+            top: '5px',
             right: '100%',
             cursor: 'pointer',
-            opacity: this.state.editMode === 'text' ? '.9' : '.6',
+            transition: 'all 100ms ease-out',
+            opacity: this.state.editMode === 'text' ? '.9' : '0',
           }}
         >
           <Button
