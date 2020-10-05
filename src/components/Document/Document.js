@@ -136,6 +136,9 @@ class Document extends React.Component {
             type: fileType,
             url: url,
             markers: [],
+            highlights: [],
+            stamps: [],
+            creator: this.props.isStudent ? localStorage.getItem('studentName') : 'Selen',
           })
 
           const options = {
@@ -344,7 +347,7 @@ class Document extends React.Component {
           icon='new-text-box'
           large={true}
           // text='Añadir texto'
-          onClick={() => this.handleAddTextFile(this.props.files.length)}
+          onClick={() => this.handleAddTextFile(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 8px'}}
