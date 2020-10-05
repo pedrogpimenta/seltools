@@ -425,7 +425,7 @@ class Document extends React.Component {
                       {file.type === 'txt' &&
                         <TextFile file={file} />
                       }
-                      {(file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') &&
+                      {(file.type === 'm4a' || file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') &&
                         <AudioFile file={file} />
                       }
                       {(file.type === 'jpg' || file.type === 'jpeg' || file.type === 'png') &&
