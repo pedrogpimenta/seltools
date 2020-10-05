@@ -22,7 +22,6 @@ import {
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 class Header extends React.Component {
-
   handleStudentShare = (e, studentId) => {
     this.props.dispatch({
       type: 'CHANGE_SHAREDWITH',
@@ -116,6 +115,13 @@ class Header extends React.Component {
 
   }
 
+  handleZoom = (dir) => {
+    this.props.dispatch({
+      type: 'ZOOM',
+      dir: dir,
+    })
+  }
+
   renderCurrentBreadcrumb = ({ text, ...restProps }) => {
     return (
       <Breadcrumb>
@@ -195,6 +201,18 @@ class Header extends React.Component {
           </div>
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
+          <Button 
+            minimal={true}
+            icon="zoom-in"
+            style={{marginRight: '2px', marginLeft: '2px'}}
+            onClick={() => this.handleZoom('in')}
+          />
+          <Button 
+            minimal={true}
+            icon="zoom-out"
+            style={{marginRight: '2px', marginLeft: '2px'}}
+            onClick={() => this.handleZoom('out')}
+          />
           {!this.props.isStudent &&
             <Popover
               boundary='viewport'

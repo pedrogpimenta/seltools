@@ -11,6 +11,7 @@ const initialState = {
   isSaving: false,
   documentIsLoading: true,
   editMode: 'marker',
+  currentZoom: 97,
 }
 
 // TODO: this is an util
@@ -298,6 +299,8 @@ function reducer(state = initialState, action) {
         type: 'txt',
         name: null,
         markers: [],
+        highlights: [],
+        stamps: [],
         content: '<p></p>',
         creator: action.creator,
       }
@@ -367,8 +370,46 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         editMode: action.editMode,
+        editType: action.editType,
       }
       
+    case 'ADD_NEW_STAMP':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          if (!updatedFiles[file].stamps) {
+            updatedFiles[file].stamps = []
+          }
+          updatedFiles[file].stamps.push({
+            id: action.id,
+            type: action.stampType,
+            xPercent: action.xPercent,
+            yPercent: action.yPercent,
+          })
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+  
+
+    case 'DELETE_STAMP':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let stamp in updatedFiles[file].stamps) {
+            if (updatedFiles[file].stamps[stamp].id === action.id) {
+              updatedFiles[file].stamps.splice(stamp, 1)
+            }
+          }
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
     case 'CHANGE_SHAREDWITH':
       const currentSharedWith = state.sharedWith
 
@@ -426,6 +467,21 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         dragging: false,
+      }
+
+      
+    case 'ZOOM':
+      let newZoom = state.currentZoom
+
+      if (action.dir === 'in') {
+        newZoom = state.currentZoom >= 97 ? state.currentZoom : state.currentZoom + 10
+      } else {
+        newZoom = state.currentZoom <= 32 ? state.currentZoom : state.currentZoom - 10
+      }
+
+      return {
+        ...state,
+        currentZoom: newZoom,
       }
 
     default:

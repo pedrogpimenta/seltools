@@ -1,6 +1,7 @@
 import React from 'react';
 import Markers from '../Markers/Markers'
 import Highlights from '../Highlights/Highlights'
+import Stamps from '../Stamps/Stamps'
 
 class FileWrapper extends React.Component {
   constructor() {
@@ -28,7 +29,7 @@ class FileWrapper extends React.Component {
           textAlign: 'left',
           position: 'relative',
           marginBottom: '15px',
-          maxWidth: '100%',
+          width: '100%',
         }}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
@@ -48,11 +49,21 @@ class FileWrapper extends React.Component {
               isActive={this.props.mode === 'marker'}
             />
           }
-          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
+          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' &&
             <Highlights
               fileId={this.props.id}
               highlights={this.props.highlights || []}
               isActive={this.props.mode === 'highlight'}
+              // isStudent={this.props.isStudent}
+              // hasRendered={this.props.hasRendered}
+            />
+          }
+          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' &&
+            <Stamps
+              fileId={this.props.id}
+              stamps={this.props.stamps || []}
+              isActive={this.props.mode === 'stamp'}
+              editType={this.props.editType}
               // isStudent={this.props.isStudent}
               // hasRendered={this.props.hasRendered}
             />

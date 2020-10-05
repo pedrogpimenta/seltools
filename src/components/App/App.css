@@ -16,7 +16,7 @@
 
   --c-marker-background-teacher: #FCDEDA;
 
-  --doc-width: 840px;
+  --doc-width: 88vw;
 }
 
 a {
@@ -214,12 +214,14 @@ body .medium-toolbar-arrow-under::after {
   min-width: 0;
 }
 
-.tools-menu .bp3-menu-item > .bp3-icon {
+.tools-menu .bp3-menu-item > .bp3-icon,
+.tools-menu .bp3-menu-item > .st-icon {
   margin-right: 0;
   margin-bottom: 2px;
 }
 
-.tools-menu .bp3-icon + div {
+.tools-menu .bp3-icon + div,
+.tools-menu .st-icon + div {
   opacity: 0;
   width: 0;
   padding-left: 0;
@@ -227,7 +229,8 @@ body .medium-toolbar-arrow-under::after {
   transition: all 100ms ease-out;
 }
 
-.tools-menu:hover .bp3-icon + div {
+.tools-menu:hover .bp3-icon + div,
+.tools-menu:hover .st-icon + div {
   opacity: 1;
   width: 100%;
   padding-left: 8px;
@@ -247,6 +250,10 @@ body .medium-toolbar-arrow-under::after {
 
 
 /* Draggable stuff */
+/* .react-draggable {
+  transform: translate(0) !important;
+} */
+
 .react-draggable:hover {
   z-index: 20;
 }
@@ -266,6 +273,22 @@ body .medium-toolbar-arrow-under::after {
 }
 
 
+/* Stamp icons */
+
+.st-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.stamps .stamp:hover .delete {
+  opacity: 1 !important;
+  cursor: pointer;
+}
+
+.st-icon svg,
+.stamp svg {
+  overflow: visible;
+}
 
 
 /* :root {

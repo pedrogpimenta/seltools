@@ -147,6 +147,7 @@ class Marker extends React.Component {
         ref={this.draggable}
         // bounds='parent'
         handle='.handle'
+        // scale={((this.props.currentZoom * 100) / 97) / 100}
         position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
         onDrag={(e) => this.reportDragging(e)}
         onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
@@ -156,16 +157,19 @@ class Marker extends React.Component {
           style={{
             position: 'absolute',
             lineHeight: '0',
+            transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
           }}
         >
+          {console.log(`aa (${this.props.x}px`)}
           <div
             className={`marker ${this.props.id}`}
             style={{
               // display: 'inline-flex',
               // alignItems: 'center',
-              padding: '3px 6px 4px 6px',
-              lineHeight: '18px',
-              borderRadius: '14px',
+              // padding: '3px 6px 4px 6px',
+              padding: `${(this.props.currentZoom * 5) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px`,
+              lineHeight: `${(this.props.currentZoom * 14) / 97}px`,
+              borderRadius: `${(this.props.currentZoom * 14) / 97}px`,
               boxShadow: this.state.hasFocus
                 ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
                 : markerShadow,
@@ -173,8 +177,14 @@ class Marker extends React.Component {
               boxSizing: 'border-box',
               zIndex: '1',
               userSelect: 'none',
-              minWidth: '16px',
-              minHeight: '19px',
+              minWidth: `${(this.props.currentZoom * 16) / 97}px`,
+              minHeight: `${(this.props.currentZoom * 19) / 97}px`,
+              fontSize: `${(this.props.currentZoom * 14) / 97}px`,
+              // 14 - 97
+              // x - percent
+              // transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
+              // 1 - 97
+              // x - y
             }}
             onDoubleClick={(e) => e.stopPropagation()}
             onMouseEnter={(e) => this.handleOnMouseEnter(e)}
@@ -309,6 +319,7 @@ class Marker extends React.Component {
 function mapStateToProps(state) {
   return {
     dragging: state.dragging,
+    currentZoom: state.currentZoom,
   }
 }
 

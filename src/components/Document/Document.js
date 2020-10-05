@@ -136,6 +136,8 @@ class Document extends React.Component {
             type: fileType,
             url: url,
             markers: [],
+            highlights: [],
+            stamps: [],
           })
 
           const options = {
@@ -391,11 +393,15 @@ class Document extends React.Component {
               backgroundColor: 'rgb(250, 250, 250)'
             }}
           >
-            <Toolbar />
+            <Toolbar
+              isStudent={this.props.isStudent}
+            />
             <div
               style={{
-                maxWidth: 'var(--doc-width)',
+                width: `calc(-70px + ${this.props.currentZoom}vw)`,
                 margin: '0 auto',
+                paddingLeft: '60px',
+                transition: 'all 100ms ease-in'
                 // paddingTop: '70px',
                 // paddingRight: '10px',
                 // paddingLeft: '43px',
@@ -415,9 +421,11 @@ class Document extends React.Component {
                       fileType={file.type}
                       markers={file.markers}
                       highlights={file.highlights}
+                      stamps={file.stamps}
                       hasRendered={file.hasRendered}
                       isStudent={this.props.isStudent}
                       mode={this.props.editMode}
+                      editType={this.props.editType}
                       fileButtons={this.renderFileButtons(i, file.id)}
                     >
                       {file.type === 'pdf' &&
@@ -467,6 +475,8 @@ function mapStateToProps(state, ownProps) {
     dragging: state.dragging,
     documentIsLoading: state.documentIsLoading,
     editMode: state.editMode,
+    editType: state.editType,
+    currentZoom: state.currentZoom,
   }
 }
 

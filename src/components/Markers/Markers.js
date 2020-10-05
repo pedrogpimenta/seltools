@@ -82,7 +82,7 @@ class Markers extends React.Component {
         className='markers'
         style={{
           position: 'absolute',
-          display: 'flex',
+          // display: 'flex',
           top: 0,
           left: 0,
           width: '100%',

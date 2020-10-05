@@ -305,8 +305,8 @@ class Editor extends React.Component {
           onBlur={(e) => this.onBlur()}
           style={{
             width: '100%',
-            minWidth: '16px',
-            minHeight: '19px',
+            minWidth: '0',
+            minHeight: '0',
             cursor: 'text',
             // textAlign: 'center',
           }}
