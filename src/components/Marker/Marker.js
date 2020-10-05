@@ -160,22 +160,6 @@ class Marker extends React.Component {
         >
           <div
             className={`marker ${this.props.id}`}
-            style={{
-              // display: 'inline-flex',
-              // alignItems: 'center',
-              padding: '3px 6px 4px 6px',
-              lineHeight: '18px',
-              borderRadius: '14px',
-              boxShadow: this.state.hasFocus
-                ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
-                : markerShadow,
-              background: this.props.background || 'white',
-              boxSizing: 'border-box',
-              zIndex: '1',
-              userSelect: 'none',
-              minWidth: '16px',
-              minHeight: '19px',
-            }}
             onDoubleClick={(e) => e.stopPropagation()}
             onMouseEnter={(e) => this.handleOnMouseEnter(e)}
             onMouseLeave={(e) => this.handleOnMouseLeave(e)}
@@ -221,15 +205,35 @@ class Marker extends React.Component {
                 <Icon icon='move' />
               </div>
             </div>
-            <Editor
-              content={this.props.content}
-              parentId={this.props.id}
-              fileId={this.props.fileId}
-              hasFocus={this.props.hasFocus}
-              onEditorChange={(e) => {this.handleChange(e)}}
-              onInputFocus={(e) => {this.onInputFocus(e)}}
-              onInputBlur={(e) => {this.onInputBlur(e)}}
-            />
+            <div
+              // classN
+              style={{
+                // display: 'inline-flex',
+                // alignItems: 'center',
+                padding: '3px 6px 4px 6px',
+                lineHeight: '18px',
+                borderRadius: '14px',
+                boxShadow: this.state.hasFocus
+                  ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
+                  : markerShadow,
+                background: this.props.background || 'white',
+                boxSizing: 'border-box',
+                zIndex: '1',
+                userSelect: 'none',
+                minWidth: '16px',
+                minHeight: '19px',
+              }}
+            >
+              <Editor
+                content={this.props.content}
+                parentId={this.props.id}
+                fileId={this.props.fileId}
+                hasFocus={this.props.hasFocus}
+                onEditorChange={(e) => {this.handleChange(e)}}
+                onInputFocus={(e) => {this.onInputFocus(e)}}
+                onInputBlur={(e) => {this.onInputBlur(e)}}
+              />
+            </div>
             <div
               style={{
                 position: 'absolute',
