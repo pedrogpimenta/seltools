@@ -359,6 +359,16 @@ class Document extends React.Component {
           // text='Añadir archivos'
           onClick={(e) => this.handleAddFile(e, this.props.files.length)}
         />
+        <Button
+          style={{margin: '0 8px'}}
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          loading={this.state.uploadingFiles}
+          icon='music'
+          large={true}
+          // text='Añadir archivos'
+          onClick={(e) => this.handleAddFile(e, this.props.files.length)}
+        />
       </div>
     )
   }
