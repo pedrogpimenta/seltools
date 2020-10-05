@@ -190,7 +190,6 @@ class Document extends React.Component {
         this.props.dispatch({
           type: 'LOAD_STUDENTS',
           students: data[0].students,
-          sharedWith: [],
         })
       })
   }
