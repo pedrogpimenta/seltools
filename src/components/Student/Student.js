@@ -48,7 +48,9 @@ class Student extends React.Component {
             marginBottom: '12px',
           }}
         >
-            <Link to={`/alumno/documento/${document._id}`}>{document.name}</Link>
+            <Link to={`/alumno/documento/${document._id}`}>
+              {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
+            </Link>
         </Card>
       </li>
     ))

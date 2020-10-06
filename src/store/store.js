@@ -36,7 +36,7 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         students: action.students,
-        sharedWith: action.sharedWith,
+        // sharedWith: action.sharedWith,
       }
 
     case 'LOAD_FILES':
@@ -301,7 +301,7 @@ function reducer(state = initialState, action) {
         markers: [],
         highlights: [],
         stamps: [],
-        content: '<p></p>',
+        content: '',
         creator: action.creator,
       }
 

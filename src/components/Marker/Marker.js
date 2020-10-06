@@ -163,29 +163,29 @@ class Marker extends React.Component {
           {console.log(`aa (${this.props.x}px`)}
           <div
             className={`marker ${this.props.id}`}
-            style={{
-              // display: 'inline-flex',
-              // alignItems: 'center',
-              // padding: '3px 6px 4px 6px',
-              padding: `${(this.props.currentZoom * 5) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px`,
-              lineHeight: `${(this.props.currentZoom * 14) / 97}px`,
-              borderRadius: `${(this.props.currentZoom * 14) / 97}px`,
-              boxShadow: this.state.hasFocus
-                ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
-                : markerShadow,
-              background: this.props.background || 'white',
-              boxSizing: 'border-box',
-              zIndex: '1',
-              userSelect: 'none',
-              minWidth: `${(this.props.currentZoom * 16) / 97}px`,
-              minHeight: `${(this.props.currentZoom * 19) / 97}px`,
-              fontSize: `${(this.props.currentZoom * 14) / 97}px`,
-              // 14 - 97
-              // x - percent
-              // transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
-              // 1 - 97
-              // x - y
-            }}
+            // style={{
+            //   // display: 'inline-flex',
+            //   // alignItems: 'center',
+            //   // padding: '3px 6px 4px 6px',
+            //   padding: `${(this.props.currentZoom * 5) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px`,
+            //   lineHeight: `${(this.props.currentZoom * 14) / 97}px`,
+            //   borderRadius: `${(this.props.currentZoom * 14) / 97}px`,
+            //   boxShadow: this.state.hasFocus
+            //     ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
+            //     : markerShadow,
+            //   background: this.props.background || 'white',
+            //   boxSizing: 'border-box',
+            //   zIndex: '1',
+            //   userSelect: 'none',
+            //   minWidth: `${(this.props.currentZoom * 16) / 97}px`,
+            //   minHeight: `${(this.props.currentZoom * 19) / 97}px`,
+            //   fontSize: `${(this.props.currentZoom * 14) / 97}px`,
+            //   // 14 - 97
+            //   // x - percent
+            //   // transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
+            //   // 1 - 97
+            //   // x - y
+            // }}
             onDoubleClick={(e) => e.stopPropagation()}
             onMouseEnter={(e) => this.handleOnMouseEnter(e)}
             onMouseLeave={(e) => this.handleOnMouseLeave(e)}
@@ -231,15 +231,35 @@ class Marker extends React.Component {
                 <Icon icon='move' />
               </div>
             </div>
-            <Editor
-              content={this.props.content}
-              parentId={this.props.id}
-              fileId={this.props.fileId}
-              hasFocus={this.props.hasFocus}
-              onEditorChange={(e) => {this.handleChange(e)}}
-              onInputFocus={(e) => {this.onInputFocus(e)}}
-              onInputBlur={(e) => {this.onInputBlur(e)}}
-            />
+            <div
+              // classN
+              style={{
+                // display: 'inline-flex',
+                // alignItems: 'center',
+                padding: '3px 6px 4px 6px',
+                lineHeight: '18px',
+                borderRadius: '14px',
+                boxShadow: this.state.hasFocus
+                  ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
+                  : markerShadow,
+                background: this.props.background || 'white',
+                boxSizing: 'border-box',
+                zIndex: '1',
+                userSelect: 'none',
+                minWidth: '16px',
+                minHeight: '19px',
+              }}
+            >
+              <Editor
+                content={this.props.content}
+                parentId={this.props.id}
+                fileId={this.props.fileId}
+                hasFocus={this.props.hasFocus}
+                onEditorChange={(e) => {this.handleChange(e)}}
+                onInputFocus={(e) => {this.onInputFocus(e)}}
+                onInputBlur={(e) => {this.onInputBlur(e)}}
+              />
+            </div>
             <div
               style={{
                 position: 'absolute',

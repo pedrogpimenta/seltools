@@ -77,6 +77,8 @@ class Document extends React.Component {
         .then(data => {
           const LSfiles = data[0].files || []
 
+          document.title = `${data[0].name} -- Seltools`;
+
           if (LSfiles.length > 0) {
             this.props.dispatch({
               type: 'LOAD_FILES',
@@ -138,6 +140,7 @@ class Document extends React.Component {
             markers: [],
             highlights: [],
             stamps: [],
+            creator: this.props.isStudent ? localStorage.getItem('studentName') : 'Selen',
           })
 
           const options = {
@@ -192,7 +195,6 @@ class Document extends React.Component {
         this.props.dispatch({
           type: 'LOAD_STUDENTS',
           students: data[0].students,
-          sharedWith: [],
         })
       })
   }
@@ -347,7 +349,7 @@ class Document extends React.Component {
           icon='new-text-box'
           large={true}
           // text='Añadir texto'
-          onClick={() => this.handleAddTextFile(this.props.files.length)}
+          onClick={() => this.handleAddTextFile(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 8px'}}
@@ -355,6 +357,16 @@ class Document extends React.Component {
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           loading={this.state.uploadingFiles}
           icon='media'
+          large={true}
+          // text='Añadir archivos'
+          onClick={(e) => this.handleAddFile(e, this.props.files.length)}
+        />
+        <Button
+          style={{margin: '0 8px'}}
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          loading={this.state.uploadingFiles}
+          icon='music'
           large={true}
           // text='Añadir archivos'
           onClick={(e) => this.handleAddFile(e, this.props.files.length)}
@@ -434,7 +446,7 @@ class Document extends React.Component {
                       {file.type === 'txt' &&
                         <TextFile file={file} />
                       }
-                      {(file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') &&
+                      {(file.type === 'm4a' || file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') &&
                         <AudioFile file={file} />
                       }
                       {(file.type === 'jpg' || file.type === 'jpeg' || file.type === 'png') &&

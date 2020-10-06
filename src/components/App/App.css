@@ -177,6 +177,13 @@ body .medium-editor-toolbar li .medium-editor-button-active {
   background-color: var(--c-primary-dark);
 }
 
+body .static-toolbar {
+  position: fixed;
+  top: 19px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 body .medium-toolbar-arrow-under::after {
   border-color: var(--c-primary-dark) transparent transparent transparent;
   top: 30px;

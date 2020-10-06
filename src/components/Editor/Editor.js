@@ -262,11 +262,13 @@ class Editor extends React.Component {
       placeholder: {text: ''},
       buttonLabels: 'fontawesome',
       toolbar: {
-        diffTop: -20,
         buttons: this.props.fileType === 'txt' ?
           ['h2', 'h3', 'bold', 'underline', 'striker', 'highlighter', 'redtext', 'justifyLeft', 'justifyCenter', 'justifyRight'] :
           ['bold', 'underline', 'striker', 'highlighter', 'redtext'],
-        static: true,
+        static: this.props.fileType === 'txt',
+        sticky: this.props.fileType === 'txt',
+        relativeContainer: this.props.fileType === 'txt' ? document.querySelector('.document') : null,
+        updateOnEmptySelection: this.props.fileType === 'txt',
       },
       extensions: {
         'bold': new BoldButton(),
