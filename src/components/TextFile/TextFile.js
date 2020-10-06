@@ -57,6 +57,7 @@ class TextFile extends React.Component {
           marginBottom: '20px',
           width: 'var(--doc-width)',
           maxWidth: '100%',
+          minHeight: '40px',
           padding: '8px 16px',
           margin: '0 auto',
           boxShadow: '0 2px 10px 0 rgba(0, 0, 0, .1)',

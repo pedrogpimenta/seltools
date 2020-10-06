@@ -298,7 +298,7 @@ function reducer(state = initialState, action) {
         type: 'txt',
         name: null,
         markers: [],
-        content: '<p></p>',
+        content: '',
         creator: action.creator,
       }
 
