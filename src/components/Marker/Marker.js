@@ -159,7 +159,6 @@ class Marker extends React.Component {
           }}
         >
           <div
-            className={`marker ${this.props.id}`}
             onDoubleClick={(e) => e.stopPropagation()}
             onMouseEnter={(e) => this.handleOnMouseEnter(e)}
             onMouseLeave={(e) => this.handleOnMouseLeave(e)}
@@ -206,7 +205,7 @@ class Marker extends React.Component {
               </div>
             </div>
             <div
-              // classN
+              className={`marker ${this.props.id}`}
               style={{
                 // display: 'inline-flex',
                 // alignItems: 'center',
