@@ -157,8 +157,8 @@ class Markers extends React.Component {
         onMouseUp={(e) => {this.handleMouseUp(e)}}
       >
         {this.state.width > 0 && this.props.theseMarkers && this.props.theseMarkers.map((marker) => {
-          const c = this.markersRef.current
-          const markersInfo = c.getBoundingClientRect() 
+          // const c = this.markersRef.current
+          // const markersInfo = c.getBoundingClientRect() 
           // const width = markersInfo.width
           // const height = markersInfo.height
 
