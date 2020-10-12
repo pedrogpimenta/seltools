@@ -17,7 +17,7 @@ import AudioFile from '../AudioFile/AudioFile'
 import TextFile from '../TextFile/TextFile'
 import FileWrapper from '../FileWrapper/FileWrapper'
 import Header from '../Header/Header'
-import Toolbar from '../Toolbar/Toolbar'
+// import Toolbar from '../Toolbar/Toolbar'
 
 // import { loadFile } from '../../helpers/render-docs'
 
@@ -382,7 +382,9 @@ class Document extends React.Component {
         style={{
           display: 'flex',
           overflow: 'hidden',
-          cursor: this.props.dragging ? 'grabbing' : 'default',
+          // width: '500px',
+          // margin: '0 auto',
+          // cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
         {!this.props.isSaved &&
@@ -405,14 +407,15 @@ class Document extends React.Component {
               backgroundColor: 'rgb(250, 250, 250)'
             }}
           >
-            <Toolbar
+            {/* <Toolbar
               isStudent={this.props.isStudent}
-            />
+            /> */}
             <div
               style={{
-                width: `calc(-70px + ${this.props.currentZoom}vw)`,
+                width: '100%',
+                // width: `calc(-70px + ${this.props.currentZoom}vw)`,
                 margin: '0 auto',
-                paddingLeft: '60px',
+                // paddingLeft: '60px',
                 transition: 'all 100ms ease-in'
                 // paddingTop: '70px',
                 // paddingRight: '10px',

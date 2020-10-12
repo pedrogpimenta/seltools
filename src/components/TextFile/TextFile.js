@@ -12,6 +12,8 @@ class TextFile extends React.Component {
   constructor() {
     super();
 
+    this.contentEditable = React.createRef()
+    
     this.state = {
       editMode: 'markers',
     }
@@ -37,9 +39,16 @@ class TextFile extends React.Component {
 
   onInputBlur = (e) => {
     // this.setState({hasFocus: false})
+    this.setState({editMode: 'markers'})
   }
 
   handleChangeMode = () => {
+    console.log('1')
+    if (this.state.editMode !== 'text') {
+    console.log('2')
+      this.contentEditable.current.focus()
+    }
+
     this.setState({editMode: this.state.editMode === 'text' ? 'markers' : 'text'})
   }
 
@@ -87,6 +96,7 @@ class TextFile extends React.Component {
           />
         </div>
         <Editor
+          ref={this.contentEditable}
           content={this.props.file.content}
           parentId={this.props.file.id}
           fileId={this.props.file.id}

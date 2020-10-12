@@ -292,11 +292,14 @@ class Editor extends React.Component {
     }
   }
 
-  render() {
+  focus = () => {
+    this.editableInput.current.focus()
+  }
 
+  render() {
     return (
       <div
-        style ={{
+        style={{
           width: '100%',
         }}
       >
@@ -307,8 +310,11 @@ class Editor extends React.Component {
           onBlur={(e) => this.onBlur()}
           style={{
             width: '100%',
-            minWidth: '0',
-            minHeight: '0',
+            minWidth: '25px',
+            minHeight: '25px',
+            padding: '3px 6px 4px 6px',
+            lineHeight: '18px',
+            textAlign: this.props.fileType === 'marker' ? 'center' : 'inherit',
             cursor: 'text',
             // textAlign: 'center',
           }}

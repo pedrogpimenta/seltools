@@ -1,8 +1,8 @@
 import React from 'react'
-import Draggable from 'react-draggable'
+// import Draggable from 'react-draggable'
 import { connect } from 'react-redux'
 import { store } from '../../store/store'
-import { findDOMNode } from 'react-dom'
+// import { findDOMNode } from 'react-dom'
 import {
   Icon,
 } from "@blueprintjs/core"
@@ -19,6 +19,7 @@ class Marker extends React.Component {
       hasFocus: false,
     }
 
+    this.markerWrapper = React.createRef()
     this.draggable = React.createRef()
     this.contentEditable = React.createRef()
   }
@@ -91,6 +92,11 @@ class Marker extends React.Component {
 
   // }
 
+  // onMarkerClick = (e) => {
+  //   this.setState({hasFocus: true})
+  //   this.contentEditable.current.focus()
+  // }
+
   onInputFocus = (e) => {
     this.setState({hasFocus: true})
   }
@@ -121,74 +127,98 @@ class Marker extends React.Component {
       // this.props.setNotEditing()
     // }
 
-    const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
-    const thisInfo = findDOMNode(this.draggable.current)
-    this.setState({
-      parentInfo: parentInfo,
-      thisInfo: thisInfo,
-    })
-  }
-
-  render() {
-    let x = 0
-    let y = 0
-    const markerShadow = 'rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 2px 8px 0px'
-
-    if (!!this.state.parentInfo) {
-      const width = this.state.parentInfo.getBoundingClientRect().width
-      const height = this.state.parentInfo.getBoundingClientRect().height
-
-      x = (this.props.x * width) / 100
-      y = (this.props.y * height) / 100
+    if (!!this.props.hasFocus) {
+      this.contentEditable.current.focus()
     }
 
+    // const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
+    // const thisInfo = findDOMNode(this.draggable.current)
+    // this.setState({
+    //   parentInfo: parentInfo,
+    //   thisInfo: thisInfo,
+    // })
+
+    // debugger;
+    // console.log('marker initial:', this.markerWrapper.current.getBoundingClientRect())
+  }
+
+  handleMarkerMove = (e) => {
+    // console.log('marker move:', )
+  }
+
+  handleMousedown = (e) => {
+    // console.log('drag start')
+    
+    store.dispatch({
+      type: "IS_DRAGGING",
+      markerId: this.props.id,
+    }) 
+  }
+
+  // handleDragEnd = (e) => {
+  //   console.log('drag end')
+  //   // console.log('markerw:', this.markerWrapper.current)
+
+  //   store.dispatch({
+  //     type: "NOT_DRAGGING",
+  //   }) 
+  // }
+
+  render() {
+    // let x = 0
+    // let y = 0
+    const markerShadow = 'rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 2px 8px 0px'
+
+    // if (!!this.state.parentInfo) {
+    //   const width = this.state.parentInfo.getBoundingClientRect().width
+    //   const height = this.state.parentInfo.getBoundingClientRect().height
+
+    //   x = (this.props.x * width) / 100
+    //   y = (this.props.y * height) / 100
+    // }
+
     return (
-      <Draggable
-        ref={this.draggable}
-        // bounds='parent'
-        handle='.handle'
-        // scale={((this.props.currentZoom * 100) / 97) / 100}
-        position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
-        onDrag={(e) => this.reportDragging(e)}
-        onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
-        onDoubleClick={(e) => e.stopPropagation()}
-      >
+      // <Draggable
+      //   ref={this.draggable}
+      //   bounds='parent'
+      //   handle='.handle'
+      //   // scale={((this.props.currentZoom * 100) / 97) / 100}
+      //   // position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
+      //   // defaultPosition={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
+      //   onDrag={(e) => this.reportDragging(e)}
+      //   // onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
+      //   onDoubleClick={(e) => e.stopPropagation()}
+      // >
         <div
+          ref={this.markerWrapper}
+          className='marker-wrapper'
           style={{
             position: 'absolute',
+            // top: y - (this.state.thisInfo?.getBoundingClientRect().height / 2),
+            top: `${this.props.y}%`,
+            left: `${this.props.x}%`,
             lineHeight: '0',
             transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
           }}
+          // draggable
+          onMouseEnter={(e) => this.handleOnMouseEnter(e)}
+          onMouseLeave={(e) => this.handleOnMouseLeave(e)}
+          onMouseDown={(e) => this.handleMousedown(e)}
+          onDragStart={(e) => {return false}}
+          // onMouseMove={(e) => this.handleDrag(e)}
+          // onMouseUp={(e) => this.handleDragEnd(e)}
         >
-          {console.log(`aa (${this.props.x}px`)}
+          {/* {console.log(`aa (${this.props.x}px`)} */}
           <div
-            className={`marker ${this.props.id}`}
-            // style={{
-            //   // display: 'inline-flex',
-            //   // alignItems: 'center',
-            //   // padding: '3px 6px 4px 6px',
-            //   padding: `${(this.props.currentZoom * 5) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px ${(this.props.currentZoom * 7) / 97}px`,
-            //   lineHeight: `${(this.props.currentZoom * 14) / 97}px`,
-            //   borderRadius: `${(this.props.currentZoom * 14) / 97}px`,
-            //   boxShadow: this.state.hasFocus
-            //     ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
-            //     : markerShadow,
-            //   background: this.props.background || 'white',
-            //   boxSizing: 'border-box',
-            //   zIndex: '1',
-            //   userSelect: 'none',
-            //   minWidth: `${(this.props.currentZoom * 16) / 97}px`,
-            //   minHeight: `${(this.props.currentZoom * 19) / 97}px`,
-            //   fontSize: `${(this.props.currentZoom * 14) / 97}px`,
-            //   // 14 - 97
-            //   // x - percent
-            //   // transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
-            //   // 1 - 97
-            //   // x - y
-            // }}
-            onDoubleClick={(e) => e.stopPropagation()}
-            onMouseEnter={(e) => this.handleOnMouseEnter(e)}
-            onMouseLeave={(e) => this.handleOnMouseLeave(e)}
+            style={{
+              // position: 'absolute',
+              // top: y - (this.state.thisInfo?.getBoundingClientRect().height / 2),
+              // left: x,
+            }}
+            // onMouseUp={(e) => this.props.editMarkerPosition(e, this.props.id)}
+            // onDoubleClick={(e) => e.stopPropagation()}
+            // onMouseEnter={(e) => this.handleOnMouseEnter(e)}
+            // onMouseLeave={(e) => this.handleOnMouseLeave(e)}
           >
             {this.props.background === 'var(--c-marker-background-teacher)' &&
               <div
@@ -232,12 +262,12 @@ class Marker extends React.Component {
               </div>
             </div>
             <div
-              // classN
+              className={`marker ${this.props.id}`}
               style={{
                 // display: 'inline-flex',
                 // alignItems: 'center',
-                padding: '3px 6px 4px 6px',
-                lineHeight: '18px',
+                // padding: '3px 6px 4px 6px',
+                // lineHeight: '18px',
                 borderRadius: '14px',
                 boxShadow: this.state.hasFocus
                   ? `0 0 0 2px var(--c-primary-dark), ${markerShadow}`
@@ -246,15 +276,18 @@ class Marker extends React.Component {
                 boxSizing: 'border-box',
                 zIndex: '1',
                 userSelect: 'none',
-                minWidth: '16px',
-                minHeight: '19px',
+                // minWidth: '16px',
+                // minHeight: '25px',
               }}
+              // onClick={(e) => this.onMarkerClick(e)}
             >
               <Editor
+                ref={this.contentEditable}
                 content={this.props.content}
                 parentId={this.props.id}
                 fileId={this.props.fileId}
-                hasFocus={this.props.hasFocus}
+                fileType='marker'
+                // hasFocus={this.state.hasFocus}
                 onEditorChange={(e) => {this.handleChange(e)}}
                 onInputFocus={(e) => {this.onInputFocus(e)}}
                 onInputBlur={(e) => {this.onInputBlur(e)}}
@@ -331,7 +364,7 @@ class Marker extends React.Component {
             </div>
           </div>
         </div>
-      </Draggable>
+      // </Draggable>
     )
   }
 };

@@ -130,6 +130,11 @@ body .marker .highlight {
   min-height: 0;
 } */
 
+body .medium-editor-placeholder::after,
+body .medium-editor-placeholder-relative::after {
+  padding: 0;
+}
+
 body .medium-editor-element p {
   margin: 0;
 }

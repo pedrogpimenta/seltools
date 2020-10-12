@@ -221,10 +221,14 @@ function reducer(state = initialState, action) {
 
     case 'EDIT_MARKER':
       const actionId = parseInt(action.id)
+      // console.log('1')
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
+      // console.log('2')
           for (let marker in updatedFiles[file].markers) {
             if (updatedFiles[file].markers[marker].id === actionId) {
+      // console.log('3')
+
               if (action.content !== undefined) {
                 updatedFiles[file].markers[marker].content = action.content
               }
@@ -461,12 +465,14 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         dragging: true,
+        markerDragId: action.markerId,
       }
 
     case 'NOT_DRAGGING':
       return {
         ...state,
         dragging: false,
+        markerDragId: null,
       }
 
       

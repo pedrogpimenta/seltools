@@ -34,7 +34,7 @@ class FileWrapper extends React.Component {
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        {this.props.fileButtons}
+        {/* {this.props.fileButtons} */}
         <div
           style={{
             position: 'relative',
