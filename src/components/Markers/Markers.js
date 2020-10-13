@@ -94,7 +94,7 @@ class Markers extends React.Component {
     const yPercent = ((markerY) * 100) / markerHeight
 
     // debugger;
-    this.props.dispatch({
+    store.dispatch({
       type: "EDIT_MARKER",
       fileId: this.props.fileId,
       id: this.props.markerDragId,
@@ -196,11 +196,13 @@ class Markers extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    dragging: state.markerDragId,
-    markerDragId: state.markerDragId,
-  }
-}
+export default Markers
 
-export default connect(mapStateToProps)(Markers)
+// function mapStateToProps(state) {
+//   return {
+//     dragging: state.markerDragId,
+//     markerDragId: state.markerDragId,
+//   }
+// }
+
+// export default connect(mapStateToProps)(Markers)
