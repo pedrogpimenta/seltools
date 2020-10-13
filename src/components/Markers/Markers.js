@@ -33,6 +33,9 @@ class Markers extends React.Component {
       x: xPercent,
       y: yPercent,
       background: 'white',
+      draggingMarkerId: null,
+      draggingMarkerX: 0,
+      draggingMarkerY: 0, 
     }) 
 
     store.dispatch({
@@ -156,24 +159,10 @@ class Markers extends React.Component {
         onMouseMove={(e) => {this.handleMouseMove(e)}}
         onMouseUp={(e) => {this.handleMouseUp(e)}}
       >
+        <span>aa</span>
+        {console.log(`this props markers: ${this.props.markers}`)}
         {this.props.markers && this.props.markers.map((marker) => {
-          // const c = this.markersRef.current
-          // const markersInfo = c.getBoundingClientRect() 
-          // const width = markersInfo.width
-          // const height = markersInfo.height
-
-          // const x = (marker.x * width) / 100
-          // const y = (marker.y * height) / 100
-          // console.log( 'render marker inside markers 1')
-
           return(
-            // <div
-            // style={{
-            //   // position: 'absolute',
-            //   // top: marker.y,
-            //   // left: marker.x,
-            // }}
-            // >
             <div>
               <span>oo</span>
               <Marker
@@ -183,7 +172,6 @@ class Markers extends React.Component {
                 id={marker.id}
                 x={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerX : marker.x}
                 y={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerY : marker.y}
-                // y={marker.y}
                 content={marker.content}
                 background={marker.background}
                 editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
