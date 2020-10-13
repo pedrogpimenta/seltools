@@ -1,6 +1,6 @@
 import React from 'react'
 // import Draggable from 'react-draggable'
-import { connect } from 'react-redux'
+// import { connect } from 'react-redux'
 import { store } from '../../store/store'
 // import { findDOMNode } from 'react-dom'
 import {
@@ -198,7 +198,7 @@ class Marker extends React.Component {
             top: `${this.props.y}%`,
             left: `${this.props.x}%`,
             lineHeight: '0',
-            transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
+            // transform: `scale(${((this.props.currentZoom * 100) / 97) / 100})`,
           }}
           // draggable
           onMouseEnter={(e) => this.handleOnMouseEnter(e)}
@@ -242,7 +242,7 @@ class Marker extends React.Component {
                 top: '0',
                 left: '-30px',
                 paddingRight: '4px',
-                cursor: this.props.dragging ? 'grabbing' : 'grab',
+                // cursor: this.props.dragging ? 'grabbing' : 'grab',
                 opacity: this.state.hover ? '1' : '0',
                 transition: 'all 100ms ease-out',
               }}
@@ -367,13 +367,15 @@ class Marker extends React.Component {
       // </Draggable>
     )
   }
-};
-
-function mapStateToProps(state) {
-  return {
-    dragging: state.dragging,
-    currentZoom: state.currentZoom,
-  }
 }
 
-export default connect(mapStateToProps)(Marker)
+export default Marker
+
+// function mapStateToProps(state) {
+//   return {
+//     dragging: state.dragging,
+//     currentZoom: state.currentZoom,
+//   }
+// }
+
+// export default connect(mapStateToProps)(Marker)
