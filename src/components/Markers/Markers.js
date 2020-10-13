@@ -156,7 +156,7 @@ class Markers extends React.Component {
         onMouseMove={(e) => {this.handleMouseMove(e)}}
         onMouseUp={(e) => {this.handleMouseUp(e)}}
       >
-        {this.state.width > 0 && this.props.theseMarkers && this.props.theseMarkers.map((marker) => {
+        {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
           // const c = this.markersRef.current
           // const markersInfo = c.getBoundingClientRect() 
           // const width = markersInfo.width
@@ -196,11 +196,10 @@ class Markers extends React.Component {
   }
 }
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
   return {
     dragging: state.markerDragId,
     markerDragId: state.markerDragId,
-    theseMarkers: ownProps.markers,
   }
 }
 
