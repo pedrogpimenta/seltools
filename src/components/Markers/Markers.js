@@ -1,6 +1,6 @@
 import React from 'react';
 import Marker from '../Marker/Marker'
-import { connect } from 'react-redux'
+// import { connect } from 'react-redux'
 import { store } from '../../store/store'
 // import { findDOMNode } from 'react-dom'
 
