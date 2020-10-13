@@ -156,7 +156,7 @@ class Markers extends React.Component {
         onMouseMove={(e) => {this.handleMouseMove(e)}}
         onMouseUp={(e) => {this.handleMouseUp(e)}}
       >
-        {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
+        {this.props.markers && this.props.markers.map((marker) => {
           // const c = this.markersRef.current
           // const markersInfo = c.getBoundingClientRect() 
           // const width = markersInfo.width
@@ -174,6 +174,8 @@ class Markers extends React.Component {
             //   // left: marker.x,
             // }}
             // >
+            <div>
+              <span>oo</span>
               <Marker
                 key={marker.id}
                 fileId={this.props.fileId}
@@ -188,7 +190,7 @@ class Markers extends React.Component {
                 isStudent={this.props.isStudent}
                 hasFocus={marker.hasFocus}
               />
-            // </div>
+            </div>
           )
         })}
       </div>
