@@ -1,6 +1,6 @@
 import React from 'react';
 import Marker from '../Marker/Marker'
-// import { connect } from 'react-redux'
+import { connect } from 'react-redux'
 import { store } from '../../store/store'
 // import { findDOMNode } from 'react-dom'
 
@@ -21,6 +21,7 @@ class Markers extends React.Component {
   addNewMarker = (e) => {
     // const c = this.markersRef.current
     // const markersInfo = c.getBoundingClientRect()
+    // debugger;
     const newId = Math.floor((Math.random() * 100000) + 1)
     const xPercent = ((e.clientX - this.state.x) * 100) / this.state.width
     const yPercent = ((e.clientY - this.state.y) * 100) / this.state.height
@@ -32,9 +33,6 @@ class Markers extends React.Component {
       x: xPercent,
       y: yPercent,
       background: 'white',
-      draggingMarkerId: null,
-      draggingMarkerX: 0,
-      draggingMarkerY: 0, 
     }) 
 
     store.dispatch({
@@ -43,6 +41,7 @@ class Markers extends React.Component {
   }
 
   editMarkerPosition = (e, markerId) => {
+    debugger;
     const c = this.markersRef.current
     const markersInfo = c.getBoundingClientRect()
     // const targetEl = findDOMNode(e.target)
@@ -94,7 +93,8 @@ class Markers extends React.Component {
     const xPercent = ((markerX) * 100) / markerWidth
     const yPercent = ((markerY) * 100) / markerHeight
 
-    store.dispatch({
+    // debugger;
+    this.props.dispatch({
       type: "EDIT_MARKER",
       fileId: this.props.fileId,
       id: this.props.markerDragId,
@@ -114,6 +114,7 @@ class Markers extends React.Component {
   componentDidMount = () => {
     // TODO: Fix timeout: check if all images have loaded and then set
     window.setTimeout(() => {
+      // debugger;
 
       const thisMarker = this.markersRef.current.getBoundingClientRect()
       const markersX = thisMarker.x
@@ -140,10 +141,13 @@ class Markers extends React.Component {
         className='markers'
         style={{
           position: 'absolute',
+          // display: 'flex',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
+          // minHeight: '1000px',
+          // marginTop: '34px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
           zIndex: this.props.isActive ? '5' : '1',
           background: 'blue',
@@ -152,13 +156,24 @@ class Markers extends React.Component {
         onMouseMove={(e) => {this.handleMouseMove(e)}}
         onMouseUp={(e) => {this.handleMouseUp(e)}}
       >
-        <span>aa</span>
-        {this.props.markers && this.props.markers.map((marker) => {
+        {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
+          // const c = this.markersRef.current
+          // const markersInfo = c.getBoundingClientRect() 
+          // const width = markersInfo.width
+          // const height = markersInfo.height
+
+          // const x = (marker.x * width) / 100
+          // const y = (marker.y * height) / 100
+          // console.log( 'render marker inside markers 1')
+
           return(
-            <div
-              key={`${marker.id}-wrapper`}
-            >
-              <span>oo</span>
+            // <div
+            // style={{
+            //   // position: 'absolute',
+            //   // top: marker.y,
+            //   // left: marker.x,
+            // }}
+            // >
               <Marker
                 key={marker.id}
                 fileId={this.props.fileId}
@@ -166,13 +181,14 @@ class Markers extends React.Component {
                 id={marker.id}
                 x={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerX : marker.x}
                 y={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerY : marker.y}
+                // y={marker.y}
                 content={marker.content}
                 background={marker.background}
                 editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
                 isStudent={this.props.isStudent}
                 hasFocus={marker.hasFocus}
               />
-            </div>
+            // </div>
           )
         })}
       </div>
@@ -180,13 +196,11 @@ class Markers extends React.Component {
   }
 }
 
-export default Markers
+function mapStateToProps(state) {
+  return {
+    dragging: state.markerDragId,
+    markerDragId: state.markerDragId,
+  }
+}
 
-// function mapStateToProps(state) {
-//   return {
-//     dragging: state.markerDragId,
-//     markerDragId: state.markerDragId,
-//   }
-// }
-
-// export default connect(mapStateToProps)(Markers)
+export default connect(mapStateToProps)(Markers)
