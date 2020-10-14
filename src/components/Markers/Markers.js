@@ -103,20 +103,7 @@ class Markers extends React.Component {
   }
 
   componentDidMount = () => {
-    window.setTimeout(() => {
-      const thisMarker = this.markersRef.current.getBoundingClientRect()
-      const markersX = thisMarker.x
-      const markersY = thisMarker.y
-      const markersWidth = thisMarker.width
-      const markersHeight = thisMarker.height
 
-      this.setState({
-        x: markersX,
-        y: markersY,
-        width: markersWidth,
-        height: markersHeight,
-      })
-    }, 1000)
   }
 
   render() {
