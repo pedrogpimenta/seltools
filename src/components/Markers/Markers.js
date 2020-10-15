@@ -156,7 +156,6 @@ class Markers extends React.Component {
         onMouseMove={(e) => {this.handleMouseMove(e)}}
         onMouseUp={(e) => {this.handleMouseUp(e)}}
       >
-        <span>aa</span>
         {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
           // const c = this.markersRef.current
           // const markersInfo = c.getBoundingClientRect() 
@@ -168,22 +167,19 @@ class Markers extends React.Component {
           // console.log( 'render marker inside markers 1')
           
           return(
-            <div>
-              <span>bb</span>
-              <Marker
-                key={marker.id}
-                fileId={this.props.fileId}
-                hasRendered={this.props.hasRendered}
-                id={marker.id}
-                x={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerX : marker.x}
-                y={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerY : marker.y}
-                content={marker.content}
-                background={marker.background}
-                editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
-                isStudent={this.props.isStudent}
-                hasFocus={marker.hasFocus}
-              />
-            </div>
+            <Marker
+              key={marker.id}
+              fileId={this.props.fileId}
+              hasRendered={this.props.hasRendered}
+              id={marker.id}
+              x={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerX : marker.x}
+              y={this.state.draggingMarkerId === marker.id ? this.state.draggingMarkerY : marker.y}
+              content={marker.content}
+              background={marker.background}
+              editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
+              isStudent={this.props.isStudent}
+              hasFocus={marker.hasFocus}
+            />
           )
         })}
       </div>
