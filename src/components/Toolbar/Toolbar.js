@@ -32,12 +32,22 @@ class Toolbar extends React.Component {
         className='toolbar'
         style={{
           position: 'fixed',
-          top: '70px',
-          left: '20px',
+          top: '50px',
+          left: '0px',
+          height: 'calc(100vh - 50px)',
           zIndex: '5',
         }}
       >
-        <Menu className={`tools-menu ${Classes.ELEVATION_1}`}>
+        <Menu
+          className={`tools-menu ${Classes.ELEVATION_1}`}
+          style={{
+            border: '0',
+            borderRadius: '0',
+            boxShadow: 'none',
+            borderRight: '1px solid lightgrey',
+            height: '100%',
+          }}
+        >
           <MenuItem
             active={this.props.editMode === 'normal'}
             icon="eye-open"

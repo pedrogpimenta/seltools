@@ -17,7 +17,7 @@ import AudioFile from '../AudioFile/AudioFile'
 import TextFile from '../TextFile/TextFile'
 import FileWrapper from '../FileWrapper/FileWrapper'
 import Header from '../Header/Header'
-// import Toolbar from '../Toolbar/Toolbar'
+import Toolbar from '../Toolbar/Toolbar'
 
 // import { loadFile } from '../../helpers/render-docs'
 
@@ -401,25 +401,22 @@ class Document extends React.Component {
           <div
             className='document'
             style={{
+              display: 'flex',
               position: 'relative',
               marginTop: '50px',
-              padding: '20px',
+              // padding: '20px',
               backgroundColor: 'rgb(250, 250, 250)'
             }}
           >
-            {/* <Toolbar
+            <Toolbar
               isStudent={this.props.isStudent}
-            /> */}
+            />
             <div
               style={{
                 width: '100%',
-                // width: `calc(-70px + ${this.props.currentZoom}vw)`,
                 margin: '0 auto',
-                // paddingLeft: '60px',
-                transition: 'all 100ms ease-in'
-                // paddingTop: '70px',
-                // paddingRight: '10px',
-                // paddingLeft: '43px',
+                transition: 'all 100ms ease-in',
+                padding: '10px 20px 20px 80px',
               }}
             >
               {this.props.files.map((file, i) => {

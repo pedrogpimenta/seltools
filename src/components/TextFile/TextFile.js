@@ -92,7 +92,7 @@ class TextFile extends React.Component {
             intent={this.state.editMode === 'markers' ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.state.editMode === 'markers' && Classes.MINIMAL}
             icon={this.state.editMode === 'markers' ? 'edit' : 'lock'}
-            onClick={this.handleChangeMode}
+            onMouseUp={this.handleChangeMode}
           />
         </div>
         <Editor

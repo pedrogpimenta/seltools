@@ -24,7 +24,7 @@ class Markers extends React.Component {
     // debugger;
     const newId = Math.floor((Math.random() * 100000) + 1)
     const xPercent = ((e.clientX - this.state.x) * 100) / this.state.width
-    const yPercent = ((e.clientY - this.state.y) * 100) / this.state.height
+    const yPercent = (((e.clientY - this.state.y) * 100) / this.state.height) - (this.state.height / 2)
 
     store.dispatch({
       type: "ADD_MARKER",
@@ -71,22 +71,21 @@ class Markers extends React.Component {
   }
 
   handleMouseUp = (e) => {
-    store.dispatch({
-      type: "NOT_DRAGGING",
-      markerId: null,
-    }) 
+    // store.dispatch({
+    //   type: "NOT_DRAGGING",
+    // }) 
   }
 
   handleMouseMove = (e) => {
     // console.log()
 
-    if (!this.props.markerDragId) return false
+    if (!this.state.draggingMarkerId) return false
 
     const c = this.markersRef.current
     const markersInfo = c.getBoundingClientRect()
 
-    const markerX = e.clientX - markersInfo.x
-    const markerY = e.clientY - markersInfo.y
+    const markerX = (e.clientX - this.state.draggingClickOffsetX) - markersInfo.x
+    const markerY = (e.clientY - this.state.draggingClickOffsetY) - markersInfo.y
     const markerWidth = markersInfo.width
     const markerHeight = markersInfo.height
     
@@ -94,16 +93,16 @@ class Markers extends React.Component {
     const yPercent = ((markerY) * 100) / markerHeight
 
     // debugger;
-    this.props.dispatch({
+    store.dispatch({
       type: "EDIT_MARKER",
       fileId: this.props.fileId,
-      id: this.props.markerDragId,
+      id: this.state.draggingMarkerId,
       x: xPercent,
       y: yPercent,
     })
 
     this.setState({
-      draggingMarkerId: this.props.markerDragId,
+      draggingMarkerId: this.state.draggingMarkerId,
       draggingMarkerX: xPercent,
       draggingMarkerY: yPercent,
     })
@@ -134,7 +133,26 @@ class Markers extends React.Component {
     // console.log( 'render marker inside markers 2')
   }
 
+  handleMarkerMouseDown = (obj) => {
+    this.setState({
+      draggingMarkerId: obj.markerId,
+      draggingClickOffsetX: obj.clickOffsetX,
+      draggingClickOffsetY: obj.clickOffsetY,
+    })
+  }
+
+  handleMarkerMouseUp = (obj) => {
+    this.setState({
+      draggingMarkerId: null,
+      draggingMarkerX: null,
+      draggingMarkerY: null,
+      draggingClickOffsetX: null,
+      draggingClickOffsetY: null,
+    })
+  }
+
   render() {
+    console.log('render markers 1')
     return (
       <div
         ref={this.markersRef}
@@ -150,13 +168,14 @@ class Markers extends React.Component {
           // marginTop: '34px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
           zIndex: this.props.isActive ? '5' : '1',
-          background: 'blue',
+          // background: 'blue',
         }}
         onDoubleClick={(e) => this.addNewMarker(e)}
         onMouseMove={(e) => {this.handleMouseMove(e)}}
         onMouseUp={(e) => {this.handleMouseUp(e)}}
       >
-        {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
+        {this.props.markers.map((marker) => {
+          console.log('dis markers')
           // const c = this.markersRef.current
           // const markersInfo = c.getBoundingClientRect() 
           // const width = markersInfo.width
@@ -179,6 +198,8 @@ class Markers extends React.Component {
               editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
               isStudent={this.props.isStudent}
               hasFocus={marker.hasFocus}
+              handleMarkerMouseDown={(obj) => this.handleMarkerMouseDown(obj)}
+              handleMarkerMouseUp={(obj) => this.handleMarkerMouseUp(obj)}
             />
           )
         })}
@@ -187,11 +208,15 @@ class Markers extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    dragging: state.markerDragId,
-    markerDragId: state.markerDragId,
-  }
-}
+export default Markers
 
-export default connect(mapStateToProps)(Markers)
+// function mapStateToProps(state) {
+//   return {
+//     dragging: state.markerDragId,
+//     markerDragId: state.markerDragId,
+//     clickOffsetX: state.clickOffsetX,
+//     clickOffsetY: state.clickOffsetY,
+//   }
+// }
+
+// export default connect(mapStateToProps)(Markers)

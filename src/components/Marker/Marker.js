@@ -1,6 +1,6 @@
 import React from 'react'
 // import Draggable from 'react-draggable'
-// import { connect } from 'react-redux'
+import { connect } from 'react-redux'
 import { store } from '../../store/store'
 // import { findDOMNode } from 'react-dom'
 import {
@@ -17,6 +17,8 @@ class Marker extends React.Component {
       parentInfo: null,
       thisInfo: null,
       hasFocus: false,
+      clickOffsetX: 0,
+      clickOffsetY: 0,
     }
 
     this.markerWrapper = React.createRef()
@@ -79,9 +81,9 @@ class Marker extends React.Component {
   }
 
   reportDragging = () => {
-    store.dispatch({
-      type: "IS_DRAGGING",
-    }) 
+    // store.dispatch({
+    //   type: "IS_DRAGGING",
+    // }) 
   }
 
   // onEditorChange = (e) => {
@@ -127,6 +129,8 @@ class Marker extends React.Component {
       // this.props.setNotEditing()
     // }
 
+    console.log('1 marker mount')
+
     if (!!this.props.hasFocus) {
       this.contentEditable.current.focus()
     }
@@ -146,13 +150,30 @@ class Marker extends React.Component {
     // console.log('marker move:', )
   }
 
-  handleMousedown = (e) => {
+  handleMouseDown = (e) => {
     // console.log('drag start')
+
+    this.setState({
+      clickOffsetX: e.clientX - this.markerWrapper.current.getBoundingClientRect().left,
+      clickOffsetY: e.clientY - this.markerWrapper.current.getBoundingClientRect().top,
+    })
+
+    this.props.handleMarkerMouseDown({
+        markerId: this.props.id,
+        clickOffsetX: e.clientX - this.markerWrapper.current.getBoundingClientRect().left,
+        clickOffsetY: e.clientY - this.markerWrapper.current.getBoundingClientRect().top,
+    })
     
-    store.dispatch({
-      type: "IS_DRAGGING",
-      markerId: this.props.id,
-    }) 
+    // store.dispatch({
+    //   type: "IS_DRAGGING",
+    //   markerId: this.props.id,
+    //   clickOffsetX: e.clientX - this.markerWrapper.current.getBoundingClientRect().left,
+    //   clickOffsetY: e.clientY - this.markerWrapper.current.getBoundingClientRect().top,
+    // }) 
+  }
+
+  handleMouseUp = (e) => {
+    this.props.handleMarkerMouseUp()
   }
 
   // handleDragEnd = (e) => {
@@ -177,6 +198,10 @@ class Marker extends React.Component {
     //   y = (this.props.y * height) / 100
     // }
 
+    // const thisX = this.props.x - tji
+
+    // const thisX = this.props.isDragging ? `calc(${this.props.y}% - ${this.state.clickOffsetY}px`
+
     return (
         <div
           ref={this.markerWrapper}
@@ -189,8 +214,9 @@ class Marker extends React.Component {
           }}
           onMouseEnter={(e) => this.handleOnMouseEnter(e)}
           onMouseLeave={(e) => this.handleOnMouseLeave(e)}
-          onMouseDown={(e) => this.handleMousedown(e)}
-          onDragStart={(e) => {return false}}
+          onMouseDown={(e) => this.handleMouseDown(e)}
+          onMouseUp={(e) => this.handleMouseUp(e)}
+          // onDragStart={(e) => {return false}}
         >
           <div
           >
@@ -333,13 +359,13 @@ class Marker extends React.Component {
   }
 }
 
-export default Marker
+// export default Marker
 
-// function mapStateToProps(state) {
-//   return {
-//     dragging: state.dragging,
-//     currentZoom: state.currentZoom,
-//   }
-// }
+function mapStateToProps(state) {
+  return {
+    dragging: state.dragging,
+    currentZoom: state.currentZoom,
+  }
+}
 
-// export default connect(mapStateToProps)(Marker)
+export default connect(mapStateToProps)(Marker)

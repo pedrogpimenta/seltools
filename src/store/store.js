@@ -194,12 +194,6 @@ function reducer(state = initialState, action) {
         }
       }
 
-      filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
-      }
-      // localStorage.setItem('files', JSON.stringify(filesForLS))
-
       return {
         ...state,
         files: updatedFiles,
@@ -243,10 +237,10 @@ function reducer(state = initialState, action) {
         }
       }
 
-      filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
-      }
+      // filesForLS = updatedFiles.slice()
+      // for (let file in filesForLS) {
+      //   filesForLS[file].hasRendered = false
+      // }
       // localStorage.setItem('files', JSON.stringify(filesForLS))
 
       return {
@@ -255,20 +249,19 @@ function reducer(state = initialState, action) {
       }
 
     case 'DELETE_MARKER':
+      console.log('delete 1')
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
           for (let marker in updatedFiles[file].markers) {
             if (updatedFiles[file].markers[marker].id === action.id) {
+      console.log('delete 3')
               updatedFiles[file].markers.splice(marker, 1)
             }
           }
         }
       }
 
-      filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
-      }
+      console.log('delete 2')
 
       return {
         ...state,
@@ -286,10 +279,10 @@ function reducer(state = initialState, action) {
         }
       }
 
-      filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
-      }
+      // filesForLS = updatedFiles.slice()
+      // for (let file in filesForLS) {
+      //   filesForLS[file].hasRendered = false
+      // }
 
       return {
         ...state,
@@ -466,6 +459,8 @@ function reducer(state = initialState, action) {
         ...state,
         dragging: true,
         markerDragId: action.markerId,
+        clickOffsetX: action.clickOffsetX,
+        clickOffsetY: action.clickOffsetY,
       }
 
     case 'NOT_DRAGGING':
@@ -473,6 +468,8 @@ function reducer(state = initialState, action) {
         ...state,
         dragging: false,
         markerDragId: null,
+        clickOffsetX: 0,
+        clickOffsetY: 0,
       }
 
       

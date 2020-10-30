@@ -201,7 +201,7 @@ class Header extends React.Component {
           </div>
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
-          <Button 
+          {/* <Button 
             minimal={true}
             icon="zoom-in"
             style={{marginRight: '2px', marginLeft: '2px'}}
@@ -212,7 +212,7 @@ class Header extends React.Component {
             icon="zoom-out"
             style={{marginRight: '2px', marginLeft: '2px'}}
             onClick={() => this.handleZoom('out')}
-          />
+          /> */}
           {!this.props.isStudent &&
             <Popover
               boundary='viewport'
