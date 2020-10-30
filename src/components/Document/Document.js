@@ -77,7 +77,7 @@ class Document extends React.Component {
         .then(data => {
           const LSfiles = data[0].files || []
 
-          document.title = `${data[0].name} -- Seltools`;
+          document.title = `${data[0].name} -- Seltools STAGING`;
 
           if (LSfiles.length > 0) {
             this.props.dispatch({
