@@ -38,7 +38,7 @@ class Student extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    if (this.state.documents.length < 1) return <div>Aún no tienes ningun documento.</div>
+    if (this.state.documents.length < 1) return <div>Aún no tienes ningún documento.</div>
 
     return this.state.documents.map(document => (
       <li key={document._id}>
@@ -134,7 +134,7 @@ class Student extends React.Component {
               paddingTop: '70px',
             }}
           >
-            <h1>Hola, {this.state.studentName}</h1>
+            <h1>¡Hola, {this.state.studentName}!</h1>
             <p>Tus documentos:</p>
             <ul style={{
               margin: '32px 0',

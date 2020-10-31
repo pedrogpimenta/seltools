@@ -121,7 +121,7 @@ class Documents extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    if (this.state.documents.length < 1) return <div>Aún no tienes ningun documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
+    if (this.state.documents.length < 1) return <div>Aún no tienes ningún documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
 
     return this.state.documents.map(document => (
       <li className='document-item' key={document._id}>
