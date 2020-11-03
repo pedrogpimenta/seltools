@@ -89,16 +89,6 @@ button:focus {
 
 
 /* Documents list */
-.document-item .bp3-card,
-.folder-item .bp3-card {
-  cursor: pointer;
-}
-
-.document-item .bp3-card:hover,
-.folder-item .bp3-card:hover {
-  box-shadow: 0 0 0 1px rgb(248, 115, 97), 0 0 0 rgba(16, 22, 26, 0), 0 0 0 rgba(16, 22, 26, 0); 
-}
-
 .document-item .button__delete-document {
   transition: all 100ms ease-out;
   opacity: 0;

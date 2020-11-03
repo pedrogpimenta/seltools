@@ -80,7 +80,12 @@ class Header extends React.Component {
 
     const documentObject = {
       name: this.props.name,
+      type: 'document',
       files: this.props.files,
+    }
+
+    if (this.props.location.search.length > 0) {
+      documentObject.parent = new URLSearchParams(this.props.location.search).get('parent')
     }
 
     for (let file in documentObject.files) {
@@ -95,9 +100,16 @@ class Header extends React.Component {
       body: JSON.stringify(documentObject)
     }
 
-    const fetchUrl = !this.props.id
+    console.log('params:', this.props.location)
+
+    let fetchUrl = !this.props.id
       ? `${REACT_APP_SERVER_BASE_URL}/document/`
       : `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
+
+    if (this.props.location.search.length > 0) {
+      const parent = new URLSearchParams(this.props.location.search).get('parent')
+      fetchUrl = fetchUrl + `?parent=${parent}`
+    }
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())

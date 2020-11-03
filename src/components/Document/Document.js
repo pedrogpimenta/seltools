@@ -194,7 +194,7 @@ class Document extends React.Component {
       .then(data => {
         this.props.dispatch({
           type: 'LOAD_STUDENTS',
-          students: data[0].students,
+          students: data.user.students,
         })
       })
   }

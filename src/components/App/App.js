@@ -36,6 +36,9 @@ class App extends React.Component {
           <Route path="/documento">
             <Document isNew={true} />
           </Route>
+          <Route path="/documentos/:folder">
+            <Documents />
+          </Route>
           <Route path="/documentos">
             <Documents />
           </Route>
