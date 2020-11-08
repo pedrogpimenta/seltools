@@ -33,6 +33,7 @@ class Document extends React.Component {
     this.state = {
       id: '',
       name: '',
+      user: {},
       files: [],
       filesOnLoad: [],
       students: [],
@@ -43,9 +44,10 @@ class Document extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.props.isStudent) {
-      this.getUser()
-    }
+    // if (!this.props.isStudent) {
+    //   this.getUser()
+    // }
+    this.getUser()
 
     if (!this.props.match.params.id) {
       this.props.dispatch({
@@ -57,10 +59,10 @@ class Document extends React.Component {
         files: [],
       })
 
-      this.props.dispatch({
-        type: 'CHANGE_DOCUMENT_SHAREDWITH',
-        sharedWith: [],
-      })
+      // this.props.dispatch({
+      //   type: 'CHANGE_DOCUMENT_SHAREDWITH',
+      //   sharedWith: [],
+      // })
 
       this.props.dispatch({
         type: 'CHANGE_DOCUMENT_ID',
@@ -75,9 +77,9 @@ class Document extends React.Component {
       fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
         .then(response => response.json())
         .then(data => {
-          const LSfiles = data[0].files || []
+          const LSfiles = data.document.files || []
 
-          document.title = `${data[0].name} -- Seltools STAGING`;
+          document.title = `${data.document.name} -- Seltools STAGING`;
 
           if (LSfiles.length > 0) {
             this.props.dispatch({
@@ -91,7 +93,7 @@ class Document extends React.Component {
           if (!this.props.isStudent) {
             this.props.dispatch({
               type: 'CHANGE_DOCUMENT_SHAREDWITH',
-              sharedWith: data[0].sharedWith,
+              sharedWith: data.document.sharedWith,
             })
           }
 
@@ -102,7 +104,36 @@ class Document extends React.Component {
 
           this.props.dispatch({
             type: 'CHANGE_DOCUMENT_NAME',
-            name: data[0].name,
+            name: data.document.name,
+          })
+          
+          let newBreadcrumbs = [{icon: 'folder-open', text: this.props.isStudent ? localStorage.getItem('studentName') : 'Selen', id: '0', type: 'folder'}]
+
+          if (newBreadcrumbs.length > 0) {
+            newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
+              return({
+                icon: 'folder-open',
+                id: crumb._id,
+                text: crumb.name,
+                type: crumb.type,
+              })
+            })
+          }
+          
+          newBreadcrumbs.push({icon: 'document', text: data.document.name, id: data.document._id, type: data.document.type})
+        
+          if (this.props.isStudent) {
+            newBreadcrumbs.shift()
+          }
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+            breadcrumbs: newBreadcrumbs,
+          })
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_SHARED',
+            shared: data.document.shared,
           })
 
           this.props.dispatch({
@@ -112,6 +143,7 @@ class Document extends React.Component {
     }
   }
 
+ 
   handleFileInputChange = (e) => {
     this.setState({uploadingFiles: true})
 
@@ -189,14 +221,24 @@ class Document extends React.Component {
   }
 
   getUser = () => {
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/Selen`)
-      .then(response => response.json())
-      .then(data => {
-        this.props.dispatch({
-          type: 'LOAD_STUDENTS',
-          students: data.user.students,
-        })
+    const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Selen'
+
+    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${userName}`)
+    .then(response => response.json())
+    .then(data => {
+      this.setState({
+        user: data.user,
       })
+    })
+
+    // fetch(`${REACT_APP_SERVER_BASE_URL}/user/Selen`)
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     this.props.dispatch({
+    //       type: 'LOAD_STUDENTS',
+    //       students: data.user.students,
+    //     })
+    //   })
   }
 
   handleMoveOneUp = (fileIndex) => {
@@ -395,7 +437,9 @@ class Document extends React.Component {
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Header isStudent={this.props.isStudent} />
+          <Header
+            isStudent={this.props.isStudent}
+          />
           <div
             className='document'
             style={{
@@ -473,7 +517,7 @@ function mapStateToProps(state, ownProps) {
     id: state.id,
     name: state.name,
     students: state.students,
-    sharedWith: state.sharedWith || [],
+    shared: state.shared || false,
     files: state.files,
     filesOnLoad: state.filesOnLoad,
     isSaved: state.isSaved,

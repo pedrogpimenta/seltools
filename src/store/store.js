@@ -103,7 +103,19 @@ function reducer(state = initialState, action) {
         ...state,
         name: action.name,
       }
+      
+    case 'CHANGE_DOCUMENT_BREADCRUMBS':
+      return {
+        ...state,
+        breadcrumbs: action.breadcrumbs,
+      }
 
+    case 'CHANGE_DOCUMENT_SHARED':
+      return {
+        ...state,
+        shared: action.shared,
+      }
+  
     case 'CHANGE_DOCUMENT_ID':
       // localStorage.setItem('id', JSON.stringify(action.id))
 

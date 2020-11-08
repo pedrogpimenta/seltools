@@ -23,6 +23,34 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 class Header extends React.Component {
 
+  handleShareDocument = () => {
+    const documentObject = {
+      shared: !this.props.shared,
+    }
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(documentObject)
+    }
+
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
+
+    fetch(fetchUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        fetch(fetchUrl)
+        .then(response => response.json())
+        .then(data => {
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_SHARED',
+            shared: data.document.shared,
+          })
+
+        })
+      })
+  }
+
   handleStudentShare = (e, studentId) => {
     this.props.dispatch({
       type: 'CHANGE_SHAREDWITH',
@@ -80,6 +108,7 @@ class Header extends React.Component {
 
     const documentObject = {
       name: this.props.name,
+      teacher: this.props.teacher,
       type: 'document',
       files: this.props.files,
     }
@@ -99,8 +128,6 @@ class Header extends React.Component {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject)
     }
-
-    console.log('params:', this.props.location)
 
     let fetchUrl = !this.props.id
       ? `${REACT_APP_SERVER_BASE_URL}/document/`
@@ -149,19 +176,19 @@ class Header extends React.Component {
   }
 
   renderStudents = () => {
-    if (this.props.sharedWith) {
-      return this.props.students.map(student => {
-        return (
-          <li key={student._id} style={{display: 'block'}}>
-            <Switch 
-              label={student.name}
-              defaultChecked={this.props.sharedWith.find(withStudent => withStudent._id === student._id)}
-              onChange={(e) => this.handleStudentShare(e, student._id)}
-            />
-          </li>
-        )
-      })
-    }
+    // if (this.props.sharedWith) {
+    //   return this.props.students.map(student => {
+    //     return (
+    //       <li key={student._id} style={{display: 'block'}}>
+    //         <Switch 
+    //           label={student.name}
+    //           defaultChecked={this.props.sharedWith.find(withStudent => withStudent._id === student._id)}
+    //           onChange={(e) => this.handleStudentShare(e, student._id)}
+    //         />
+    //       </li>
+    //     )
+    //   })
+    // }
   }
 
   render() {
@@ -191,42 +218,74 @@ class Header extends React.Component {
           <div
             style={{marginLeft: '8px'}}
           >
-            <Breadcrumbs
-              currentBreadcrumbRenderer={this.props.isStudent ? null : this.renderCurrentBreadcrumb}
-              items={[
-                { href: this.props.isStudent ? '/alumno/documentos' : '/documentos',
-                  icon: 'arrow-left',
-                  text: 'Documentos',
-                },
-                {
-                  icon: 'document',
-                  text: this.props.name,
-                },
-              ]}
-            />
+            <ul className='bp3-overflow-list bp3-breadcrumbs'>
+              {this.props.breadcrumbs.map((crumb, i) => {
+                const icon = crumb.type === 'folder' ? 'folder-open' : 'user'
+                if (this.props.breadcrumbs.length - 1 === i) {
+                  return (
+                    <li>
+                      <span className={`bp3-breadcrumb bp3-breadcrumb-current`}>
+                        <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                          {this.props.isStudent &&
+                            crumb.text
+                          }
+                          {!this.props.isStudent &&
+                            <EditableText
+                              style={{color: 'black'}}
+                              defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
+                              placeholder='Nuevo documento'
+                              confirmOnEnterKey={true}
+                              onConfirm={(e) => this.handleNameInputConfirm(e)}
+                            ></EditableText>
+                          }
+                      </span>
+                    </li>
+                  )
+                } else {
+                  return (
+                    <li style={{cursor: 'pointer'}}>
+                      <span className='bp3-breadcrumb' onClick={() => {
+                        // this.getDocuments(crumb.id)
+                        window.open(this.props.isStudent? `/alumno/documentos/${crumb.id}` : `/documentos/${crumb.id}`, '_blank')
+                        // this.props.history.push(this.props.isStudent? `/alumno/documento/${crumb.id}` : `/documento/${crumb.id}`)
+                      }}>
+                        <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                        {crumb.text}
+                      </span>
+                    </li>
+                  )
+
+                }}
+              )}
+            </ul>
           </div>
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
           {!this.props.isStudent &&
-            <Popover
-              boundary='viewport'
+            <div
+              style={{
+                display: 'inline-flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                borderRadius: '3px',
+                fontSize: '14px',
+                justifyContent: 'center',
+                padding: '5px 10px',
+                textAlign: 'left',
+                verticalAlign: 'middle',
+                minHeight: '30px',
+                minWidth: '30px',
+                border: '1px solid rgba(24,32,38,.2)',
+                boxSizing: 'border-box',
+              }}
             >
-              <Button 
-                intent={Intent.PRIMARY}
-                icon="share"
-                text="Compartir"
-                style={{marginRight: '2px', marginLeft: '2px'}}
+              <Switch
+                style={{marginBottom: '0'}}
+                checked={this.props.shared}
+                label="Compartido"
+                onChange={this.handleShareDocument}
               />
-              <ul
-                style={{
-                  listStyle: 'none',
-                  margin: 0,
-                  padding: '16px',
-                }}
-              >
-                {this.renderStudents()}
-              </ul>
-            </Popover>
+            </div>
           }
           <Button
             intent={this.props.name ? this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
@@ -249,9 +308,10 @@ function mapStateToProps(state) {
   return {
     id: state.id,
     name: state.name,
+    breadcrumbs: state.breadcrumbs || [],
     files: state.files,
     students: state.students,
-    sharedWith: state.sharedWith || [],
+    shared: state.shared || false,
     isSaved: state.isSaved,
     isSaving: state.isSaving,
     editMode: state.editMode,
