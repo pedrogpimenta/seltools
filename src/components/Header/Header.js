@@ -5,13 +5,10 @@ import { connect } from 'react-redux'
 import {
   Alignment,
   Intent,
-  Breadcrumbs,
-  Breadcrumb,
   Button,
   Classes,
   EditableText,
   Icon,
-  Popover,
   Navbar,
   NavbarDivider,
   NavbarGroup,
@@ -48,31 +45,6 @@ class Header extends React.Component {
           })
 
         })
-      })
-  }
-
-  handleStudentShare = (e, studentId) => {
-    this.props.dispatch({
-      type: 'CHANGE_SHAREDWITH',
-      sharedWithStudent: studentId,
-    })
-
-    const documentObject = {
-      _id: this.props.id,
-      name: this.props.name,
-    }
-
-    const requestOptions = {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
-    }
-
-    const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/student/${studentId}/document`
-
-    fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
       })
   }
 
@@ -155,40 +127,8 @@ class Header extends React.Component {
 
   }
 
-  renderCurrentBreadcrumb = ({ text, ...restProps }) => {
-    return (
-      <Breadcrumb>
-        <Icon icon='document' color='#182026' />
-        <EditableText
-          style={{color: 'black'}}
-          defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
-          placeholder='Nuevo documento'
-          confirmOnEnterKey={true}
-          onConfirm={(e) => this.handleNameInputConfirm(e)}
-        >
-        </EditableText>
-      </Breadcrumb>
-    )
-  }
-
   componentDidMount() {
     this.handleUnsaveDocument()
-  }
-
-  renderStudents = () => {
-    // if (this.props.sharedWith) {
-    //   return this.props.students.map(student => {
-    //     return (
-    //       <li key={student._id} style={{display: 'block'}}>
-    //         <Switch 
-    //           label={student.name}
-    //           defaultChecked={this.props.sharedWith.find(withStudent => withStudent._id === student._id)}
-    //           onChange={(e) => this.handleStudentShare(e, student._id)}
-    //         />
-    //       </li>
-    //     )
-    //   })
-    // }
   }
 
   render() {
@@ -220,7 +160,7 @@ class Header extends React.Component {
           >
             <ul className='bp3-overflow-list bp3-breadcrumbs'>
               {this.props.breadcrumbs.map((crumb, i) => {
-                const icon = crumb.type === 'folder' ? 'folder-open' : 'user'
+                const icon = crumb.type === 'folder' ? 'folder-open' : crumb.type === 'document' ? 'document' : 'user'
                 if (this.props.breadcrumbs.length - 1 === i) {
                   return (
                     <li>
@@ -245,9 +185,7 @@ class Header extends React.Component {
                   return (
                     <li style={{cursor: 'pointer'}}>
                       <span className='bp3-breadcrumb' onClick={() => {
-                        // this.getDocuments(crumb.id)
                         window.open(this.props.isStudent? `/alumno/documentos/${crumb.id}` : `/documentos/${crumb.id}`, '_blank')
-                        // this.props.history.push(this.props.isStudent? `/alumno/documento/${crumb.id}` : `/documento/${crumb.id}`)
                       }}>
                         <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
                         {crumb.text}

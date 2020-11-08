@@ -1,13 +1,11 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import { Link } from 'react-router-dom'
 import { store } from '../../store/store'
 import { CirclePicker } from 'react-color';
 
 import {
   Alignment,
   AnchorButton,
-  Breadcrumbs,
   Button,
   Classes,
   Card,
@@ -22,13 +20,9 @@ import {
   NavbarDivider,
   NavbarGroup,
   NavbarHeading,
-  Popover,
-  Tooltip,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
-
-import TeacherStudents from '../TeacherStudents/TeacherStudents'
 
 class Documents extends React.Component {
   constructor() {
@@ -218,6 +212,7 @@ class Documents extends React.Component {
   }
 
   handleDeleteDocument = () => {
+    console.log('ola')
     const confirmDelete = window.confirm('¿Quieres eliminar el documento?')
 
     if (confirmDelete) {
@@ -343,26 +338,6 @@ class Documents extends React.Component {
         })
     }
   }
-  
-  // handleModifyDocument = () => {
-  //   const documentObject = {
-  //     parentId: this.state.dialogFolder._id,
-  //   }
-
-  //   const requestOptions = {
-  //     method: 'PUT',
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: JSON.stringify(documentObject)
-  //   }
-
-  //   let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentmove/${this.state.selectedDocumentId}`
-
-  //   fetch(fetchUrl, requestOptions)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
-  //     })
-  // }
 
   handleRename = (documentId, documentName) => {
     const newName = window.prompt('Cambia el nombre:', documentName)
@@ -427,25 +402,45 @@ class Documents extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    if (this.state.userDocuments.length < 1 && this.state.userFolders.length < 1) return <div>Aún no tienes ningún documento. Empieza haciendo un nuevo: <Link to='/documento' isNew={true}>Nuevo documento</Link></div>
+    if (this.state.userDocuments.length < 1 && this.state.userFolders.length < 1) return <div>Aún no tienes ningún documento. Empieza haciendo un nuevo: 
+    <AnchorButton
+      type='button'
+      icon='add'
+      className={Classes.MINIMAL}
+      intent={Intent.PRIMARY}
+      text='Nuevo documento'
+      href={`/documento?parent=${this.props.match.params.folder}`}
+      target='_blank'
+      style={{marginRight: '8px'}}
+    /></div>
 
     return (
-      <div
-        // style={{
-        //   display: 'grid',
-        //   gridTemplateColumns: '1fr 1fr 1fr 1fr',
-        //   gridGap: '20px',
-        // }}
-      >
+      <div>
         {this.state.students.length > 0 &&
           <>
             <div style={{
-              margin: '1rem 0 0 0',
-              fontSize: '.8rem',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              margin: '0 0 1rem 0',
             }}>
-              Alumnos
+              <div style={{
+                fontSize: '.8rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}>
+                Alumnos
+              </div>
+              <div>
+                <Button
+                  type='button'
+                  icon='new-person'
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nuevo alumno'
+                  onClick={this.handleAddStudent}
+                />
+              </div>
             </div>
             <ul
               className='documents__students'
@@ -516,13 +511,43 @@ class Documents extends React.Component {
             </ul>
           </>
         }
-        <div style={{
-          margin: '1rem 0 0 0',
-          fontSize: '.8rem',
-          fontWeight: 'bold',
-          textTransform: 'uppercase',
-        }}>
-          Documentos
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '2rem 0 1rem 0',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '.8rem',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+            }}
+          >
+            Documentos
+          </div>
+          <div>
+            <AnchorButton
+              type='button'
+              icon='add'
+              className={Classes.MINIMAL}
+              intent={Intent.PRIMARY}
+              text='Nuevo documento'
+              href={`/documento?parent=${this.props.match.params.folder}`}
+              target='_blank'
+              style={{marginRight: '8px'}}
+            />
+            <Button
+              type='button'
+              icon='folder-new'
+              className={Classes.MINIMAL}
+              intent={Intent.PRIMARY}
+              text='Nueva carpeta'
+              onClick={this.handleAddFolder}
+            />
+          </div>
         </div>
         <ul
           className='documents__documents'
@@ -609,14 +634,6 @@ class Documents extends React.Component {
                   }}>
                     {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
                   </h3>
-                  {/* <Button
-                    type='button'
-                    icon='delete'
-                    intent={Intent.PRIMARY}
-                    className={`button__delete-document ${Classes.MINIMAL}`}
-                    text='Eliminar'
-                    onClick={(e) => this.handleDeleteDocument(document._id)}
-                  /> */}
                 </Card>
               </li>
             )
@@ -659,9 +676,12 @@ class Documents extends React.Component {
     })
 
     document.addEventListener('click', (event) => {
-      if (this.state.showPopoverMenu === true) {
-        this.setState({showPopoverMenu: false})
-      }
+      window.setTimeout(() => {
+        if (this.state.showPopoverMenu === true) {
+          this.setState({showPopoverMenu: false})
+        }
+      }, 100)
+
       // event.preventDefault()
       // this.setState({
       //   showPopoverMenu: true,
@@ -689,7 +709,7 @@ class Documents extends React.Component {
           icon="delete"
           text="Eliminar"
           intent={Intent.DANGER}
-          onClick={(e) => this.handleDeleteDocument(this.state.selectedDocumentId)}
+          onClick={(e) => this.handleDeleteDocument()}
         />
         <MenuItem
           icon="share"
@@ -741,22 +761,6 @@ class Documents extends React.Component {
         onClose={() => this.setState({isMoveDialogOpen: false})}
       >
         <div className={Classes.DIALOG_BODY}>
-          {/* <h3
-            style={{
-              marginTop: '0',
-              marginLeft: '10px',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <Icon icon='folder-open' />
-            <span
-              style={{marginLeft: '8px'}}
-            >
-              {this.state.dialogFolder.name}
-            </span>
-          </h3> */}
           <div
             style={{marginLeft: '8px', marginBottom: '8px'}}
           >
@@ -787,7 +791,6 @@ class Documents extends React.Component {
             </ul>
           </div>
           <HTMLTable
-            // className={Classes.ELEVATION_1}
             style={{
               width: '100%',
               background: 'white',
@@ -798,26 +801,6 @@ class Documents extends React.Component {
             striped={true}
           >
             <tbody>
-              {/* {this.state.dialogFolder.name !== 'Selen' && this.state.dialogFolder.type !== 'student-folder' &&
-                <tr
-                  onClick={() => this.getCurrentDialogContent(this.state.dialogFolder.parent)}
-                >
-                  <td>
-                    <Icon icon='arrow-left' />
-                    <span style={{marginLeft: '8px'}}>Atrás</span>
-                  </td>
-                </tr>
-              }
-              {this.state.dialogFolder.type === 'student-folder' &&
-                <tr
-                  onClick={() => this.getCurrentDialogContent(this.state.user.userfolder)}
-                >
-                  <td>
-                    <Icon icon='arrow-left' />
-                    <span style={{marginLeft: '8px'}}>Atrás</span>
-                  </td>
-                </tr>
-              } */}
               {this.state.dialogStudents.map((student, index) => {
                 return (
                   <tr
@@ -946,8 +929,6 @@ class Documents extends React.Component {
               </div>
             </NavbarGroup>
             <NavbarGroup align={Alignment.RIGHT}>
-              {/* <NavbarDivider />
-              <Button className={Classes.MINIMAL} icon="user" /> */}
             </NavbarGroup>
           </Navbar>
           <div
@@ -971,38 +952,8 @@ class Documents extends React.Component {
                   width: '100%',
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <AnchorButton
-                    type='button'
-                    icon='add'
-                    intent={Intent.PRIMARY}
-                    text='Nuevo documento'
-                    href={`/documento?parent=${this.props.match.params.folder}`}
-                    target='_blank'
-                  />
-                  <Button
-                    type='button'
-                    icon='new-person'
-                    intent={Intent.PRIMARY}
-                    text='Nuevo alumno'
-                    onClick={this.handleAddStudent}
-                  />
-                  <Button
-                    type='button'
-                    icon='folder-new'
-                    intent={Intent.PRIMARY}
-                    text='Nueva carpeta'
-                    onClick={this.handleAddFolder}
-                  />
-                </div>
                 <div style={{
-                  margin: '24px 0 32px',
+                  margin: '0 0 32px',
                 }}>
                   {this.renderDocuments()}
                 </div>
@@ -1017,5 +968,4 @@ class Documents extends React.Component {
   }
 }
 
-// export default Documents
 export default withRouter(Documents)

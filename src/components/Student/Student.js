@@ -1,10 +1,8 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import { Link } from 'react-router-dom'
 
 import {
   Alignment,
-  Breadcrumbs,
   Card,
   Icon,
   Navbar,
@@ -48,7 +46,6 @@ class Student extends React.Component {
             flexDirection: 'column',
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
-            // minHeight: '6rem',
             height: '100%',
             overflow: 'hidden',
             padding: '16px',
@@ -135,7 +132,6 @@ class Student extends React.Component {
       .then(response => response.json())
       .then(userData => {
         this.setState({
-          // isLoading: false,
           studentName: userData.name,
           studentId: userData._id,
           studentFolderId: userData.folderId,

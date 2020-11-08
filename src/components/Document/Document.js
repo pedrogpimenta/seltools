@@ -19,8 +19,6 @@ import FileWrapper from '../FileWrapper/FileWrapper'
 import Header from '../Header/Header'
 import Toolbar from '../Toolbar/Toolbar'
 
-// import { loadFile } from '../../helpers/render-docs'
-
 class Document extends React.Component {
   constructor() {
     super()
@@ -44,12 +42,48 @@ class Document extends React.Component {
   }
 
   componentDidMount() {
-    // if (!this.props.isStudent) {
-    //   this.getUser()
-    // }
     this.getUser()
 
+    const parent = new URLSearchParams(this.props.location.search).get('parent')
+    if (!!parent) {
+      fetch(`${REACT_APP_SERVER_BASE_URL}/document/${parent}`)
+        .then(response => response.json())
+        .then(data => {
+          let newBreadcrumbs = []
+
+          if (data.breadcrumbs) {
+            newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
+              return({
+                icon: 'folder-open',
+                id: crumb._id,
+                text: crumb.name,
+                type: crumb.type,
+              })
+            })
+          }
+  
+          newBreadcrumbs.push({
+            icon: data.document.type === 'folder' ? 'folder-open' : 'user',
+            text: data.document.name,
+            id: data.document._id,
+            type: data.document.type
+          })
+
+          newBreadcrumbs.push({icon: 'document', text: '', id: '', type: 'document'})
+        
+          if (this.props.isStudent) {
+            newBreadcrumbs.shift()
+          }
+  
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+            breadcrumbs: newBreadcrumbs,
+          })
+        })
+    }
+
     if (!this.props.match.params.id) {
+      
       this.props.dispatch({
         type: 'DOCUMENT_IS_LOADED',
       })
@@ -58,11 +92,6 @@ class Document extends React.Component {
         type: 'LOAD_FILES',
         files: [],
       })
-
-      // this.props.dispatch({
-      //   type: 'CHANGE_DOCUMENT_SHAREDWITH',
-      //   sharedWith: [],
-      // })
 
       this.props.dispatch({
         type: 'CHANGE_DOCUMENT_ID',
@@ -230,15 +259,6 @@ class Document extends React.Component {
         user: data.user,
       })
     })
-
-    // fetch(`${REACT_APP_SERVER_BASE_URL}/user/Selen`)
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     this.props.dispatch({
-    //       type: 'LOAD_STUDENTS',
-    //       students: data.user.students,
-    //     })
-    //   })
   }
 
   handleMoveOneUp = (fileIndex) => {

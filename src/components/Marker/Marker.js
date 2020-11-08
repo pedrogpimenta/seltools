@@ -83,14 +83,6 @@ class Marker extends React.Component {
     }) 
   }
 
-  // onEditorChange = (e) => {
-  //   console.log('editor:', e)
-  // }
-
-  // onClick = (e) => {
-
-  // }
-
   onInputFocus = (e) => {
     this.setState({hasFocus: true})
   }
@@ -100,27 +92,6 @@ class Marker extends React.Component {
   }
 
   componentDidMount = () => {
-    // if (this.props.editing === this.props.id) {
-      // TODO: WHY setTimout, WHY?
-      // setTimeout(() => {
-      //   let range, selection
-        
-      //   if (document.body.createTextRange) {
-      //     range = document.body.createTextRange()
-      //     range.moveToElementText(this.contentEditable.current)
-      //     range.select()
-      //   } else if (window.getSelection) {
-      //     selection = window.getSelection()
-      //     range = document.createRange()
-      //     range.selectNodeContents(this.contentEditable.current)
-      //     selection.removeAllRanges()
-      //     selection.addRange(range)
-      //   }
-      // }, 1)
-
-      // this.props.setNotEditing()
-    // }
-
     const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
     const thisInfo = findDOMNode(this.draggable.current)
     this.setState({
@@ -145,7 +116,6 @@ class Marker extends React.Component {
     return (
       <Draggable
         ref={this.draggable}
-        // bounds='parent'
         handle='.handle'
         position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
         onDrag={(e) => this.reportDragging(e)}
@@ -207,8 +177,6 @@ class Marker extends React.Component {
             <div
               className={`marker ${this.props.id}`}
               style={{
-                // display: 'inline-flex',
-                // alignItems: 'center',
                 padding: '3px 6px 4px 6px',
                 lineHeight: '18px',
                 borderRadius: '14px',
