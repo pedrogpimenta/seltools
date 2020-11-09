@@ -150,7 +150,9 @@ class Student extends React.Component {
         className='App'
         style={{
           display: 'flex',
+          minHeight: '100vh',
           overflow: 'hidden',
+          backgroundColor: '#f8f8f8',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
@@ -225,6 +227,8 @@ class Student extends React.Component {
               maxWidth: '1100px',
               margin: '0 auto',
               paddingTop: '70px',
+              paddingLeft: '16px',
+              paddingRight: '16px',
             }}
           >
             <h1
