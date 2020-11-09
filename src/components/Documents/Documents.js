@@ -7,6 +7,7 @@ import {
   Alignment,
   AnchorButton,
   Button,
+  Callout,
   Classes,
   Card,
   Dialog,
@@ -154,65 +155,7 @@ class Documents extends React.Component {
       })
   }
 
-  renderStudents = () => {
-    if (this.state.isLoadingStudents) return <div>Cargando...</div>
-
-    if (this.state.students < 1) return <div>No tienes estudiantes, añade uno:</div>
-
-    return this.state.students.sort((a, b) => a.name > b.name ? 1 : -1).map(student => (
-      <li
-        key={student._id}
-      >
-        {/* <div
-          style={{padding: '4px 0'}}
-        > */}
-        <Card
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height: '8rem',
-            padding: '8px',
-            marginBottom: '12px',
-          }}
-        >
-          <Icon
-            icon='user'
-            style={{marginRight: '6px'}}
-          />
-            {student.name}
-        </Card>
-        {/* </div> */}
-      </li>
-    ))
-  }
-
-  handleAddStudentOLD = () => {
-    const studentName = window.prompt('¿Cómo se llama tu nuevo alumno?')
-
-    if (!!studentName && studentName.length > 0) {
-      const requestOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({name: studentName})
-      }
-
-      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/student/`
-
-      fetch(fetchUrl, requestOptions)
-        .then(response => response.json())
-        .then((data) => {
-          const updatedStudents = this.state.students.slice()
-          updatedStudents.push({_id: data._id, name: data.name})
-          this.setState({
-            students: updatedStudents,
-          })
-        })
-    }
-  }
-
   handleDeleteDocument = () => {
-    console.log('ola')
     const confirmDelete = window.confirm('¿Quieres eliminar el documento?')
 
     if (confirmDelete) {
@@ -402,21 +345,43 @@ class Documents extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    if (this.state.userDocuments.length < 1 && this.state.userFolders.length < 1) return <div>Aún no tienes ningún documento. Empieza haciendo un nuevo: 
-    <AnchorButton
-      type='button'
-      icon='add'
-      className={Classes.MINIMAL}
-      intent={Intent.PRIMARY}
-      text='Nuevo documento'
-      href={`/documento?parent=${this.props.match.params.folder}`}
-      target='_blank'
-      style={{marginRight: '8px'}}
-    /></div>
-
-    return (
-      <div>
-        {this.state.students.length > 0 &&
+    const students = () => {
+      if (this.state.students.length < 1)  {
+        return (
+          <div
+            style={{
+              display: 'flex',
+              marginTop: '16px',
+            }}
+          >
+            <Callout  
+              title='¡No tienes alumnos!'
+              style={{
+                display: 'inline-flex',
+                flexDirection: 'column',
+                width: 'auto',
+                padding: '24px',
+                marginBottom: '16px',
+              }}
+            >
+              <div 
+                style={{
+                  marginTop: '16px',
+                }}
+              >
+                <Button
+                  type='button'
+                  icon='new-person'
+                  intent={Intent.PRIMARY}
+                  text='Nuevo alumno'
+                  onClick={this.handleAddStudent}
+                />
+              </div>
+            </Callout>
+          </div>
+        )
+      } else {
+        return (
           <>
             <div style={{
               display: 'flex',
@@ -445,10 +410,10 @@ class Documents extends React.Component {
             <ul
               className='documents__students'
               style={{
-                margin: '.5rem 0 1.5rem 0',
+                margin: '.5rem 0 3rem 0',
                 padding: '0',
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
                 gridGap: '20px',
               }}
             >
@@ -469,7 +434,7 @@ class Documents extends React.Component {
                         alignItems: 'center',
                         justifyContent: 'flex-start',
                         // height: '4rem',
-                        padding: '16px',
+                        padding: '12px',
                       }}
                       onClick={() => {
                         this.getDocuments(student._id)
@@ -478,11 +443,14 @@ class Documents extends React.Component {
                         this.setState({
                           currentDocumentOverId: student._id,
                           currentDocumentOverName: student.name,
+                          currentDocumentOverType: student.type,
                         })
                       }}
                       onMouseLeave={() => {
                         this.setState({
                           currentDocumentOverId: null,
+                          currentDocumentOverName: null,
+                          currentDocumentOverType: null,
                         })
                       }}
                     >
@@ -497,148 +465,210 @@ class Documents extends React.Component {
                           pointerEvents: 'none',
                         }}
                       />
-                      <h2 style={{
+                      <h3 style={{
                         fontWeight: '400',
                         margin: '0',
                         pointerEvents: 'none'
                       }}>
                         {!!student.name.trim().length ? student.name : 'Documento sin nombre' }
-                      </h2>
+                      </h3>
                     </Card>
                   </li>
                 )
               })}
             </ul>
           </>
-        }
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            margin: '2rem 0 1rem 0',
-          }}
-        >
+        )
+      }
+    }
+
+    const documents = () => {
+      if (this.state.userDocuments.length < 1)  {
+        return (
           <div
             style={{
-              fontSize: '.8rem',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
+              display: 'flex',
+              marginTop: '16px',
+              // justifyContent: 'center',
             }}
           >
-            Documentos
-          </div>
-          <div>
-            <AnchorButton
-              type='button'
-              icon='add'
-              className={Classes.MINIMAL}
-              intent={Intent.PRIMARY}
-              text='Nuevo documento'
-              href={`/documento?parent=${this.props.match.params.folder}`}
-              target='_blank'
-              style={{marginRight: '8px'}}
-            />
-            <Button
-              type='button'
-              icon='folder-new'
-              className={Classes.MINIMAL}
-              intent={Intent.PRIMARY}
-              text='Nueva carpeta'
-              onClick={this.handleAddFolder}
-            />
-          </div>
-        </div>
-        <ul
-          className='documents__documents'
-          style={{
-            margin: '.5rem 0 3rem 0',
-            padding: '0',
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr 1fr',
-            gridGap: '20px',
-            justifyItems: 'stretch',
-          }}
-        >
-          {this.state.userDocuments.map(document => {
-            const docType = document.type || 'document'
-    
-            return (
-              <li
-                className='document-item'
-                key={document._id}
+            <Callout  
+              title='Carpeta vacía!'
+              style={{
+                display: 'inline-flex',
+                flexDirection: 'column',
+                padding: '24px',
+                width: 'auto',
+              }}
+            >
+              <div
                 style={{
-                  listStyle: 'none',
+                  marginBottom: '16px',
                 }}
               >
-                <Card
-                  className='document-item-card bp3-elevation-2'
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    justifyContent: 'flex-start',
-                    // minHeight: '6rem',
-                    height: '100%',
-                    overflow: 'hidden',
-                    padding: '16px',
-                  }}
-                  onClick={() => {
-                    if (docType === 'document') {
-                      window.open(`/documento/${document._id}`, '_blank')
-                    } else {
-                      this.getDocuments(document._id)
-                    }
-                  }}
-                  onMouseEnter={() => {
-                    this.setState({
-                      currentDocumentOverId: document._id,
-                      currentDocumentOverName: document.name,
-                      currentDocumentOverShared: document.shared,
-                    })
-                  }}
-                  onMouseLeave={() => {
-                    this.setState({
-                      currentDocumentOverId: null,
-                      currentDocumentOverName: null,
-                      currentDocumentOverShared: null,
-                    })
-                  }}
-                >
-                  {docType === 'document' &&
-                    <Icon
-                      icon='document'
-                      iconSize={Icon.SIZE_LARGE} 
-                      color={document.color}
+                Aún no tienes ningún documento.
+              </div>
+              <div>
+                <AnchorButton
+                  type='button'
+                  icon='add'
+                  intent={Intent.PRIMARY}
+                  text='Nuevo documento'
+                  href={`/documento?parent=${this.props.match.params.folder}`}
+                  target='_blank'
+                  style={{marginRight: '8px'}}
+                />
+                <Button
+                  type='button'
+                  icon='folder-new'
+                  intent={Intent.PRIMARY}
+                  text='Nueva carpeta'
+                  onClick={this.handleAddFolder}
+                />
+              </div>
+            </Callout>
+          </div>
+        )
+      } else {
+        return (
+          <>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              margin: '0 0 1rem 0',
+            }}>
+              <div
+                style={{
+                  fontSize: '.8rem',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Documentos
+              </div>
+              <div>
+                <AnchorButton
+                  type='button'
+                  icon='add'
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nuevo documento'
+                  href={`/documento?parent=${this.props.match.params.folder}`}
+                  target='_blank'
+                  style={{marginRight: '8px'}}
+                />
+                <Button
+                  type='button'
+                  icon='folder-new'
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nueva carpeta'
+                  onClick={this.handleAddFolder}
+                />
+              </div>
+            </div>
+            <ul
+              className='documents__documents'
+              style={{
+                margin: '.5rem 0 3rem 0',
+                padding: '0',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                gridGap: '20px',
+                justifyItems: 'stretch',
+              }}
+            >
+              {this.state.userDocuments.map(document => {
+                const docType = document.type || 'document'
+        
+                return (
+                  <li
+                    className='document-item'
+                    key={document._id}
+                    style={{
+                      listStyle: 'none',
+                    }}
+                  >
+                    <Card
+                      className='document-item-card bp3-elevation-2'
                       style={{
-                        marginRight: '6px',
-                        pointerEvents: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        justifyContent: 'flex-start',
+                        // minHeight: '6rem',
+                        height: '100%',
+                        overflow: 'hidden',
+                        padding: '12px',
                       }}
-                    />
-                  }
-                  {docType === 'folder' &&
-                    <Icon
-                      icon='folder-close'
-                      iconSize={Icon.SIZE_LARGE} 
-                      color={document.color}
-                      style={{
-                        marginRight: '6px',
-                        pointerEvents: 'none',
+                      onClick={() => {
+                        if (docType === 'document') {
+                          window.open(`/documento/${document._id}`, '_blank')
+                        } else {
+                          this.getDocuments(document._id)
+                        }
                       }}
-                    />
-                  }
-                  <h3 style={{
-                    fontWeight: '400',
-                    margin: '8px 0 0 0',
-                    pointerEvents: 'none'
-                  }}>
-                    {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
-                  </h3>
-                </Card>
-              </li>
-            )
-          })}
-        </ul>
+                      onMouseEnter={() => {
+                        this.setState({
+                          currentDocumentOverId: document._id,
+                          currentDocumentOverName: document.name,
+                          currentDocumentOverShared: document.shared,
+                          currentDocumentOverType: document.type,
+                        })
+                      }}
+                      onMouseLeave={() => {
+                        this.setState({
+                          currentDocumentOverId: null,
+                          currentDocumentOverName: null,
+                          currentDocumentOverShared: null,
+                        })
+                      }}
+                    >
+                      {docType === 'document' &&
+                        <Icon
+                          icon='document'
+                          iconSize={Icon.SIZE_LARGE} 
+                          color={document.color}
+                          style={{
+                            marginRight: '6px',
+                            pointerEvents: 'none',
+                          }}
+                        />
+                      }
+                      {docType === 'folder' &&
+                        <Icon
+                          icon='folder-close'
+                          iconSize={Icon.SIZE_LARGE} 
+                          color={document.color}
+                          style={{
+                            marginRight: '6px',
+                            pointerEvents: 'none',
+                          }}
+                        />
+                      }
+                      <h3 style={{
+                        fontWeight: '400',
+                        margin: '8px 0 0 0',
+                        pointerEvents: 'none'
+                      }}>
+                        {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
+                      </h3>
+                    </Card>
+                  </li>
+                )
+              })}
+            </ul>
+          </>
+        )
+      }
+
+    }
+
+    return (
+      <div>
+        {this.state.breadcrumbs.length === 1 && students()}
+        {documents()}
       </div>
     )
   }
@@ -668,6 +698,7 @@ class Documents extends React.Component {
           selectedDocumentId: this.state.currentDocumentOverId,
           selectedDocumentName: this.state.currentDocumentOverName,
           selectedDocumentShared: this.state.currentDocumentOverShared,
+          selectedDocumentType: this.state.currentDocumentOverType,
           showPopoverMenu: true,
           menuTop: event.pageY,
           menuLeft: event.pageX,
@@ -711,13 +742,17 @@ class Documents extends React.Component {
           intent={Intent.DANGER}
           onClick={(e) => this.handleDeleteDocument()}
         />
-        <MenuItem
-          icon="share"
-          text="Compartir"
-          // intent={Intent.DANGER}
-          labelElement={this.state.selectedDocumentShared ? <Icon icon="tick" /> : <Icon icon="cross" />} 
-          onClick={(e) => this.handleShareDocument(this.state.selectedDocumentId)}
-        />
+        {this.state.selectedDocumentType !== 'user' &&
+          this.state.selectedDocumentType !== 'student' &&
+          (!!this.state.breadcrumbs[1] && this.state.breadcrumbs[1].type === 'student') &&
+          <MenuItem
+            icon="share"
+            text="Compartir"
+            // intent={Intent.DANGER}
+            labelElement={this.state.selectedDocumentShared ? <Icon icon="tick" /> : <Icon icon="cross" />} 
+            onClick={(e) => this.handleShareDocument(this.state.selectedDocumentId)}
+          />
+        }
         <MenuItem
           icon="edit"
           text="Cambiar nombre..."
@@ -736,19 +771,23 @@ class Documents extends React.Component {
             />
           </div>
         </MenuItem>
-        <MenuItem
-          icon="duplicate"
-          text="Duplicar"
-          onClick={(e) => this.handleCloneDocument(this.state.selectedDocumentId)}
-        />
-        <MenuItem
-          icon="add-to-folder"
-          text="Mover a..."
-          onClick={(e) => {
-            this.getCurrentDialogContent(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
-            this.setState({isMoveDialogOpen: true})
-          }}
-        />
+        {this.state.selectedDocumentType === 'document' &&
+          <MenuItem
+            icon="duplicate"
+            text="Duplicar"
+            onClick={(e) => this.handleCloneDocument(this.state.selectedDocumentId)}
+          />
+        }
+        {this.state.selectedDocumentType === 'document' &&
+          <MenuItem
+            icon="add-to-folder"
+            text="Mover a..."
+            onClick={(e) => {
+              this.getCurrentDialogContent(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+              this.setState({isMoveDialogOpen: true})
+            }}
+          />
+        }
       </Menu>
     )
   }

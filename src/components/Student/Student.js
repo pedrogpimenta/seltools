@@ -48,7 +48,7 @@ class Student extends React.Component {
             justifyContent: 'flex-start',
             height: '100%',
             overflow: 'hidden',
-            padding: '16px',
+            padding: '12px',
           }}
           onClick={() => {
             if (document.type === 'document') {
@@ -140,7 +140,7 @@ class Student extends React.Component {
         localStorage.setItem('studentId', userData._id)
         localStorage.setItem('studentFolderId', userData.folderId)
 
-        this.getDocuments(this.props.match.params.folder || userData.folderId)
+        this.getDocuments(this.props.match.params.folderId || userData.folderId)
       })
   }
 
