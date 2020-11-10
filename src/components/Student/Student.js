@@ -21,7 +21,8 @@ class Student extends React.Component {
       studentId: null,
       studentName: null,
       breadcrumbs: [],
-      documents: [],
+      userDocuments: [],
+      userFolders: [],
       isLoading: true,
     }
   }
@@ -29,67 +30,135 @@ class Student extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    if (this.state.documents.length < 1) return <div>Aún no tienes ningún documento.</div>
-
-    return this.state.documents.map(document => (
-      <li
-        className='document-item'
-        key={document._id}
-        style={{
-          listStyle: 'none',
-        }}
-      >
-        <Card
-          className='document-item-card bp3-elevation-2'
+    const renderDocument = (document) => {
+      return (
+        <li
+          className='document-item'
+          key={document._id}
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'flex-start',
-            height: '100%',
-            overflow: 'hidden',
-            padding: '12px',
-          }}
-          onClick={() => {
-            if (document.type === 'document') {
-              window.open(`/alumno/documento/${document._id}`, '_blank')
-            } else {
-              this.getDocuments(document._id)
-            }
+            listStyle: 'none',
           }}
         >
-          {document.type === 'document' &&
-            <Icon
-              icon='document'
-              iconSize={Icon.SIZE_LARGE} 
-              color={document.color}
-              style={{
-                marginRight: '6px',
-                pointerEvents: 'none',
-              }}
-            />
-          }
-          {document.type === 'folder' &&
-            <Icon
-              icon='folder-close'
-              iconSize={Icon.SIZE_LARGE} 
-              color={document.color}
-              style={{
-                marginRight: '6px',
-                pointerEvents: 'none',
-              }}
-            />
-          }
-          <h3 style={{
-            fontWeight: '400',
-            margin: '8px 0 0 0',
-            pointerEvents: 'none'
+          <Card
+            className='document-item-card bp3-elevation-1'
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              padding: '12px',
+              overflow: 'hidden',
+            }}
+            onClick={() => {
+              if (document.type === 'document') {
+                this.props.history.push(`/alumno/documento/${document._id}`)
+              } else {
+                this.getDocuments(document._id)
+              }
+            }}
+          >
+              <Icon
+                icon={document.type === 'document' ? 'document' : document.type === 'folder' ? 'folder-close' : 'user'}
+                color={document.color || '#666'}
+                style={{
+                  marginRight: '6px',
+                  pointerEvents: 'none',
+                }}
+              />
+            <h4 style={{
+              fontWeight: '400',
+              margin: '0 0 0 4px',
+              pointerEvents: 'none'
+            }}>
+              {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
+            </h4>
+          </Card>
+        </li>
+      )
+    }
+
+    const folders = () => {
+      if (this.state.userFolders.length === 0) return null
+
+      return (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '0 0 .6rem 0',
           }}>
-            {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
-          </h3>
-        </Card>
-      </li>
-    ))
+            <div
+              style={{
+                fontSize: '.8rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}
+            >
+              Carpetas
+            </div>
+          </div>
+          <ul
+            className='documents__documents'
+            style={{
+              margin: '.5rem 0 2rem 0',
+              padding: '0',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+              gridGap: '16px',
+              justifyItems: 'stretch',
+            }}
+          >
+            {this.state.userFolders.map(folder => renderDocument(folder))}
+          </ul>
+        </>
+      )
+    }
+
+    const documents = () => {
+      if (this.state.userDocuments.length === 0) return null
+
+      return (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '0 0 .6rem 0',
+          }}>
+            <div
+              style={{
+                fontSize: '.8rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}
+            >
+              Documentos
+            </div>
+          </div>
+          <ul
+            className='documents__documents'
+            style={{
+              margin: '.5rem 0 2rem 0',
+              padding: '0',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+              gridGap: '16px',
+              justifyItems: 'stretch',
+            }}
+          >
+            {this.state.userDocuments.map(document => renderDocument(document))}
+          </ul>
+        </>
+      )
+    }
+
+    return (
+      <div>
+        {folders()}
+        {documents()}
+      </div>
+    )
   }
 
   getDocuments = (folderId) => {
@@ -105,19 +174,24 @@ class Student extends React.Component {
               id: crumb._id,
               text: crumb.name,
               type: crumb.type,
+              color: crumb.color,
             })
           })
         }
         
-        newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type})
+        newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type, color: data.folder.color})
       
         if (newBreadcrumbs[0].type === 'student') {
           newBreadcrumbs.unshift({icon: 'folder-open', text: this.state.studentName, id: this.state.studentFolderId, type: 'folder'})
         }
 
+        const folders = data.documents.filter(doc => doc.type === 'folder')
+        const documents = data.documents.filter(doc => doc.type === 'document')
+
         this.setState({
           isLoadingDocuments: false,
-          documents: data.documents || [],
+          userFolders: folders || [],
+          userDocuments: documents || [],
           breadcrumbs: newBreadcrumbs,
         })
 
@@ -195,7 +269,32 @@ class Student extends React.Component {
                       return (
                         <li>
                           <span className={`bp3-breadcrumb bp3-breadcrumb-current`}>
-                            <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                            {crumb.type === 'student' && 
+                              <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center', 
+                                width: '18px',
+                                height: '18px',
+                                backgroundColor: crumb.color || 'black',
+                                color: 'white',
+                                borderRadius: '50%',
+                                marginRight: '6px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              {crumb.text.substr(0, 1).toUpperCase()}
+                            </div>
+                            }
+                            {crumb.type !== 'student' && 
+                              <Icon
+                                icon={icon}
+                                color={crumb.color || '#666'}
+                                className='bp3-icon'
+                              />
+                            }
                             {crumb.text}
                           </span>
                         </li>
@@ -206,7 +305,32 @@ class Student extends React.Component {
                           <span className='bp3-breadcrumb' onClick={() => {
                             this.getDocuments(crumb.id)
                           }}>
-                            <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                            {crumb.type === 'student' && 
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center', 
+                                  width: '18px',
+                                  height: '18px',
+                                  backgroundColor: crumb.color || 'black',
+                                  color: 'white',
+                                  borderRadius: '50%',
+                                  marginRight: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                }}
+                              >
+                                {crumb.text.substr(0, 1).toUpperCase()}
+                              </div>
+                            }
+                            {crumb.type !== 'student' && 
+                              <Icon
+                                icon={icon}
+                                color={crumb.color || '#666'}
+                                className='bp3-icon'
+                              />
+                            }
                             {crumb.text}
                           </span>
                         </li>
@@ -238,17 +362,11 @@ class Student extends React.Component {
             >
               ¡Hola, {this.state.studentName}!
             </h1>
-            <ul style={{
-              margin: '.5rem 0 3rem 0',
-              padding: '0',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr',
-              gridGap: '20px',
-              justifyItems: 'stretch',
+            <div style={{
+              margin: '0 0 32px',
             }}>
               {this.renderDocuments()}
-            </ul>
-
+            </div>
           </div>
         </div>
       </div>

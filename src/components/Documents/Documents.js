@@ -7,7 +7,6 @@ import {
   Alignment,
   AnchorButton,
   Button,
-  Callout,
   Classes,
   Card,
   Dialog,
@@ -88,7 +87,12 @@ class Documents extends React.Component {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`)
       .then(response => response.json())
       .then(data => {
-        let newBreadcrumbs = [{icon: 'folder-open', text: this.state.user.name, id: this.state.user._id, type: 'folder'}]
+        let newBreadcrumbs = [
+          {icon: 'folder-open',
+          text: this.state.user.name,
+          id: this.state.user._id,
+          type: 'folder'
+        }]
 
         if (newBreadcrumbs.length > 0) {
           newBreadcrumbs = data.breadcrumbs.map(crumb => {
@@ -97,23 +101,29 @@ class Documents extends React.Component {
               id: crumb._id,
               text: crumb.name,
               type: crumb.type,
+              color: crumb.color,
             })
           })
         }
         
-        newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type})
+        newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type, color: data.folder.color})
       
         if (newBreadcrumbs[0].type === 'student') {
           newBreadcrumbs.unshift({icon: 'folder-open', text: this.state.user.username, id: this.state.user.userfolder, type: 'folder'})
         }
 
+        const folders = data.documents.filter(doc => doc.type === 'folder')
+        const documents = data.documents.filter(doc => doc.type === 'document')
+
         this.setState({
           isLoadingDocuments: false,
           students: data.students || [],
-          userDocuments: data.documents || [],
+          userFolders: folders || [],
+          userDocuments: documents || [],
           breadcrumbs: newBreadcrumbs,
         })
 
+        document.title = `${data.folder.name} -- Seltools STAGING`;
         this.props.history.push(`/documentos/${folderId}`)
       })
   }
@@ -126,7 +136,12 @@ class Documents extends React.Component {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${'5f3633a4e93634d14b1df842'}/documents/${folderId}`)
       .then(response => response.json())
       .then(data => {
-        let dialogBreadcrumbs = [{icon: 'folder-open', text: this.state.user.name, id: this.state.user._id, type: 'folder'}]
+        let dialogBreadcrumbs = [{
+          icon: 'folder-open',
+          text: this.state.user.name,
+          id: this.state.user._id,
+          type: 'folder',
+        }]
 
         if (dialogBreadcrumbs.length > 0) {
           dialogBreadcrumbs = data.breadcrumbs.map(crumb => {
@@ -135,11 +150,12 @@ class Documents extends React.Component {
               id: crumb._id,
               text: crumb.name,
               type: crumb.type,
+              color: crumb.color
             })
           })
         }
 
-        dialogBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type})
+        dialogBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type,  color: data.folder.color})
       
         if (dialogBreadcrumbs[0].type === 'student') {
           dialogBreadcrumbs.unshift({icon: 'folder-open', text: this.state.user.username, id: this.state.user.userfolder, type: 'folder'})
@@ -168,18 +184,7 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then(data => {
-          const currentDocuments = [...this.state.userDocuments]
-          const index = currentDocuments.findIndex((document) => document._id === this.state.selectedDocumentId)
-
-          if (index !== -1) {
-            currentDocuments.splice(index, 1)
-          }
-
-          this.setState({
-            userDocuments: currentDocuments,
-            selectedDocumentId: null,
-            selectedDocumentName: null,
-          })
+          this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
         })
     }
   }
@@ -246,9 +251,7 @@ class Documents extends React.Component {
         .then(response => response.json())
         .then((data) => {
 
-          this.setState({
-            userDocuments: data,
-          })
+          this.getDocuments(parent)
         })
     }
   }
@@ -345,329 +348,234 @@ class Documents extends React.Component {
   renderDocuments = () => {
     if (this.state.isLoadingDocuments) return <div>Cargando...</div>
 
-    const students = () => {
-      if (this.state.students.length < 1)  {
-        return (
-          <div
+    const renderDocument = (document) => {
+      return (
+        <li
+          className='document-item'
+          key={document._id}
+          style={{
+            listStyle: 'none',
+          }}
+        >
+          <Card
+            className='document-item-card bp3-elevation-1'
             style={{
+              position: 'relative',
               display: 'flex',
-              marginTop: '16px',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              padding: '12px',
+              overflow: 'hidden',
+            }}
+            onClick={() => {
+              if (document.type === 'document') {
+                this.props.history.push(`/documento/${document._id}`)
+              } else {
+                this.getDocuments(document._id)
+              }
+            }}
+            onMouseEnter={() => {
+              this.setState({
+                currentDocumentOverId: document._id,
+                currentDocumentOverName: document.name,
+                currentDocumentOverShared: document.shared,
+                currentDocumentOverType: document.type,
+              })
+            }}
+            onMouseLeave={() => {
+              this.setState({
+                currentDocumentOverId: null,
+                currentDocumentOverName: null,
+                currentDocumentOverShared: null,
+              })
             }}
           >
-            <Callout  
-              title='¡No tienes alumnos!'
-              style={{
-                display: 'inline-flex',
-                flexDirection: 'column',
-                width: 'auto',
-                padding: '24px',
-                marginBottom: '16px',
-              }}
-            >
-              <div 
+            {document.type === 'student' &&
+              <div
                 style={{
-                  marginTop: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center', 
+                  width: '18px',
+                  height: '18px',
+                  backgroundColor: document.color || 'black',
+                  color: 'white',
+                  borderRadius: '50%',
+                  marginRight: '6px',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
                 }}
               >
-                <Button
-                  type='button'
-                  icon='new-person'
-                  intent={Intent.PRIMARY}
-                  text='Nuevo alumno'
-                  onClick={this.handleAddStudent}
-                />
+                {document.name.substr(0, 1).toUpperCase()}
               </div>
-            </Callout>
-          </div>
-        )
-      } else {
-        return (
-          <>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              margin: '0 0 1rem 0',
+            }
+            {document.type !== 'student' &&
+              <Icon
+                icon={document.type === 'document' && document.shared === true ? 'document-share' :
+                      document.type === 'document' ? 'document' :
+                      document.type === 'folder' && document.shared === true ? 'folder-shared' :
+                      document.type === 'folder' ? 'folder-close' :
+                      'user'}
+                color={document.color || '#888'}
+                style={{
+                  marginRight: '6px',
+                  pointerEvents: 'none',
+                }}
+              />
+            }
+            <h4 style={{
+              fontWeight: '400',
+              margin: '0 0 0 4px',
+              pointerEvents: 'none'
             }}>
-              <div style={{
+              {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
+            </h4>
+          </Card>
+        </li>
+      )
+    }
+
+    const students = () => {
+      return (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '0 0 .5rem 0',
+          }}>
+            <div style={{
+              fontSize: '.8rem',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+            }}>
+              Alumnos
+            </div>
+            <div>
+              <Button
+                type='button'
+                icon='new-person'
+                className={Classes.MINIMAL}
+                intent={Intent.PRIMARY}
+                text='Nuevo alumno'
+                onClick={this.handleAddStudent}
+              />
+            </div>
+          </div>
+          <ul
+            className='documents__students'
+            style={{
+              margin: '.5rem 0 2rem 0',
+              padding: '0',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+              gridGap: '16px',
+            }}
+          >
+            {this.state.students.map(student => renderDocument(student))}
+          </ul>
+        </>
+      )
+    }
+
+    const folders = () => {
+      return (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '0 0 .5rem 0',
+          }}>
+            <div
+              style={{
                 fontSize: '.8rem',
                 fontWeight: 'bold',
                 textTransform: 'uppercase',
-              }}>
-                Alumnos
-              </div>
-              <div>
-                <Button
-                  type='button'
-                  icon='new-person'
-                  className={Classes.MINIMAL}
-                  intent={Intent.PRIMARY}
-                  text='Nuevo alumno'
-                  onClick={this.handleAddStudent}
-                />
-              </div>
-            </div>
-            <ul
-              className='documents__students'
-              style={{
-                margin: '.5rem 0 3rem 0',
-                padding: '0',
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-                gridGap: '20px',
               }}
             >
-              {this.state.students.map(student => {
-                return (
-                  <li
-                    className='document-item'
-                    key={student._id}
-                    style={{
-                      listStyle: 'none',
-                    }}
-                  >
-                    <Card
-                      className='document-item-card bp3-elevation-2'
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        // height: '4rem',
-                        padding: '12px',
-                      }}
-                      onClick={() => {
-                        this.getDocuments(student._id)
-                      }}
-                      onMouseEnter={() => {
-                        this.setState({
-                          currentDocumentOverId: student._id,
-                          currentDocumentOverName: student.name,
-                          currentDocumentOverType: student.type,
-                        })
-                      }}
-                      onMouseLeave={() => {
-                        this.setState({
-                          currentDocumentOverId: null,
-                          currentDocumentOverName: null,
-                          currentDocumentOverType: null,
-                        })
-                      }}
-                    >
-                      <Icon
-                        icon='user'
-                        iconSize={Icon.SIZE_LARGE} 
-                        color={student.color}
-                        style={{
-                          position: 'relative',
-                          top: '1px',
-                          marginRight: '8px',
-                          pointerEvents: 'none',
-                        }}
-                      />
-                      <h3 style={{
-                        fontWeight: '400',
-                        margin: '0',
-                        pointerEvents: 'none'
-                      }}>
-                        {!!student.name.trim().length ? student.name : 'Documento sin nombre' }
-                      </h3>
-                    </Card>
-                  </li>
-                )
-              })}
-            </ul>
-          </>
-        )
-      }
+              Carpetas
+            </div>
+            <div>
+              <Button
+                type='button'
+                icon='folder-new'
+                className={Classes.MINIMAL}
+                intent={Intent.PRIMARY}
+                text='Nueva carpeta'
+                onClick={this.handleAddFolder}
+              />
+            </div>
+          </div>
+          <ul
+            className='documents__documents'
+            style={{
+              margin: '.5rem 0 2rem 0',
+              padding: '0',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+              gridGap: '16px',
+              justifyItems: 'stretch',
+            }}
+          >
+            {this.state.userFolders.map(folder => renderDocument(folder))}
+          </ul>
+        </>
+      )
     }
 
     const documents = () => {
-      if (this.state.userDocuments.length < 1)  {
-        return (
-          <div
+      return (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '0 0 .5rem 0',
+          }}>
+            <div
+              style={{
+                fontSize: '.8rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}
+            >
+              Documentos
+            </div>
+            <div>
+              <AnchorButton
+                type='button'
+                icon='add'
+                className={Classes.MINIMAL}
+                intent={Intent.PRIMARY}
+                text='Nuevo documento'
+                href={`/documento?parent=${this.props.match.params.folder}`}
+                style={{marginRight: '8px'}}
+              />
+            </div>
+          </div>
+          <ul
+            className='documents__documents'
             style={{
-              display: 'flex',
-              marginTop: '16px',
-              // justifyContent: 'center',
+              margin: '.5rem 0 2rem 0',
+              padding: '0',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+              gridGap: '16px',
+              justifyItems: 'stretch',
             }}
           >
-            <Callout  
-              title='Carpeta vacía!'
-              style={{
-                display: 'inline-flex',
-                flexDirection: 'column',
-                padding: '24px',
-                width: 'auto',
-              }}
-            >
-              <div
-                style={{
-                  marginBottom: '16px',
-                }}
-              >
-                Aún no tienes ningún documento.
-              </div>
-              <div>
-                <AnchorButton
-                  type='button'
-                  icon='add'
-                  intent={Intent.PRIMARY}
-                  text='Nuevo documento'
-                  href={`/documento?parent=${this.props.match.params.folder}`}
-                  target='_blank'
-                  style={{marginRight: '8px'}}
-                />
-                <Button
-                  type='button'
-                  icon='folder-new'
-                  intent={Intent.PRIMARY}
-                  text='Nueva carpeta'
-                  onClick={this.handleAddFolder}
-                />
-              </div>
-            </Callout>
-          </div>
-        )
-      } else {
-        return (
-          <>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              margin: '0 0 1rem 0',
-            }}>
-              <div
-                style={{
-                  fontSize: '.8rem',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Documentos
-              </div>
-              <div>
-                <AnchorButton
-                  type='button'
-                  icon='add'
-                  className={Classes.MINIMAL}
-                  intent={Intent.PRIMARY}
-                  text='Nuevo documento'
-                  href={`/documento?parent=${this.props.match.params.folder}`}
-                  target='_blank'
-                  style={{marginRight: '8px'}}
-                />
-                <Button
-                  type='button'
-                  icon='folder-new'
-                  className={Classes.MINIMAL}
-                  intent={Intent.PRIMARY}
-                  text='Nueva carpeta'
-                  onClick={this.handleAddFolder}
-                />
-              </div>
-            </div>
-            <ul
-              className='documents__documents'
-              style={{
-                margin: '.5rem 0 3rem 0',
-                padding: '0',
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                gridGap: '20px',
-                justifyItems: 'stretch',
-              }}
-            >
-              {this.state.userDocuments.map(document => {
-                const docType = document.type || 'document'
-        
-                return (
-                  <li
-                    className='document-item'
-                    key={document._id}
-                    style={{
-                      listStyle: 'none',
-                    }}
-                  >
-                    <Card
-                      className='document-item-card bp3-elevation-2'
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        justifyContent: 'flex-start',
-                        // minHeight: '6rem',
-                        height: '100%',
-                        overflow: 'hidden',
-                        padding: '12px',
-                      }}
-                      onClick={() => {
-                        if (docType === 'document') {
-                          window.open(`/documento/${document._id}`, '_blank')
-                        } else {
-                          this.getDocuments(document._id)
-                        }
-                      }}
-                      onMouseEnter={() => {
-                        this.setState({
-                          currentDocumentOverId: document._id,
-                          currentDocumentOverName: document.name,
-                          currentDocumentOverShared: document.shared,
-                          currentDocumentOverType: document.type,
-                        })
-                      }}
-                      onMouseLeave={() => {
-                        this.setState({
-                          currentDocumentOverId: null,
-                          currentDocumentOverName: null,
-                          currentDocumentOverShared: null,
-                        })
-                      }}
-                    >
-                      {docType === 'document' &&
-                        <Icon
-                          icon='document'
-                          iconSize={Icon.SIZE_LARGE} 
-                          color={document.color}
-                          style={{
-                            marginRight: '6px',
-                            pointerEvents: 'none',
-                          }}
-                        />
-                      }
-                      {docType === 'folder' &&
-                        <Icon
-                          icon='folder-close'
-                          iconSize={Icon.SIZE_LARGE} 
-                          color={document.color}
-                          style={{
-                            marginRight: '6px',
-                            pointerEvents: 'none',
-                          }}
-                        />
-                      }
-                      <h3 style={{
-                        fontWeight: '400',
-                        margin: '8px 0 0 0',
-                        pointerEvents: 'none'
-                      }}>
-                        {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
-                      </h3>
-                    </Card>
-                  </li>
-                )
-              })}
-            </ul>
-          </>
-        )
-      }
-
+            {this.state.userDocuments.map(document => renderDocument(document))}
+          </ul>
+        </>
+      )
     }
 
     return (
       <div>
         {this.state.breadcrumbs.length === 1 && students()}
+        {folders()}
         {documents()}
       </div>
     )
@@ -686,7 +594,6 @@ class Documents extends React.Component {
 
     if (localStorage.getItem('isUserAllowed')) {
       this.getUser()
-      // this.getDocuments(this.props.match.params.folder)
     }
 
     document.addEventListener('contextmenu', (event) => {
@@ -712,13 +619,6 @@ class Documents extends React.Component {
           this.setState({showPopoverMenu: false})
         }
       }, 100)
-
-      // event.preventDefault()
-      // this.setState({
-      //   showPopoverMenu: true,
-      //   menuTop: event.pageY,
-      //   menuLeft: event.pageX,
-      // })
     })
   }
 
@@ -732,23 +632,18 @@ class Documents extends React.Component {
           left: `${this.state.menuLeft}px`,
         }}
       >
-        <li className='bp3-menu-header'>
-          <h6 className='bp3-heading'>{this.state.selectedDocumentName}</h6>
-        </li>
-        <MenuDivider />
         <MenuItem
-          icon="delete"
-          text="Eliminar"
-          intent={Intent.DANGER}
-          onClick={(e) => this.handleDeleteDocument()}
+          icon="share"
+          text="Abrir en una pestaña nueva"
+          onClick={(e) => window.open(this.state.selectedDocumentType === 'document' ? `/documento/${this.state.selectedDocumentId}` : `/documentos/${this.state.selectedDocumentId}`, '_blank')}
         />
+        <MenuDivider />
         {this.state.selectedDocumentType !== 'user' &&
           this.state.selectedDocumentType !== 'student' &&
           (!!this.state.breadcrumbs[1] && this.state.breadcrumbs[1].type === 'student') &&
           <MenuItem
-            icon="share"
+            icon={this.state.selectedDocumentType === 'document' ? 'document-share' : 'folder-shared'}
             text="Compartir"
-            // intent={Intent.DANGER}
             labelElement={this.state.selectedDocumentShared ? <Icon icon="tick" /> : <Icon icon="cross" />} 
             onClick={(e) => this.handleShareDocument(this.state.selectedDocumentId)}
           />
@@ -783,11 +678,17 @@ class Documents extends React.Component {
             icon="add-to-folder"
             text="Mover a..."
             onClick={(e) => {
-              this.getCurrentDialogContent(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+              this.getCurrentDialogContent(this.state.breadcrumbs[0].id)
               this.setState({isMoveDialogOpen: true})
             }}
           />
         }
+        <MenuItem
+          icon="delete"
+          text="Eliminar"
+          intent={Intent.DANGER}
+          onClick={(e) => this.handleDeleteDocument()}
+        />
       </Menu>
     )
   }
@@ -809,7 +710,10 @@ class Documents extends React.Component {
                   return (
                     <li>
                       <span className={`bp3-breadcrumb bp3-breadcrumb-current`}>
-                        <Icon icon='folder-open' className='bp3-icon' />
+                        <Icon
+                          icon={crumb.type === 'folder' ? 'folder-close' : 'user'}
+                          color={crumb.color}
+                          className='bp3-icon' />
                         {crumb.text}
                       </span>
                     </li>
@@ -820,7 +724,10 @@ class Documents extends React.Component {
                       <span className='bp3-breadcrumb' onClick={() => {
                         this.getCurrentDialogContent(crumb.id)
                       }}>
-                        <Icon icon='folder-open' className='bp3-icon' />
+                        <Icon
+                          icon={crumb.type === 'folder' ? 'folder-close' : 'user'}
+                          color={crumb.color}
+                          className='bp3-icon' />
                         {crumb.text}
                       </span>
                     </li>
@@ -840,7 +747,7 @@ class Documents extends React.Component {
             striped={true}
           >
             <tbody>
-              {this.state.dialogStudents.map((student, index) => {
+              {this.state.dialogStudents.map((student) => {
                 return (
                   <tr
                     onClick={() => {
@@ -848,28 +755,39 @@ class Documents extends React.Component {
                     }}
                   >
                     <td>
-                      <Icon icon='user' />
-                      <span style={{marginLeft: '8px'}}>{student.name}</span>
+                      <Icon
+                        icon='user'
+                        color={student.color || '#666'}
+                      />
+                      <span style={{marginLeft: '6px'}}>{student.name}</span>
                     </td>
                   </tr>
                 )
               })}
-              {this.state.dialogDocuments.map((doc, index) => {
+              {this.state.dialogDocuments.map((doc) => {
                 return (
                   <tr
+                    style={{
+                      pointerEvents: doc.type === 'document' ? 'none' : 'all',
+                    }}
                     onClick={() => {
                       if (doc.type === 'document') return false
                       this.getCurrentDialogContent(doc._id)
                     }}
                   >
                     <td>
-                      {doc.type === 'document' &&
-                        <Icon icon='document' />
-                      }
-                      {doc.type !== 'document' &&
-                        <Icon icon='folder-close' />
-                      }
-                      <span style={{marginLeft: '8px'}}>{doc.name}</span>
+                      <Icon
+                        icon={doc.type === 'document' ? 'document' : 'folder-close'}
+                        color={doc.color || '#666'}
+                      />
+                      <span
+                        style={{
+                          marginLeft: '8px',
+                          opacity: doc.type === 'document' ? '.4' : '1',
+                        }}
+                      >
+                        {doc.name}
+                      </span>
                     </td>
                   </tr>
                 )
@@ -923,7 +841,8 @@ class Documents extends React.Component {
                 }}
               >
                 <div style={{
-                  maxHeight: '44px'
+                  maxHeight: '44px',
+                  overflow: 'hidden',
                 }}>
                   <img 
                     style={{
@@ -945,7 +864,32 @@ class Documents extends React.Component {
                       return (
                         <li>
                           <span className={`bp3-breadcrumb bp3-breadcrumb-current`}>
-                            <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                            {crumb.type === 'student' && 
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center', 
+                                  width: '18px',
+                                  height: '18px',
+                                  backgroundColor: crumb.color || 'black',
+                                  color: 'white',
+                                  borderRadius: '50%',
+                                  marginRight: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                }}
+                              >
+                                {crumb.text.substr(0, 1).toUpperCase()}
+                              </div>
+                            }
+                            {crumb.type !== 'student' && 
+                              <Icon
+                                icon={icon}
+                                color={crumb.color || '#666'}
+                                className='bp3-icon'
+                              />
+                            }
                             {crumb.text}
                           </span>
                         </li>
@@ -956,7 +900,32 @@ class Documents extends React.Component {
                           <span className='bp3-breadcrumb' onClick={() => {
                             this.getDocuments(crumb.id)
                           }}>
-                            <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                            {crumb.type === 'student' && 
+                              <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center', 
+                                width: '18px',
+                                height: '18px',
+                                backgroundColor: crumb.color || 'black',
+                                color: 'white',
+                                borderRadius: '50%',
+                                marginRight: '6px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              {crumb.text.substr(0, 1).toUpperCase()}
+                            </div>
+                            }
+                            {crumb.type !== 'student' && 
+                              <Icon
+                                icon={icon}
+                                color={crumb.color || '#666'}
+                                className='bp3-icon'
+                              />
+                            }
                             {crumb.text}
                           </span>
                         </li>

@@ -165,7 +165,32 @@ class Header extends React.Component {
                   return (
                     <li>
                       <span className={`bp3-breadcrumb bp3-breadcrumb-current`}>
-                        <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                        {crumb.type === 'student' && 
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center', 
+                              width: '18px',
+                              height: '18px',
+                              backgroundColor: crumb.color || 'black',
+                              color: 'white',
+                              borderRadius: '50%',
+                              marginRight: '6px',
+                              fontSize: '12px',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            {crumb.text.substr(0, 1).toUpperCase()}
+                          </div>
+                          }
+                          {crumb.type !== 'student' && 
+                            <Icon
+                              icon={icon}
+                              color={crumb.color || '#666'}
+                              className='bp3-icon'
+                            />
+                          }
                           {this.props.isStudent &&
                             crumb.text
                           }
@@ -185,9 +210,34 @@ class Header extends React.Component {
                   return (
                     <li style={{cursor: 'pointer'}}>
                       <span className='bp3-breadcrumb' onClick={() => {
-                        window.open(this.props.isStudent? `/alumno/documentos/${crumb.id}` : `/documentos/${crumb.id}`, '_blank')
+                        this.props.history.push(this.props.isStudent ? `/alumno/documentos/${crumb.id}` : `/documentos/${crumb.id}`)
                       }}>
-                        <Icon style={{position: 'relative', top: '1px',}} icon={icon} className='bp3-icon' />
+                        {crumb.type === 'student' && 
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center', 
+                              width: '18px',
+                              height: '18px',
+                              backgroundColor: crumb.color || 'black',
+                              color: 'white',
+                              borderRadius: '50%',
+                              marginRight: '6px',
+                              fontSize: '12px',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            {crumb.text.substr(0, 1).toUpperCase()}
+                          </div>
+                        }
+                        {crumb.type !== 'student' && 
+                          <Icon
+                            icon={icon}
+                            color={crumb.color || '#999'}
+                            className='bp3-icon'
+                          />
+                        }
                         {crumb.text}
                       </span>
                     </li>

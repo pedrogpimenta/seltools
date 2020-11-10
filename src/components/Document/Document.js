@@ -58,6 +58,7 @@ class Document extends React.Component {
                 id: crumb._id,
                 text: crumb.name,
                 type: crumb.type,
+                color: crumb.color
               })
             })
           }
@@ -66,7 +67,8 @@ class Document extends React.Component {
             icon: data.document.type === 'folder' ? 'folder-open' : 'user',
             text: data.document.name,
             id: data.document._id,
-            type: data.document.type
+            type: data.document.type,
+            color: data.document.color,
           })
 
           newBreadcrumbs.push({icon: 'document', text: '', id: '', type: 'document'})
@@ -145,6 +147,7 @@ class Document extends React.Component {
                 id: crumb._id,
                 text: crumb.name,
                 type: crumb.type,
+                color: crumb.color,
               })
             })
           }
