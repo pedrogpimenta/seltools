@@ -501,16 +501,24 @@ class Document extends React.Component {
                       mode={this.props.editMode}
                       fileButtons={this.renderFileButtons(i, file.id)}
                     >
-                      {file.type === 'pdf' &&
+                      {(file.type && file.type.toLowerCase() === 'pdf') &&
                         <Canvas file={file} fileHasRendered={this.fileHasRendered} />
                       }
-                      {file.type === 'txt' &&
+                      {(file.type && file.type.toLowerCase() === 'txt') &&
                         <TextFile file={file} />
                       }
-                      {(file.type === 'm4a' || file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') &&
+                      {((file.type && file.type.toLowerCase() === 'm4a') ||
+                        (file.type && file.type.toLowerCase() === 'aac') ||
+                        (file.type && file.type.toLowerCase() === 'mp3') ||
+                        (file.type && file.type.toLowerCase() === 'ogg') ||
+                        (file.type && file.type.toLowerCase() === 'opus') ||
+                        (file.type && file.type.toLowerCase() === 'wav') ||
+                        (file.type && file.type.toLowerCase() === 'webm')) &&
                         <AudioFile file={file} />
                       }
-                      {(file.type === 'jpg' || file.type === 'jpeg' || file.type === 'png') &&
+                      {((file.type && file.type.toLowerCase() === 'jpg') ||
+                        (file.type && file.type.toLowerCase() === 'jpeg') ||
+                        (file.type && file.type.toLowerCase() === 'png')) &&
                         <Image file={file} />
                       }
                     </FileWrapper>
