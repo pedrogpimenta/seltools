@@ -209,6 +209,79 @@ body .medium-toolbar-arrow-under::after {
   top: 30px;
 }
 
+/* Text editor Quill */
+
+.text-editor .quill {
+  width: 100%;
+}
+
+.text-editor .ql-container {
+  font-family: 'Roboto', sans-serif;
+}
+
+.text-editor.locked .ql-toolbar.ql-snow {
+  opacity: 0;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.text-editor .ql-toolbar.ql-snow {
+  position: sticky;
+  top: 50px;
+  border-radius: 6px 6px 0 0;
+  border: none;
+  border-bottom: 1px solid #EEE;
+  background: white;
+  height: 42px;
+  z-index: 10;
+  transition: all 100ms ease-in;
+}
+
+.text-editor .ql-container.ql-snow  {
+  border: none
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value='roboto']::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value='roboto']::before {
+  content: 'Roboto';
+  font-family: 'Roboto';
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value='comfortaa']::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value='comfortaa']::before {
+  content: 'Comfortaa';
+  font-family: 'Comfortaa';
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value='lobster']::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value='lobster']::before {
+  content: 'Lobster';
+  font-family: 'Lobster';
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value='amatic']::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value='amatic']::before {
+  content: 'Amatic';
+  font-family: 'Amatic SC';
+}
+
+.ql-font-roboto {
+  font-family: 'Roboto';
+}
+
+.ql-font-comfortaa {
+  font-family: 'Comfortaa';
+}
+
+.ql-font-lobster {
+  font-family: 'Lobster';
+}
+
+.ql-font-amatic {
+  font-family: 'Amatic SC';
+}
+
 /* Text file */
 
 .text-editor .bp3-button {

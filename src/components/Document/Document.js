@@ -446,7 +446,7 @@ class Document extends React.Component {
         className='App'
         style={{
           display: 'flex',
-          overflow: 'hidden',
+          // overflow: 'hidden',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >

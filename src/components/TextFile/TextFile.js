@@ -6,7 +6,15 @@ import {
   Intent,
 } from "@blueprintjs/core"
 
-import Editor from '../Editor/Editor'
+import ReactQuill, {Quill} from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+
+var FontAttributor = Quill.import('attributors/class/font');
+
+FontAttributor.whitelist = [
+  'roboto', 'comfortaa', 'lobster', 'amatic',
+];
+Quill.register(FontAttributor, true);
 
 class TextFile extends React.Component {
   constructor() {
@@ -17,12 +25,11 @@ class TextFile extends React.Component {
     }
   }
 
-  handleChange = (e, fileId) => {
+  handleChange = (e) => {
     store.dispatch({
       type: "EDIT_TEXT_FILE",
-      fileId: this.props.file.id,
-      id: e.parentNode.parentNode.classList[1],
-      content: e.innerHTML,
+      id: this.props.file.id,
+      content: e,
       name: null,
     }) 
 
@@ -30,27 +37,15 @@ class TextFile extends React.Component {
       type: "DOCUMENT_UNSAVED",
     }) 
   }
-  
-  onInputFocus = (e) => {
-    // this.setState({hasFocus: true})
-  }
-
-  onInputBlur = (e) => {
-    // this.setState({hasFocus: false})
-  }
 
   handleChangeMode = () => {
     this.setState({editMode: this.state.editMode === 'text' ? 'markers' : 'text'})
   }
 
-  // handleChangeMode = (prevState) => {
-  //   this.setState({editMode: prevState === 'text' ? 'markers' : 'text'})
-  // }
-
   render() {
     return (
       <div
-        className={`text-editor ${this.props.file.id} bp3-running-text`}
+        className={`text-editor ${this.state.editMode !== 'text' ? 'locked' : ''} ${this.props.file.id} bp3-running-text`}
         style={{
           position: 'relative',
           display: 'flex',
@@ -58,7 +53,7 @@ class TextFile extends React.Component {
           width: 'var(--doc-width)',
           maxWidth: '100%',
           minHeight: '40px',
-          padding: '8px 16px',
+          padding: '0',
           margin: '0 auto',
           boxShadow: '0 2px 10px 0 rgba(0, 0, 0, .1)',
           borderRadius: '6px',
@@ -86,7 +81,25 @@ class TextFile extends React.Component {
             onClick={this.handleChangeMode}
           />
         </div>
-        <Editor
+        <ReactQuill
+          theme="snow"
+          value={this.props.file.content}
+          onChange={this.handleChange}
+          modules={{
+            toolbar: [
+              [{ 'font': ['roboto', 'comfortaa', 'lobster', 'amatic'] }],
+              [{ 'header': [1, 2, false] }],
+              [{ 'align': [] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+              [{ 'color': [] }, { 'background': [] }],
+              ['link'],
+              ['clean'],
+            ],
+          }}
+        />
+
+        {/* <Editor
           content={this.props.file.content}
           parentId={this.props.file.id}
           fileId={this.props.file.id}
@@ -95,7 +108,7 @@ class TextFile extends React.Component {
           onEditorChange={(e) => {this.handleChange(e, this.props.file.id)}}
           onInputFocus={(e) => {this.onInputFocus(e)}}
           onInputBlur={(e) => {this.onInputBlur(e)}}
-        />
+        /> */}
         {/* {this.props.file.content} */}
       </div>
     )
