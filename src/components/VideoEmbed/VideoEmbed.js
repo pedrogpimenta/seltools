@@ -30,10 +30,14 @@ class VideoEmbed extends React.Component {
           borderRadius: '6px',
           fontSize: '16px',
           backgroundColor: 'white',
+          overflow: 'hidden',
           zIndex: '10',
         }}
       >
-        <ReactPlayer url={this.props.file.content} />
+        <ReactPlayer
+          controls={true}
+          url={this.props.file.content}
+        />
       </div>
     )
   }
