@@ -96,6 +96,9 @@ class TextFile extends React.Component {
               ['link'],
               ['clean'],
             ],
+            clipboard: {
+              matchVisual: false,
+            },
           }}
         />
 
