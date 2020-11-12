@@ -337,6 +337,24 @@ function reducer(state = initialState, action) {
         ...state,
         files: filesForLS,
       }
+      
+    case 'ADD_VIDEO_EMBED':
+      filesForLS = updatedFiles.slice()
+      const embedToAdd = {
+        id: `video-embed-${Math.floor((Math.random() * 100000) + 1)}`,
+        type: 'videoembed',
+        name: null,
+        markers: [],
+        content: action.url,
+        creator: action.creator,
+      }
+
+      filesForLS.splice(action.position + 1, 0, embedToAdd)
+
+      return {
+        ...state,
+        files: filesForLS,
+      }
 
     case 'ADD_NEW_HIGHLIGHT':
       for (let file in updatedFiles) {

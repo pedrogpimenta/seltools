@@ -15,6 +15,7 @@ import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
 import TextFile from '../TextFile/TextFile'
+import VideoEmbed from '../VideoEmbed/VideoEmbed'
 import FileWrapper from '../FileWrapper/FileWrapper'
 import Header from '../Header/Header'
 import Toolbar from '../Toolbar/Toolbar'
@@ -305,6 +306,24 @@ class Document extends React.Component {
     this.fileInput.current.click(e)
   }
 
+  handleAddYoutubeEmbed = (fileIndex, creator) => {
+    const url = window.prompt('¿Cuál es la URL del vídeo? Ej: "https://www.youtube.com/watch?v=yfTCbVMmGa0"')
+
+    if (!(!!url && url.length > 0)) return false
+
+    console.log('url:', url)
+    this.props.dispatch({
+      type: "ADD_VIDEO_EMBED",
+      position: fileIndex,
+      creator: creator,
+      url: url,
+    })
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    })
+  }
+
   handleDeleteFile = (fileId) => {
     const confirmDelete = window.confirm('¿Quieres eliminar el archivo?')
 
@@ -384,6 +403,14 @@ class Document extends React.Component {
           loading={this.state.uploadingFiles}
           icon='music'
           onClick={(e) => this.handleAddFile(e, i - 1)}
+        />
+        <Button
+          style={{margin: '0 4px'}}
+          intent={Intent.DEFAULT}
+          className={Classes.MINIMAL}
+          loading={this.state.uploadingFiles}
+          icon='video'
+          onClick={(e) => this.handleAddYoutubeEmbed(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         {(!this.props.isStudent ? true : this.props.files[i].creator === localStorage.getItem('studentName')) &&
           <Button
@@ -520,6 +547,9 @@ class Document extends React.Component {
                         (file.type && file.type.toLowerCase() === 'jpeg') ||
                         (file.type && file.type.toLowerCase() === 'png')) &&
                         <Image file={file} />
+                      }
+                      {((file.type && file.type.toLowerCase() === 'videoembed')) &&
+                        <VideoEmbed file={file} />
                       }
                     </FileWrapper>
                   </div>
