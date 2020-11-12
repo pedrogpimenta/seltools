@@ -217,6 +217,7 @@ body .medium-toolbar-arrow-under::after {
 
 .text-editor .ql-container {
   font-family: 'Roboto', sans-serif;
+  font-size: 14px;
 }
 
 .text-editor.locked .ql-toolbar.ql-snow {
