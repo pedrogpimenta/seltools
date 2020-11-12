@@ -124,7 +124,7 @@ class Documents extends React.Component {
         })
 
         document.title = `${data.folder.name} -- Seltools STAGING`;
-        this.props.history.push(`/documentos/${folderId}`)
+        // this.props.history.push(`/documentos/${folderId}`)
       })
   }
 
@@ -184,7 +184,7 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then(data => {
-          this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+          this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
         })
     }
   }
@@ -205,7 +205,7 @@ class Documents extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
       })
   }
 
@@ -225,7 +225,7 @@ class Documents extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
       })
   }
 
@@ -251,7 +251,7 @@ class Documents extends React.Component {
         .then(response => response.json())
         .then((data) => {
 
-          this.getDocuments(parent)
+          this.props.history.push(`/documentos/${parent}`)
         })
     }
   }
@@ -305,7 +305,7 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then(data => {
-          this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+          this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
         })
     }
 
@@ -327,7 +327,7 @@ class Documents extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
       })
   }
 
@@ -341,7 +341,7 @@ class Documents extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.getDocuments(this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id)
+        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
       })
   }
 
@@ -372,7 +372,7 @@ class Documents extends React.Component {
               if (document.type === 'document') {
                 this.props.history.push(`/documento/${document._id}`)
               } else {
-                this.getDocuments(document._id)
+                this.props.history.push(`/documentos/${document._id}`)
               }
             }}
             onMouseEnter={() => {
@@ -595,6 +595,15 @@ class Documents extends React.Component {
     if (localStorage.getItem('isUserAllowed')) {
       this.getUser()
     }
+    
+    this.props.history.listen((location, action) => {
+      // if (action !== 'PUSH') return false
+      const locationArray = location.pathname.split('/')
+      const docId = locationArray[locationArray.length - 1]
+      console.log('ola:', this.props.match.params.folder)
+      console.log('ola2:', docId)
+      this.getDocuments(docId)
+    })
 
     document.addEventListener('contextmenu', (event) => {
       event.preventDefault()
@@ -824,13 +833,13 @@ class Documents extends React.Component {
           minHeight: '100vh',
           overflow: 'hidden',
           backgroundColor: '#f8f8f8',
-          cursor: this.props.dragging ? 'grabbing' : 'default',
+          // cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
         <div
           style={{
             width: '100%',
-            cursor: this.props.dragging ? 'grabbing' : 'default',
+            // cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
           <Navbar fixedToTop={true}>
@@ -898,7 +907,7 @@ class Documents extends React.Component {
                       return (
                         <li style={{cursor: 'pointer'}}>
                           <span className='bp3-breadcrumb' onClick={() => {
-                            this.getDocuments(crumb.id)
+                            this.props.history.push(`/documentos/${crumb.id}`)
                           }}>
                             {crumb.type === 'student' && 
                               <div

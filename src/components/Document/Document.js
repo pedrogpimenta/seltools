@@ -299,14 +299,14 @@ class Document extends React.Component {
     })  
   }
 
-  handleAddFile = (e, fileIndex) => {
+  handleAddFile = (e, fileIndex, creator) => {
     this.setState({
       addFileIndex: fileIndex,
     })
     this.fileInput.current.click(e)
   }
 
-  handleAddYoutubeEmbed = (fileIndex, creator) => {
+  handleAddVideoEmbed = (fileIndex, creator) => {
     const url = window.prompt('¿Cuál es la URL del vídeo? Ej: "https://www.youtube.com/watch?v=yfTCbVMmGa0"')
 
     if (!(!!url && url.length > 0)) return false
@@ -394,7 +394,7 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='media'
-          onClick={(e) => this.handleAddFile(e, i - 1)}
+          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 4px'}}
@@ -402,7 +402,7 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='music'
-          onClick={(e) => this.handleAddFile(e, i - 1)}
+          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 4px'}}
@@ -410,7 +410,7 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='video'
-          onClick={(e) => this.handleAddYoutubeEmbed(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={(e) => this.handleAddVideoEmbed(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         {(!this.props.isStudent ? true : this.props.files[i].creator === localStorage.getItem('studentName')) &&
           <Button
@@ -440,7 +440,6 @@ class Document extends React.Component {
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           icon='new-text-box'
           large={true}
-          // text='Añadir texto'
           onClick={() => this.handleAddTextFile(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
@@ -450,8 +449,7 @@ class Document extends React.Component {
           loading={this.state.uploadingFiles}
           icon='media'
           large={true}
-          // text='Añadir archivos'
-          onClick={(e) => this.handleAddFile(e, this.props.files.length)}
+          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 8px'}}
@@ -460,8 +458,15 @@ class Document extends React.Component {
           loading={this.state.uploadingFiles}
           icon='music'
           large={true}
-          // text='Añadir archivos'
-          onClick={(e) => this.handleAddFile(e, this.props.files.length)}
+          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+        />
+        <Button
+          style={{margin: '0 8px'}}
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          icon='video'
+          large={true}
+          onClick={(e) => this.handleAddVideoEmbed(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
       </div>
     )
@@ -473,7 +478,9 @@ class Document extends React.Component {
         className='App'
         style={{
           display: 'flex',
-          // overflow: 'hidden',
+          minHeight: '100vh',
+          overflow: 'hidden',
+          backgroundColor: '#f8f8f8',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
@@ -496,7 +503,6 @@ class Document extends React.Component {
               position: 'relative',
               marginTop: '50px',
               padding: '20px',
-              backgroundColor: 'rgb(250, 250, 250)'
             }}
           >
             <Toolbar />
