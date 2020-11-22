@@ -113,6 +113,10 @@ class Header extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
+        if (!this.props.id) {
+          this.props.history.push(this.props.isStudent? `/alumno/documento/${data.id}` : `/documento/${data.id}`)
+        }
+
         this.props.dispatch({
           type: 'CHANGE_DOCUMENT_ID',
           id: data.id,
@@ -121,8 +125,6 @@ class Header extends React.Component {
         this.props.dispatch({
           type: 'DOCUMENT_SAVED',
         })
-
-        this.props.history.push(this.props.isStudent? `/alumno/documento/${data.id}` : `/documento/${data.id}`)
       })
 
   }
@@ -197,7 +199,7 @@ class Header extends React.Component {
                           {!this.props.isStudent &&
                             <EditableText
                               style={{color: 'black'}}
-                              defaultValue={this.props.documentIsLoading ? 'Cargando...' : this.props.name}
+                              defaultValue={this.props.breadcrumbs[this.props.breadcrumbs.length - 1].text}
                               placeholder='Nuevo documento'
                               confirmOnEnterKey={true}
                               onConfirm={(e) => this.handleNameInputConfirm(e)}

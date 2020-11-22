@@ -1,7 +1,7 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { store } from '../../store/store'
-import { CirclePicker } from 'react-color';
+import { cloneDeep } from 'lodash'
 
 import {
   Alignment,
@@ -9,51 +9,38 @@ import {
   Button,
   Classes,
   Card,
-  Dialog,
-  HTMLTable,
   Icon,
   Intent,
-  Menu,
-  MenuDivider,
-  MenuItem,
   Navbar,
   NavbarDivider,
   NavbarGroup,
   NavbarHeading,
+  Popover,
+  Spinner,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
+
+import MoveDialog from '../MoveDialog/MoveDialog'
+import DropdownMenu from '../DropdownMenu/DropdownMenu'
 
 class Documents extends React.Component {
   constructor() {
     super()
 
     this.state = {
-      isLoadingStudents: true,
       isLoadingDocuments: true,
       user: {},
       userFolders: [],
       userDocuments: [],
-      // documents: [],
       students: [],
       isUserAllowed: false,
-      currentDocumentOverId: null,
       selectedDocumentId: null,
       selectedDocumentName: null,
       isMoveDialogOpen: false,
-      isLoadingDialogDocuments: false,
-      dialogStudents: [],
-      dialogFolder: {},
-      dialogDocuments: [],
-      dialogBreadcrumbs: [],
-      showPopoverMenu: false,
-      menuTop: 0,
-      menuLeft: 0,
-      currentPath: [],
-      currentPathName: [],
       breadcrumbs: [
         { icon: 'folder-open',
-          text: 'Documentos',
+          text: 'Selen',
         },
       ],
     }
@@ -78,12 +65,17 @@ class Documents extends React.Component {
           user: data.user,
         })
 
-        this.getDocuments(this.props.match.params.folder || data.user.userfolder)
+        // this.getDocuments(this.props.match.params.folder || data.user.userfolder)
+        this.props.history.push(`/documentos/${this.props.match.params.folder || data.user.userfolder}`)
       })
 
   }
   
   getDocuments = (folderId) => {
+    this.setState({
+      isLoadingDocuments: true,
+    })
+
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`)
       .then(response => response.json())
       .then(data => {
@@ -128,70 +120,47 @@ class Documents extends React.Component {
       })
   }
 
-  getCurrentDialogContent = (folderId) => {
-    this.setState({
-      isLoadingDialogDocuments: true,
-    })
-
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${'5f3633a4e93634d14b1df842'}/documents/${folderId}`)
-      .then(response => response.json())
-      .then(data => {
-        let dialogBreadcrumbs = [{
-          icon: 'folder-open',
-          text: this.state.user.name,
-          id: this.state.user._id,
-          type: 'folder',
-        }]
-
-        if (dialogBreadcrumbs.length > 0) {
-          dialogBreadcrumbs = data.breadcrumbs.map(crumb => {
-            return({
-              icon: 'folder-open',
-              id: crumb._id,
-              text: crumb.name,
-              type: crumb.type,
-              color: crumb.color
-            })
-          })
-        }
-
-        dialogBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type,  color: data.folder.color})
-      
-        if (dialogBreadcrumbs[0].type === 'student') {
-          dialogBreadcrumbs.unshift({icon: 'folder-open', text: this.state.user.username, id: this.state.user.userfolder, type: 'folder'})
-        }
-
-        this.setState({
-          isLoadingDialogDocuments: false,
-          dialogStudents: data.students || [],
-          dialogFolder: data.folder || [],
-          dialogDocuments: data.documents || [],
-          dialogBreadcrumbs: dialogBreadcrumbs || [],
-        })
-      })
-  }
-
-  handleDeleteDocument = () => {
-    const confirmDelete = window.confirm('¿Quieres eliminar el documento?')
+  handleDeleteDocument = (documentId, documentName, documentType) => {
+    const confirmDelete = window.confirm(`¿Quieres eliminar "${documentName}"?`)
 
     if (confirmDelete) {
       const requestOptions = {
         method: 'DELETE',
       }
 
-      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${this.state.selectedDocumentId}`
+      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
 
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then(data => {
-          this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
+          if (data.ok !== 1) return false
+
+          const updatedDocs = documentType === 'document' ?
+            this.state.userDocuments.filter((doc) => doc._id !== documentId) :
+            documentType === 'folder' ?
+              this.state.userFolders.filter((doc) => doc._id !== documentId) :
+              this.state.students.filter((doc) => doc._id !== documentId)
+
+          if (documentType === 'document') {
+            this.setState({
+              userDocuments: updatedDocs
+            })
+          } else if (documentType === 'folder') {
+            this.setState({
+              userFolders: updatedDocs
+            })
+          } else {
+            this.setState({
+              students: updatedDocs
+            })
+          }
         })
     }
   }
 
-  handleShareDocument = () => {
+  handleShareDocument = (documentId, documentShared, documentType) => {
     const documentObject = {
-      shared: !this.state.selectedDocumentShared,
+      shared: !documentShared,
     }
 
     const requestOptions = {
@@ -200,18 +169,37 @@ class Documents extends React.Component {
       body: JSON.stringify(documentObject)
     }
 
-    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${this.state.selectedDocumentId}`
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
+        if (data.ok !== 1) return false
+
+        const updatedDocs = documentType === 'document' ? [...this.state.userDocuments] : documentType === 'folder' ? [...this.state.userFolders] : [...this.state.students]
+
+        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
+        updatedDocs[docIndex].shared = !updatedDocs[docIndex].shared
+
+        if (documentType === 'document') {
+          this.setState({
+            userDocuments: updatedDocs
+          })
+        } else if (documentType === 'folder') {
+          this.setState({
+            userFolders: updatedDocs
+          })
+        } else {
+          this.setState({
+            students: updatedDocs
+          })
+        }
       })
   }
 
-  handleMoveDocument = () => {
+  handleMoveDocument = (folderId, documentId) => {
     const documentObject = {
-      parentId: this.state.dialogFolder._id,
+      parentId: folderId,
     }
 
     const requestOptions = {
@@ -225,7 +213,12 @@ class Documents extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
+          if (data.ok !== 1) return false
+          const documents = this.state.userDocuments.filter((doc) => doc._id !== documentId)
+
+          this.setState({
+            userDocuments: documents
+          })
       })
   }
 
@@ -251,7 +244,8 @@ class Documents extends React.Component {
         .then(response => response.json())
         .then((data) => {
 
-          this.props.history.push(`/documentos/${parent}`)
+          this.getDocuments(parent)
+          // this.props.history.push(`/documentos/${parent}`)
         })
     }
   }
@@ -285,7 +279,7 @@ class Documents extends React.Component {
     }
   }
 
-  handleRename = (documentId, documentName) => {
+  handleRename = (documentId, documentName, documentType) => {
     const newName = window.prompt('Cambia el nombre:', documentName)
 
     if (!!newName) {
@@ -300,18 +294,37 @@ class Documents extends React.Component {
         body: JSON.stringify(documentObject)
       }
   
-      let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${this.state.selectedDocumentId}`
+      let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
   
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then(data => {
-          this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
+          if (data.ok !== 1) return false
+
+          const updatedDocs = documentType === 'document' ? [...this.state.userDocuments] : documentType === 'folder' ? [...this.state.userFolders] : [...this.state.students]
+
+          const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
+          updatedDocs[docIndex].name = newName
+  
+          if (documentType === 'document') {
+            this.setState({
+              userDocuments: updatedDocs
+            })
+          } else if (documentType === 'folder') {
+            this.setState({
+              userFolders: updatedDocs
+            })
+          } else {
+            this.setState({
+              students: updatedDocs
+            })
+          }
         })
     }
 
   }
 
-  handleColorChange = (color) => {
+  handleColorChange = (color, documentId, documentType) => {
     const documentObject = {
       color: color.hex,
     }
@@ -322,12 +335,32 @@ class Documents extends React.Component {
       body: JSON.stringify(documentObject)
     }
 
-    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${this.state.selectedDocumentId}`
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
+        if (data.ok !== 1) return false
+
+        const updatedDocs = documentType === 'document' ? [...this.state.userDocuments] : documentType === 'folder' ? [...this.state.userFolders] : [...this.state.students]
+
+        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
+        updatedDocs[docIndex].color = color.hex
+
+        if (documentType === 'document') {
+          this.setState({
+            userDocuments: updatedDocs
+          })
+        } else if (documentType === 'folder') {
+          this.setState({
+            userFolders: updatedDocs
+          })
+        } else {
+          this.setState({
+            students: updatedDocs
+          })
+        }
+
       })
   }
 
@@ -341,97 +374,153 @@ class Documents extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.props.history.push(`/documentos/${this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id}`)
+        if (!data.id) return false
+
+        const updatedDocs = [...this.state.userDocuments]
+        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
+        const newDoc = cloneDeep(updatedDocs[docIndex])
+        newDoc._id = data.id
+        newDoc.name = newDoc.name + ' Clone'
+        newDoc.shared = false
+        updatedDocs.unshift(newDoc)
+
+        this.setState({userDocuments: updatedDocs})
       })
   }
 
-  renderDocuments = () => {
-    if (this.state.isLoadingDocuments) return <div>Cargando...</div>
+  handleMoveDialogOpen = (documentId, documentName) => {
+    this.setState({
+      isMoveDialogOpen: true,
+      selectedDocumentId: documentId,
+      selectedDocumentName: documentName,
+    })
+  }
 
+  renderMoveDialog = () => {
+    if (!this.state.isMoveDialogOpen) return false
+
+    return(
+      <MoveDialog
+        initialFolder={this.state.breadcrumbs[0].id}
+        user={this.state.user}
+        selectedDocumentId={this.state.selectedDocumentId}
+        selectedDocumentName={this.state.selectedDocumentName}
+        handleCloseButton={() => this.setState({isMoveDialogOpen: false})}
+        handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+      >
+      </MoveDialog>
+    )
+  }
+
+  renderDocuments = () => {
     const renderDocument = (document) => {
       return (
         <li
-          className='document-item'
           key={document._id}
+          className='document-item'
           style={{
+            position: 'relative',
             listStyle: 'none',
           }}
         >
           <Card
             className='document-item-card bp3-elevation-1'
             style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              padding: '12px',
-              overflow: 'hidden',
-            }}
-            onClick={() => {
-              if (document.type === 'document') {
-                this.props.history.push(`/documento/${document._id}`)
-              } else {
-                this.props.history.push(`/documentos/${document._id}`)
-              }
-            }}
-            onMouseEnter={() => {
-              this.setState({
-                currentDocumentOverId: document._id,
-                currentDocumentOverName: document.name,
-                currentDocumentOverShared: document.shared,
-                currentDocumentOverType: document.type,
-              })
-            }}
-            onMouseLeave={() => {
-              this.setState({
-                currentDocumentOverId: null,
-                currentDocumentOverName: null,
-                currentDocumentOverShared: null,
-              })
+              padding: '0',
             }}
           >
-            {document.type === 'student' &&
-              <div
+            <Link
+              style={{
+                position: 'relative',
+                display: 'flex',
+                height: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                padding: '8px',
+                overflow: 'hidden',
+              }}
+              to={`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`}
+            >
+              {document.type === 'student' &&
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center', 
+                    width: '18px',
+                    height: '18px',
+                    backgroundColor: document.color || 'black',
+                    color: 'white',
+                    borderRadius: '50%',
+                    marginRight: '6px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    userSelect: 'none',
+                  }}
+                >
+                  {document.name.substr(0, 1).toUpperCase()}
+                </div>
+              }
+              {document.type !== 'student' &&
+                <Icon
+                  icon={document.type === 'document' && document.shared === true ? 'document-share' :
+                        document.type === 'document' ? 'document' :
+                        document.type === 'folder' && document.shared === true ? 'folder-shared' :
+                        document.type === 'folder' ? 'folder-close' :
+                        'user'}
+                  color={document.color || '#888'}
+                  style={{
+                    marginRight: '6px',
+                    // pointerEvents: 'none',
+                    userSelect: 'none',
+                  }}
+                />
+              }
+              <h4
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center', 
-                  width: '18px',
-                  height: '18px',
-                  backgroundColor: document.color || 'black',
-                  color: 'white',
-                  borderRadius: '50%',
-                  marginRight: '6px',
-                  fontSize: '12px',
-                  fontWeight: 'bold',
+                  flex: '1',
+                  fontWeight: '300',
+                  margin: '0 0 0 4px',
+                  // pointerEvents: 'none',
+                  userSelect: 'none',
                 }}
               >
-                {document.name.substr(0, 1).toUpperCase()}
-              </div>
-            }
-            {document.type !== 'student' &&
-              <Icon
-                icon={document.type === 'document' && document.shared === true ? 'document-share' :
-                      document.type === 'document' ? 'document' :
-                      document.type === 'folder' && document.shared === true ? 'folder-shared' :
-                      document.type === 'folder' ? 'folder-close' :
-                      'user'}
-                color={document.color || '#888'}
-                style={{
-                  marginRight: '6px',
-                  pointerEvents: 'none',
-                }}
-              />
-            }
-            <h4 style={{
-              fontWeight: '400',
-              margin: '0 0 0 4px',
-              pointerEvents: 'none'
-            }}>
-              {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
-            </h4>
+                {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
+              </h4>
+            </Link>
           </Card>
+            <Popover
+              autoFocus={false}
+              content={<DropdownMenu
+                documentId={document._id}
+                documentName={document.name}
+                documentType={document.type}
+                documentShared={document.shared}
+                breadcrumbs={this.state.breadcrumbs}
+                handleShareDocument={this.handleShareDocument}
+                handleRename={this.handleRename}
+                handleColorChange={this.handleColorChange}
+                handleCloneDocument={this.handleCloneDocument}
+                handleDeleteDocument={this.handleDeleteDocument}
+                handleMoveDialogOpen={this.handleMoveDialogOpen}
+              />}
+            >
+              <div
+                className={'card-actions'}
+                style={{
+                  background: 'rgb(197, 197, 197)',
+                  padding: '4px',
+                  borderRadius: '3px',
+                  lineHeight: '0',
+                }}
+              >
+                <Icon
+                  icon='more'
+                  color='white'
+                />
+              </div>
+            </Popover>
         </li>
       )
     }
@@ -582,6 +671,12 @@ class Documents extends React.Component {
   }
 
   componentDidMount = () => {
+    
+    store.dispatch({
+      type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+      breadcrumbs: [],
+    })
+
     store.dispatch({
       type: 'LOAD_FILES',
       files: [],
@@ -597,229 +692,11 @@ class Documents extends React.Component {
     }
     
     this.props.history.listen((location, action) => {
-      // if (action !== 'PUSH') return false
+      if (action !== 'PUSH') return false
       const locationArray = location.pathname.split('/')
       const docId = locationArray[locationArray.length - 1]
-      console.log('ola:', this.props.match.params.folder)
-      console.log('ola2:', docId)
       this.getDocuments(docId)
     })
-
-    document.addEventListener('contextmenu', (event) => {
-      event.preventDefault()
-      const clickedADocument = event.target.classList.contains('document-item-card')
-
-      if (!!this.state.currentDocumentOverId && clickedADocument) {
-        this.setState({
-          selectedDocumentId: this.state.currentDocumentOverId,
-          selectedDocumentName: this.state.currentDocumentOverName,
-          selectedDocumentShared: this.state.currentDocumentOverShared,
-          selectedDocumentType: this.state.currentDocumentOverType,
-          showPopoverMenu: true,
-          menuTop: event.pageY,
-          menuLeft: event.pageX,
-        })
-      }
-    })
-
-    document.addEventListener('click', (event) => {
-      window.setTimeout(() => {
-        if (this.state.showPopoverMenu === true) {
-          this.setState({showPopoverMenu: false})
-        }
-      }, 100)
-    })
-  }
-
-  renderPopoverMenu = () => {
-    return (
-      <Menu
-        className={Classes.ELEVATION_2}
-        style={{
-          position: 'absolute',
-          top: `${this.state.menuTop}px`,
-          left: `${this.state.menuLeft}px`,
-        }}
-      >
-        <MenuItem
-          icon="share"
-          text="Abrir en una pestaña nueva"
-          onClick={(e) => window.open(this.state.selectedDocumentType === 'document' ? `/documento/${this.state.selectedDocumentId}` : `/documentos/${this.state.selectedDocumentId}`, '_blank')}
-        />
-        <MenuDivider />
-        {this.state.selectedDocumentType !== 'user' &&
-          this.state.selectedDocumentType !== 'student' &&
-          (!!this.state.breadcrumbs[1] && this.state.breadcrumbs[1].type === 'student') &&
-          <MenuItem
-            icon={this.state.selectedDocumentType === 'document' ? 'document-share' : 'folder-shared'}
-            text="Compartir"
-            labelElement={this.state.selectedDocumentShared ? <Icon icon="tick" /> : <Icon icon="cross" />} 
-            onClick={(e) => this.handleShareDocument(this.state.selectedDocumentId)}
-          />
-        }
-        <MenuItem
-          icon="edit"
-          text="Cambiar nombre..."
-          onClick={(e) => this.handleRename(this.state.selectedDocumentId, this.state.selectedDocumentName)}
-        />
-        <MenuItem
-          icon="tint"
-          text="Color"
-        >
-          <div
-            style={{padding: '8px'}}
-          >
-            <CirclePicker 
-              onChange={this.handleColorChange} 
-              colors={["#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#795548", "#607d8b", "#000"]}
-            />
-          </div>
-        </MenuItem>
-        {this.state.selectedDocumentType === 'document' &&
-          <MenuItem
-            icon="duplicate"
-            text="Duplicar"
-            onClick={(e) => this.handleCloneDocument(this.state.selectedDocumentId)}
-          />
-        }
-        {this.state.selectedDocumentType === 'document' &&
-          <MenuItem
-            icon="add-to-folder"
-            text="Mover a..."
-            onClick={(e) => {
-              this.getCurrentDialogContent(this.state.breadcrumbs[0].id)
-              this.setState({isMoveDialogOpen: true})
-            }}
-          />
-        }
-        <MenuItem
-          icon="delete"
-          text="Eliminar"
-          intent={Intent.DANGER}
-          onClick={(e) => this.handleDeleteDocument()}
-        />
-      </Menu>
-    )
-  }
-
-  renderMoveDialog = () => {
-    return (
-      <Dialog
-        title={`Mover "${this.state.selectedDocumentName}" a:`}
-        isOpen={this.state.isMoveDialogOpen}
-        onClose={() => this.setState({isMoveDialogOpen: false})}
-      >
-        <div className={Classes.DIALOG_BODY}>
-          <div
-            style={{marginLeft: '8px', marginBottom: '8px'}}
-          >
-            <ul className='bp3-overflow-list bp3-breadcrumbs'>
-              {this.state.dialogBreadcrumbs.map((crumb, i) => {
-                if (this.state.dialogBreadcrumbs.length - 1 === i) {
-                  return (
-                    <li>
-                      <span className={`bp3-breadcrumb bp3-breadcrumb-current`}>
-                        <Icon
-                          icon={crumb.type === 'folder' ? 'folder-close' : 'user'}
-                          color={crumb.color}
-                          className='bp3-icon' />
-                        {crumb.text}
-                      </span>
-                    </li>
-                  )
-                } else {
-                  return (
-                    <li style={{cursor: 'pointer'}}>
-                      <span className='bp3-breadcrumb' onClick={() => {
-                        this.getCurrentDialogContent(crumb.id)
-                      }}>
-                        <Icon
-                          icon={crumb.type === 'folder' ? 'folder-close' : 'user'}
-                          color={crumb.color}
-                          className='bp3-icon' />
-                        {crumb.text}
-                      </span>
-                    </li>
-                  )
-                }}
-              )}
-            </ul>
-          </div>
-          <HTMLTable
-            style={{
-              width: '100%',
-              background: 'white',
-              boxShadow: '0 0 0 1px rgba(0, 0, 0, .1), inset 0px 1px 3px 0 rgba(0, 0, 0, .1)',
-              minHeight: '100px',
-            }}
-            interactive={true}
-            striped={true}
-          >
-            <tbody>
-              {this.state.dialogStudents.map((student) => {
-                return (
-                  <tr
-                    onClick={() => {
-                      this.getCurrentDialogContent(student._id)
-                    }}
-                  >
-                    <td>
-                      <Icon
-                        icon='user'
-                        color={student.color || '#666'}
-                      />
-                      <span style={{marginLeft: '6px'}}>{student.name}</span>
-                    </td>
-                  </tr>
-                )
-              })}
-              {this.state.dialogDocuments.map((doc) => {
-                return (
-                  <tr
-                    style={{
-                      pointerEvents: doc.type === 'document' ? 'none' : 'all',
-                    }}
-                    onClick={() => {
-                      if (doc.type === 'document') return false
-                      this.getCurrentDialogContent(doc._id)
-                    }}
-                  >
-                    <td>
-                      <Icon
-                        icon={doc.type === 'document' ? 'document' : 'folder-close'}
-                        color={doc.color || '#666'}
-                      />
-                      <span
-                        style={{
-                          marginLeft: '8px',
-                          opacity: doc.type === 'document' ? '.4' : '1',
-                        }}
-                      >
-                        {doc.name}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </HTMLTable>
-        </div>
-
-        <div className={Classes.DIALOG_FOOTER}>
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button
-              intent={Intent.PRIMARY}
-              onClick={() => {
-                this.handleMoveDocument()
-                this.setState({isMoveDialogOpen: false})
-              }}
-            >
-              Mover a "{this.state.dialogFolder.name}"
-            </Button>
-          </div>
-        </div>
-      </Dialog>
-    )
   }
 
   render() {
@@ -869,48 +746,16 @@ class Documents extends React.Component {
                 <ul className='bp3-overflow-list bp3-breadcrumbs'>
                   {this.state.breadcrumbs.map((crumb, i) => {
                     const icon = crumb.type === 'folder' ? 'folder-open' : 'user'
-                    if (this.state.breadcrumbs.length - 1 === i) {
-                      return (
-                        <li>
-                          <span className={`bp3-breadcrumb bp3-breadcrumb-current`}>
-                            {crumb.type === 'student' && 
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center', 
-                                  width: '18px',
-                                  height: '18px',
-                                  backgroundColor: crumb.color || 'black',
-                                  color: 'white',
-                                  borderRadius: '50%',
-                                  marginRight: '6px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                {crumb.text.substr(0, 1).toUpperCase()}
-                              </div>
-                            }
-                            {crumb.type !== 'student' && 
-                              <Icon
-                                icon={icon}
-                                color={crumb.color || '#666'}
-                                className='bp3-icon'
-                              />
-                            }
-                            {crumb.text}
-                          </span>
-                        </li>
-                      )
-                    } else {
-                      return (
-                        <li style={{cursor: 'pointer'}}>
-                          <span className='bp3-breadcrumb' onClick={() => {
-                            this.props.history.push(`/documentos/${crumb.id}`)
-                          }}>
-                            {crumb.type === 'student' && 
-                              <div
+                    return (
+                      <li key={`crumb-${crumb.id}`}>
+                        <span
+                          className={`bp3-breadcrumb ${this.state.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
+                          onClick={() => {
+                            this.state.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb.id}`)
+                          }}
+                        >
+                          {crumb.type === 'student' && 
+                            <div
                               style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -922,25 +767,23 @@ class Documents extends React.Component {
                                 borderRadius: '50%',
                                 marginRight: '6px',
                                 fontSize: '12px',
-                                fontWeight: 'bold',
+                                fontWeight: '700',
                               }}
                             >
                               {crumb.text.substr(0, 1).toUpperCase()}
                             </div>
-                            }
-                            {crumb.type !== 'student' && 
-                              <Icon
-                                icon={icon}
-                                color={crumb.color || '#666'}
-                                className='bp3-icon'
-                              />
-                            }
-                            {crumb.text}
-                          </span>
-                        </li>
-                      )
-
-                    }}
+                          }
+                          {crumb.type !== 'student' && 
+                            <Icon
+                              icon={icon}
+                              color={crumb.color || '#666'}
+                              className='bp3-icon'
+                            />
+                          }
+                          {crumb.text}
+                        </span>
+                      </li>
+                    )}
                   )}
                 </ul>
               </div>
@@ -972,13 +815,21 @@ class Documents extends React.Component {
                 <div style={{
                   margin: '0 0 32px',
                 }}>
-                  {this.renderDocuments()}
+                  {!this.state.isLoadingDocuments &&
+                    this.renderDocuments()
+                  }
                 </div>
               </div>
             </div>
           </div>
-          {this.state.isMoveDialogOpen && this.renderMoveDialog()}
-          {this.state.showPopoverMenu && this.renderPopoverMenu()}
+          {this.state.isLoadingDocuments &&
+            <Spinner 
+              style={{
+                background: 'red',
+              }}
+            />
+          }
+          {this.renderMoveDialog()}
         </div>
       </div>
     )

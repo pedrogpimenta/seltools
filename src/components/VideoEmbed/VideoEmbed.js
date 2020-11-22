@@ -8,11 +8,6 @@ import ReactPlayer from 'react-player'
 // } from "@blueprintjs/core"
 
 class VideoEmbed extends React.Component {
-  constructor() {
-    super();
-
-  }
-
   render() {
     return (
       <div

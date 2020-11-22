@@ -16,6 +16,52 @@ FontAttributor.whitelist = [
 ];
 Quill.register(FontAttributor, true);
 
+let Inline = Quill.import('blots/inline');
+
+class MarkBlot extends Inline { } 
+MarkBlot.blotName = 'mark'
+MarkBlot.tagName = 'mark'
+MarkBlot.className = 'highlight'
+Quill.register(MarkBlot)
+
+class DelBlot extends Inline { } 
+DelBlot.blotName = 'del'
+DelBlot.tagName = 'del'
+DelBlot.className = 'striker'
+Quill.register(DelBlot)
+
+export class TagBlot extends Inline {
+  static blotName = 'tag';
+  static className = 'redtext';
+  static tagName = 'span';
+
+  static formats() {
+    return true;
+  }
+}
+Quill.register(TagBlot)
+
+
+// class MyCustomInline extends Inline {
+//   static blotName = 'redtext'
+//   static tagName = 'span'
+//   static className = 'redtext'
+
+//   formats() {
+//     return MyCustomInline.tagName
+//   }
+// }
+
+// Quill.register(MyCustomInline)
+
+
+// class RedTextBlot extends Inline { } 
+// RedTextBlot.blotName = 'redtext';
+// RedTextBlot.tagName = 'SPAN';
+// RedTextBlot.className = 'redtext';
+// Quill.register(RedTextBlot)
+
+
 class TextFile extends React.Component {
   constructor() {
     super();
@@ -57,7 +103,6 @@ class TextFile extends React.Component {
           margin: '0 auto',
           boxShadow: '0 2px 10px 0 rgba(0, 0, 0, .1)',
           borderRadius: '6px',
-          fontSize: '16px',
           backgroundColor: 'white',
           zIndex: this.state.editMode === 'text' ? '10' : '1',
         }}

@@ -186,6 +186,7 @@ class Document extends React.Component {
     for (let i = 0; i < files.length; i++) {
       let fileParts = files[i].name.split('.')
       let fileName = files[i].name.replace(/\s+/gi, '-').replace(/[^a-zA-Z0-9-]/gi, '_')
+      fileName = `${fileName}-${Math.floor((Math.random() * 100000) + 1)}`
       let fileType = fileParts[fileParts.length - 1]
 
       axios.post(`${REACT_APP_SERVER_BASE_URL}/sign_s3`, {
@@ -198,7 +199,7 @@ class Document extends React.Component {
           const url = returnData.url
 
           filesForState.push({
-            id: `${fileName}-${Math.floor((Math.random() * 100000) + 1)}`,
+            id: fileName,
             name: fileName,
             type: fileType,
             url: url,
@@ -551,6 +552,7 @@ class Document extends React.Component {
                       }
                       {((file.type && file.type.toLowerCase() === 'jpg') ||
                         (file.type && file.type.toLowerCase() === 'jpeg') ||
+                        (file.type && file.type.toLowerCase() === 'jfif') ||
                         (file.type && file.type.toLowerCase() === 'png')) &&
                         <Image file={file} />
                       }
