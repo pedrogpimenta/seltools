@@ -18,6 +18,8 @@ import {
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
+import IconSel from '../IconSel/IconSel'
+
 class Header extends React.Component {
 
   handleShareDocument = () => {
@@ -162,7 +164,7 @@ class Header extends React.Component {
           >
             <ul className='bp3-overflow-list bp3-breadcrumbs'>
               {this.props.breadcrumbs.map((crumb, i) => {
-                const icon = crumb.type === 'folder' ? 'folder-open' : crumb.type === 'document' ? 'document' : 'user'
+                const icon = crumb.type === 'folder' ? 'folder-open' : crumb.type === 'document' ? 'document' : <IconSel />
                 if (this.props.breadcrumbs.length - 1 === i) {
                   return (
                     <li>

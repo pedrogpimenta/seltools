@@ -67,9 +67,9 @@ class Markers extends React.Component {
 
   componentDidMount = () => {
     // TODO: Fix timeout: check if all images have loaded and then set
-    if (!this.markersRef.current) return
-
     window.setTimeout(() => {
+      if (!this.markersRef.current) return
+
       this.setState({
         width: this.markersRef.current.offsetWidth,
         height: this.markersRef.current.offsetHeight,

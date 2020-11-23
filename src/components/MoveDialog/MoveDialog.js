@@ -10,6 +10,7 @@ import {
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
+import IconSel from '../IconSel/IconSel'
 
 class MoveDialog extends React.Component {
   constructor() {
@@ -33,7 +34,7 @@ class MoveDialog extends React.Component {
       .then(response => response.json())
       .then(data => {
         let dialogBreadcrumbs = [{
-          icon: 'folder-open',
+          icon: <IconSel />,
           text: this.props.user.name,
           id: this.props.user._id,
           type: 'folder',
@@ -102,7 +103,7 @@ class MoveDialog extends React.Component {
             >
               <ul className='bp3-overflow-list bp3-breadcrumbs'>
                 {this.state.breadcrumbs.map((crumb, i) => {
-                    const icon = crumb.type === 'folder' ? 'folder-open' : 'user'
+                    const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
                     return (
                       <li key={`menuitem-${crumb}`}>
                         <span

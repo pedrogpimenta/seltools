@@ -23,6 +23,7 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 import MoveDialog from '../MoveDialog/MoveDialog'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
+import IconSel from '../IconSel/IconSel'
 
 class Documents extends React.Component {
   constructor() {
@@ -79,8 +80,8 @@ class Documents extends React.Component {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`)
       .then(response => response.json())
       .then(data => {
-        let newBreadcrumbs = [
-          {icon: 'folder-open',
+        let newBreadcrumbs = [{
+          icon: <IconSel />,
           text: this.state.user.name,
           id: this.state.user._id,
           type: 'folder'
@@ -745,7 +746,7 @@ class Documents extends React.Component {
               >
                 <ul className='bp3-overflow-list bp3-breadcrumbs'>
                   {this.state.breadcrumbs.map((crumb, i) => {
-                    const icon = crumb.type === 'folder' ? 'folder-open' : 'user'
+                    const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
                     return (
                       <li key={`crumb-${crumb.id}`}>
                         <span
