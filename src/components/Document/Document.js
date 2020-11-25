@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { Beforeunload } from 'react-beforeunload'
 import axios from 'axios'
 
+import io from 'socket.io-client'
+
 import {
   Intent,
   Button,
@@ -42,76 +44,82 @@ class Document extends React.Component {
     }
   }
 
+  socket = ''
+  
+  componentWillUnmount() {
+    this.socket.disconnect()
+  }
+
   componentDidMount() {
     this.getUser()
 
-    const parent = new URLSearchParams(this.props.location.search).get('parent')
-    if (!!parent) {
-      fetch(`${REACT_APP_SERVER_BASE_URL}/document/${parent}`)
-        .then(response => response.json())
-        .then(data => {
-          let newBreadcrumbs = []
-
-          if (data.breadcrumbs) {
-            newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
-              return({
-                icon: 'folder-open',
-                id: crumb._id,
-                text: crumb.name,
-                type: crumb.type,
-                color: crumb.color
-              })
-            })
-          }
-  
-          newBreadcrumbs.push({
-            icon: data.document.type === 'folder' ? 'folder-open' : 'user',
-            text: data.document.name,
-            id: data.document._id,
-            type: data.document.type,
-            color: data.document.color,
-          })
-
-          newBreadcrumbs.push({icon: 'document', text: '', id: '', type: 'document'})
-        
-          if (this.props.isStudent) {
-            newBreadcrumbs.shift()
-          }
-  
-          this.props.dispatch({
-            type: 'CHANGE_DOCUMENT_BREADCRUMBS',
-            breadcrumbs: newBreadcrumbs,
-          })
-        })
-    }
-
     if (!this.props.match.params.id) {
-      
-      this.props.dispatch({
-        type: 'DOCUMENT_IS_LOADED',
-      })
+      const parent = new URLSearchParams(this.props.location.search).get('parent')
 
-      this.props.dispatch({
-        type: 'LOAD_FILES',
-        files: [],
-      })
+      if (!!parent) {
+        fetch(`${REACT_APP_SERVER_BASE_URL}/document/${parent}`)
+          .then(response => response.json())
+          .then(data => {
+            let newBreadcrumbs = []
 
-      this.props.dispatch({
-        type: 'CHANGE_DOCUMENT_ID',
-        id: '',
-      })
+            if (data.breadcrumbs) {
+              newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
+                return({
+                  icon: 'folder-open',
+                  id: crumb._id,
+                  text: crumb.name,
+                  type: crumb.type,
+                  color: crumb.color
+                })
+              })
+            }
+    
+            newBreadcrumbs.push({
+              icon: data.document.type === 'folder' ? 'folder-open' : 'user',
+              text: data.document.name,
+              id: data.document._id,
+              type: data.document.type,
+              color: data.document.color,
+            })
 
-      this.props.dispatch({
-        type: 'CHANGE_DOCUMENT_NAME',
-        name: '',
-      })
+            newBreadcrumbs.push({icon: 'document', text: '', id: '', type: 'document'})
+          
+            if (this.props.isStudent) {
+              newBreadcrumbs.shift()
+            }
+    
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+              breadcrumbs: newBreadcrumbs,
+            })
+
+            this.props.dispatch({
+              type: 'DOCUMENT_IS_LOADED',
+            })
+
+            this.props.dispatch({
+              type: 'LOAD_FILES',
+              files: [],
+            })
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_ID',
+              id: '',
+            })
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_NAME',
+              name: '',
+            })
+          })
+      } 
     } else {
       fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
         .then(response => response.json())
         .then(data => {
           const LSfiles = data.document.files || []
 
-          document.title = `${data.document.name} -- Seltools STAGING`;
+          document.title = `${data.document.name} -- Seltools`;
 
           if (LSfiles.length > 0) {
             this.props.dispatch({
@@ -172,6 +180,18 @@ class Document extends React.Component {
           this.props.dispatch({
             type: "DOCUMENT_IS_LOADED",
           }) 
+
+          // WebSockets
+          const thisUserName = this.props.isStudent ? localStorage.getItem('studentName') : 'Selen'
+
+          this.socket = io('ws://localhost:3000/')
+
+          this.socket.on('connect', () => {
+            console.log('1')
+
+            this.socket.emit('document open', thisUserName, data.document._id)
+          });
+
         })
     }
   }

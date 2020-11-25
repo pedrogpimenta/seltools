@@ -116,7 +116,7 @@ class Documents extends React.Component {
           breadcrumbs: newBreadcrumbs,
         })
 
-        document.title = `${data.folder.name} -- Seltools STAGING`;
+        document.title = `${data.folder.name} -- Seltools`;
         // this.props.history.push(`/documentos/${folderId}`)
       })
   }
