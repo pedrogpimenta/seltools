@@ -27,6 +27,18 @@ class Toolbar extends React.Component {
           left: '10px',
         }}
       >
+        {this.props.isLocked &&
+          <div
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              // background: 'red',
+            }}
+            onClick={this.props.handleClickWhenLocked}
+          >
+          </div>
+        }
         <Menu className={`tools-menu ${Classes.ELEVATION_1}`}>
           <MenuItem
             active={this.props.editMode === 'marker'}

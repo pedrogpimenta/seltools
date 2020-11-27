@@ -87,7 +87,7 @@ button:focus {
   display: flex;
   overflow: auto;
   justify-content: space-between;
-  background-color: var(--c-primary-lightest);
+  /* background-color: var(--c-primary-lightest); */
   box-shadow: none;
   z-index: 20;
 }
@@ -216,6 +216,42 @@ body .quill span.redtext {
   color: var(--c-redtext)
 }
 
+
+body .quill .ql-bubble.ql-container {
+  font-family: 'Open Sans', sans-serif;
+}
+
+body .quill .ql-bubble .ql-editor {
+  padding: 0;
+}
+
+body .quill .ql-bubble .ql-tooltip {
+  /* width: auto !important;
+  max-width: none !important; */
+  /* width: 192px !important; */
+  background-color: var(--c-primary-dark);
+  margin-top: -78px;
+}
+
+body .quill .ql-bubble .ql-toolbar .ql-stroke {
+  stroke: rgba(255, 255, 255, .9);
+}
+
+body .quill .ql-bubble .ql-toolbar .ql-fill {
+  fill: rgba(255, 255, 255, .9);
+}
+
+body .quill .ql-bubble .ql-tooltip .ql-tooltip-arrow {
+  top: 36px;
+  border-bottom: none;
+  border-top: 6px solid var(--c-primary-dark);
+}
+
+body .quill .ql-bubble .ql-tooltip .ql-formats {
+  display: flex;
+  margin: 6px;
+}
+
 body .medium-editor-element:focus {
   outline: none;
 }
@@ -298,10 +334,10 @@ body .medium-toolbar-arrow-under::after {
   border: none
 }
 
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value='roboto']::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value='roboto']::before {
-  content: 'Roboto';
-  font-family: 'Roboto';
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value='opensans']::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value='opensans']::before {
+  content: 'Open Sans';
+  font-family: 'Open Sans';
 }
 
 .ql-snow .ql-picker.ql-font .ql-picker-label[data-value='comfortaa']::before,
@@ -322,8 +358,8 @@ body .medium-toolbar-arrow-under::after {
   font-family: 'Amatic SC';
 }
 
-.ql-font-roboto {
-  font-family: 'Roboto';
+.ql-font-opensans {
+  font-family: 'Open Sans';
 }
 
 .ql-font-comfortaa {
@@ -397,7 +433,7 @@ body .medium-toolbar-arrow-under::after {
   opacity: 1 !important;
 }
 
-.file:hover .fileButtons {
+.file:hover .fileButtons:not(.locked) {
   opacity: .6 !important;
 }
 
@@ -445,68 +481,17 @@ table.bp3-html-table tbody tr:first-child td {
   border-radius: 5px;
 }
 
-
-/* Circle color picker */
-/* .circle-picker > span:last-child > div:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 2px black;
-  pointer-events: none;
-} */
-
-
-/* :root {
-  --c-primary: #F87361;
-  --c-white: #FFF;
-
-  --c-button-bg: var(--c-primary);
-  --c-button-text: var(--c-white);
-
-  --py-button: .8em;
-  --px-button: 1.4em;
+/* header */
+.btn--lock .bp3-button-text {
+  opacity: 0;
+  width: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: all 100ms ease-in;
 }
 
-body {
-
+.btn--lock:hover .bp3-button-text {
+  opacity: 1;
+  width: auto;
+  max-width: 100px;
 }
-
-@font-face {
-  font-family: 'Nunito';
-  src: url('/assets/fonts/nunito-italic-webfont.woff2') format('woff2'),
-    url('/assets/fonts/nunito-italic-webfont.woff') format('woff');
-  font-weight: normal;
-  font-style: italic;
-}
-
-@font-face {
-    font-family: 'Nunito';
-    src: url('/assets/fonts/nunito-regular-webfont.woff2') format('woff2'),
-      url('/assets/fonts/nunito-regular-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Nunito';
-    src: url('/assets/fonts/nunito-semibold-webfont.woff2') format('woff2'),
-      url('/assets/fonts/nunito-semibold-webfont.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Nunito';
-    src: url('/assets/fonts/nunito-semibolditalic-webfont.woff2') format('woff2'),
-      url('/assets/fonts/nunito-semibolditalic-webfont.woff') format('woff');
-    font-weight: bold;
-    font-style: italic;
-}
-
-.App {
-  font-family: Nunito, sans-serif;
-} */

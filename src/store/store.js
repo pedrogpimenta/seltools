@@ -39,10 +39,15 @@ function reducer(state = initialState, action) {
       }
 
     case 'LOAD_FILES':
+      console.log('jappen')
       const filesOnLoad = cloneDeep(action.files)
       
       for (let file in filesOnLoad) {
         delete filesOnLoad[file].content
+      }
+      
+      if (!action.noReset) {
+        state = initialState
       }
 
       return {
@@ -124,25 +129,25 @@ function reducer(state = initialState, action) {
         id: action.id,
       }
 
-    case 'CHANGE_DOCUMENT_SHAREDWITH':
-      // localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
+    // case 'CHANGE_DOCUMENT_SHAREDWITH':
+    //   // localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
 
-      return {
-        ...state,
-        sharedWith: action.sharedWith || [],
-      }
+    //   return {
+    //     ...state,
+    //     sharedWith: action.sharedWith || [],
+    //   }
 
-    case 'FILE_HAS_RENDERED':
-      for (let file in updatedFiles) {
-        if (updatedFiles[file].id === action.fileId) {
-          updatedFiles[file].hasRendered = true
-        }
-      }
+    // case 'FILE_HAS_RENDERED':
+    //   for (let file in updatedFiles) {
+    //     if (updatedFiles[file].id === action.fileId) {
+    //       updatedFiles[file].hasRendered = true
+    //     }
+    //   }
 
-      return {
-        ...state,
-        files: updatedFiles,
-      }
+    //   return {
+    //     ...state,
+    //     files: updatedFiles,
+    //   }
 
     case 'MOVE_FILE_UP':
       updatedFiles = array_move(updatedFiles, action.position, action.position - 1)
@@ -440,6 +445,12 @@ function reducer(state = initialState, action) {
         isSaving: false,
       }
 
+    case 'CHANGE_DOCUMENT_MODIFIED_DATE':
+      return {
+        ...state,
+        modifiedDate: action.modifiedDate,
+      }
+
     case 'DOCUMENT_IS_LOADED':
       return {
         ...state,
@@ -456,6 +467,14 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         dragging: false,
+      }
+
+    case 'DOCUMENT_IS_LOCKED':
+      return {
+        ...state,
+        locked: action.locked,
+        isLocked: action.isLocked,
+        lockedBy: action.lockedBy,
       }
 
     default:

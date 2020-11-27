@@ -94,8 +94,21 @@ class Markers extends React.Component {
           cursor: this.props.dragging ? 'grabbing' : 'default',
           zIndex: this.props.isActive ? '5' : '1',
         }}
-        onDoubleClick={(e) => this.addNewMarker(e)}
+        onDoubleClick={(e) => {!this.props.isLocked && this.addNewMarker(e)}}
       >
+        {this.props.isLocked &&
+          <div
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              zIndex: '100',
+              // background: 'red',
+            }}
+            onClick={this.props.handleClickWhenLocked}
+          >
+          </div>
+        }
         {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
           return(
             <Marker

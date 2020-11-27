@@ -7,6 +7,40 @@ import {
   Icon,
 } from "@blueprintjs/core"
 import Editor from '../Editor/Editor'
+import ReactQuill, {Quill} from 'react-quill'
+import 'react-quill/dist/quill.bubble.css'
+
+var FontAttributor = Quill.import('attributors/class/font');
+
+FontAttributor.whitelist = [
+  'roboto', 'comfortaa', 'lobster', 'amatic',
+];
+Quill.register(FontAttributor, true);
+
+let Inline = Quill.import('blots/inline');
+
+class MarkBlot extends Inline { } 
+MarkBlot.blotName = 'mark'
+MarkBlot.tagName = 'mark'
+MarkBlot.className = 'highlight'
+Quill.register(MarkBlot)
+
+class DelBlot extends Inline { } 
+DelBlot.blotName = 'del'
+DelBlot.tagName = 'del'
+DelBlot.className = 'striker'
+Quill.register(DelBlot)
+
+export class TagBlot extends Inline {
+  static blotName = 'tag';
+  static className = 'redtext';
+  static tagName = 'span';
+
+  static formats() {
+    return true;
+  }
+}
+Quill.register(TagBlot)
 
 class Marker extends React.Component {
   constructor(props) {
@@ -31,8 +65,8 @@ class Marker extends React.Component {
    store.dispatch({
       type: "EDIT_MARKER",
       fileId: this.props.fileId,
-      id: e.parentNode.parentNode.classList[1],
-      content: e.innerHTML,
+      id: this.props.id,
+      content: e,
     }) 
 
     store.dispatch({
@@ -177,6 +211,7 @@ class Marker extends React.Component {
             <div
               className={`marker ${this.props.id}`}
               style={{
+                position: 'relative',
                 padding: '3px 6px 4px 6px',
                 lineHeight: '18px',
                 borderRadius: '14px',
@@ -191,7 +226,20 @@ class Marker extends React.Component {
                 minHeight: '19px',
               }}
             >
-              <Editor
+        <ReactQuill
+          theme="bubble"
+          value={this.props.content}
+          onChange={(e) => {this.handleChange(e)}}
+          modules={{
+            toolbar: [
+              ['bold', 'italic', 'underline', 'strike', { 'color': [] }, { 'background': [] }],
+            ],
+            clipboard: {
+              matchVisual: false,
+            },
+          }}
+        />
+              {/* <Editor
                 content={this.props.content}
                 parentId={this.props.id}
                 fileId={this.props.fileId}
@@ -199,7 +247,7 @@ class Marker extends React.Component {
                 onEditorChange={(e) => {this.handleChange(e)}}
                 onInputFocus={(e) => {this.onInputFocus(e)}}
                 onInputBlur={(e) => {this.onInputBlur(e)}}
-              />
+              /> */}
             </div>
             <div
               style={{

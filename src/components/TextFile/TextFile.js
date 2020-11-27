@@ -12,7 +12,7 @@ import 'react-quill/dist/quill.snow.css'
 var FontAttributor = Quill.import('attributors/class/font');
 
 FontAttributor.whitelist = [
-  'roboto', 'comfortaa', 'lobster', 'amatic',
+  'opensans', 'comfortaa', 'lobster', 'amatic',
 ];
 Quill.register(FontAttributor, true);
 
@@ -110,6 +110,7 @@ class TextFile extends React.Component {
         <div
           className='text-editor__edit-button'
           style={{
+            display: this.props.isLocked ? 'none' : 'block',
             position: 'absolute',
             top: '5px',
             right: '100%',
@@ -132,7 +133,7 @@ class TextFile extends React.Component {
           onChange={this.handleChange}
           modules={{
             toolbar: [
-              [{ 'font': ['roboto', 'comfortaa', 'lobster', 'amatic'] }],
+              [{ 'font': ['opensans', 'comfortaa', 'lobster', 'amatic'] }],
               [{ 'header': [1, 2, false] }],
               [{ 'align': [] }],
               ['bold', 'italic', 'underline', 'strike'],

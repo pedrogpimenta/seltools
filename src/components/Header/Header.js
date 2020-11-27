@@ -21,7 +21,6 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import IconSel from '../IconSel/IconSel'
 
 class Header extends React.Component {
-
   handleShareDocument = () => {
     const documentObject = {
       shared: !this.props.shared,
@@ -70,66 +69,11 @@ class Header extends React.Component {
   handleUnsaveDocument = () => {
     window.setInterval(() => {
       if (!this.props.isSaved) {
-        this.handleSaveDocument()
+        this.props.handleSaveDocument(true)
       }
-    }, 30000)
+    }, 60000)
   }
 
-  handleSaveDocument = () => {
-    this.props.dispatch({
-      type: 'DOCUMENT_IS_SAVING',
-    })
-
-    const documentObject = {
-      name: this.props.name,
-      teacher: this.props.teacher,
-      type: 'document',
-      files: this.props.files,
-    }
-
-    if (this.props.location.search.length > 0) {
-      documentObject.parent = new URLSearchParams(this.props.location.search).get('parent')
-    }
-
-    for (let file in documentObject.files) {
-      for (let marker in documentObject.files[file].markers) {
-        delete documentObject.files[file].markers[marker].hasFocus
-      }
-    }
-
-    const requestOptions = {
-      method: !this.props.id ? 'POST' : 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
-    }
-
-    let fetchUrl = !this.props.id
-      ? `${REACT_APP_SERVER_BASE_URL}/document/`
-      : `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
-
-    if (this.props.location.search.length > 0) {
-      const parent = new URLSearchParams(this.props.location.search).get('parent')
-      fetchUrl = fetchUrl + `?parent=${parent}`
-    }
-
-    fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        if (!this.props.id) {
-          this.props.history.push(this.props.isStudent? `/alumno/documento/${data.id}` : `/documento/${data.id}`)
-        }
-
-        this.props.dispatch({
-          type: 'CHANGE_DOCUMENT_ID',
-          id: data.id,
-        })
-
-        this.props.dispatch({
-          type: 'DOCUMENT_SAVED',
-        })
-      })
-
-  }
 
   componentDidMount() {
     this.handleUnsaveDocument()
@@ -137,7 +81,13 @@ class Header extends React.Component {
 
   render() {
     return(
-      <Navbar fixedToTop={true}>
+      <Navbar
+        fixedToTop={true}
+        style={{
+          background: this.props.isLocked ? 'rgb(255, 192, 192)' : 'var(--c-primary-lightest)',
+          // background: 'var(--c-primary-lightest)',
+        }}
+      >
         <NavbarGroup align={Alignment.LEFT}>
           <NavbarHeading
             style={{
@@ -251,9 +201,24 @@ class Header extends React.Component {
               )}
             </ul>
           </div>
+          {this.props.isLocked && !this.props.isStudent &&
+            <>
+              <Button
+                className={`btn--lock ${Classes.MINIMAL}`}
+                intent={Intent.DANGER}
+                style={{marginRight: '8px', marginLeft: '8px'}}
+                icon="lock"
+                text="Desbloquear"
+                onClick={this.props.handleUnlock}
+              />
+              <div>
+                ultima edición: {this.props.modifiedDate}
+              </div>
+            </>
+          }
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
-          {!this.props.isStudent &&
+          {!this.props.isStudent && !this.props.isLocked &&
             <div
               style={{
                 display: 'inline-flex',
@@ -279,15 +244,26 @@ class Header extends React.Component {
               />
             </div>
           }
-          <Button
-            intent={this.props.name ? this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
-            loading={this.props.isSaving}
-            style={{marginRight: '8px', marginLeft: '8px'}}
-            disabled={!this.props.name}
-            icon="floppy-disk"
-            text={this.props.isSaved ? "¡Guardado!" : "Guardar"}
-            onClick={(e) => this.handleSaveDocument(e)}
-          />
+          {this.props.isLocked && this.props.isStudent &&
+            <Button
+              intent={Intent.DANGER}
+              style={{marginRight: '8px', marginLeft: '8px'}}
+              disabled={true}
+              icon="lock"
+              text="Documento bloqueado"
+            />
+          }
+          {!this.props.isLocked &&
+            <Button
+              intent={this.props.name ? this.props.isSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
+              loading={this.props.isSaving}
+              style={{marginRight: '8px', marginLeft: '8px'}}
+              disabled={!this.props.name}
+              icon="floppy-disk"
+              text={this.props.isSaved ? "¡Guardado!" : "Guardar"}
+              onClick={(e) => this.props.handleSaveDocument(true)}
+            />
+          }
           <NavbarDivider />
           <Button className={Classes.MINIMAL} icon="user" />
         </NavbarGroup>
@@ -306,11 +282,12 @@ function mapStateToProps(state) {
     shared: state.shared || false,
     isSaved: state.isSaved,
     isSaving: state.isSaving,
+    locked: state.locked,
+    isLocked: state.isLocked,
+    lockedBy: state.lockedBy,
     editMode: state.editMode,
+    modifiedDate: state.modifiedDate,
   }
 }
 
 export default connect(mapStateToProps)(withRouter(Header))
-
-
-

@@ -51,6 +51,8 @@ class FileWrapper extends React.Component {
               isStudent={this.props.isStudent}
               hasRendered={this.props.hasRendered}
               isActive={this.props.mode === 'marker'}
+              isLocked={this.props.isLocked}
+              handleClickWhenLocked={this.props.handleClickWhenLocked}
             />
           }
           {this.props.fileType !== 'aac' &&

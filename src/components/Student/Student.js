@@ -24,6 +24,7 @@ class Student extends React.Component {
       userDocuments: [],
       userFolders: [],
       isLoading: true,
+      user: {},
     }
   }
 
@@ -162,10 +163,10 @@ class Student extends React.Component {
   }
 
   getDocuments = (folderId) => {
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.studentId}/documents/${folderId}`)
+    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`)
       .then(response => response.json())
       .then(data => {
-        let newBreadcrumbs = [{icon: 'folder-open', text: this.state.studentName, id: this.state.studentId, type: 'folder'}]
+        let newBreadcrumbs = [{icon: 'folder-open', text: this.state.user.username, id: this.state.user._id, type: 'folder'}]
 
         if (newBreadcrumbs.length > 0) {
           newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
@@ -182,7 +183,7 @@ class Student extends React.Component {
         newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type, color: data.folder.color})
       
         if (newBreadcrumbs[0].type === 'student') {
-          newBreadcrumbs.unshift({icon: 'folder-open', text: this.state.studentName, id: this.state.studentFolderId, type: 'folder'})
+          newBreadcrumbs.unshift({icon: 'folder-open', text: this.state.user.username, id: this.state.user._id, type: 'folder'})
         }
 
         const folders = data.documents.filter(doc => doc.type === 'folder')
@@ -206,11 +207,9 @@ class Student extends React.Component {
       .then(response => response.json())
       .then(userData => {
         this.setState({
-          studentName: userData.name,
-          studentId: userData._id,
-          studentFolderId: userData.folderId,
+          user: userData,
         })
-        localStorage.setItem('studentName', userData.name)
+        localStorage.setItem('studentName', userData.username)
         localStorage.setItem('studentId', userData._id)
         localStorage.setItem('studentFolderId', userData.folderId)
 
@@ -360,7 +359,7 @@ class Student extends React.Component {
                 margin: '0 0 2rem 0',
               }}
             >
-              ¡Hola, {this.state.studentName}!
+              ¡Hola, {this.state.user.username}!
             </h1>
             <div style={{
               margin: '0 0 32px',
