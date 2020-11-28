@@ -6,7 +6,40 @@ import { findDOMNode } from 'react-dom'
 import {
   Icon,
 } from "@blueprintjs/core"
-import Editor from '../Editor/Editor'
+import ReactQuill, {Quill} from 'react-quill'
+import 'react-quill/dist/quill.bubble.css'
+
+var FontAttributor = Quill.import('attributors/class/font');
+
+FontAttributor.whitelist = [
+  'roboto', 'comfortaa', 'lobster', 'amatic',
+];
+Quill.register(FontAttributor, true);
+
+let Inline = Quill.import('blots/inline');
+
+class MarkBlot extends Inline { } 
+MarkBlot.blotName = 'mark'
+MarkBlot.tagName = 'mark'
+MarkBlot.className = 'highlight'
+Quill.register(MarkBlot)
+
+class DelBlot extends Inline { } 
+DelBlot.blotName = 'del'
+DelBlot.tagName = 'del'
+DelBlot.className = 'striker'
+Quill.register(DelBlot)
+
+export class TagBlot extends Inline {
+  static blotName = 'tag';
+  static className = 'redtext';
+  static tagName = 'span';
+
+  static formats() {
+    return true;
+  }
+}
+Quill.register(TagBlot)
 
 class Marker extends React.Component {
   constructor(props) {
@@ -20,7 +53,8 @@ class Marker extends React.Component {
     }
 
     this.draggable = React.createRef()
-    this.contentEditable = React.createRef()
+    this.editableInput = React.createRef()
+    // this.contentEditable = React.createRef()
   }
 
   editMarker(e) {
@@ -31,8 +65,8 @@ class Marker extends React.Component {
    store.dispatch({
       type: "EDIT_MARKER",
       fileId: this.props.fileId,
-      id: e.parentNode.parentNode.classList[1],
-      content: e.innerHTML,
+      id: this.props.id,
+      content: e,
     }) 
 
     store.dispatch({
@@ -83,14 +117,6 @@ class Marker extends React.Component {
     }) 
   }
 
-  // onEditorChange = (e) => {
-  //   console.log('editor:', e)
-  // }
-
-  // onClick = (e) => {
-
-  // }
-
   onInputFocus = (e) => {
     this.setState({hasFocus: true})
   }
@@ -100,33 +126,18 @@ class Marker extends React.Component {
   }
 
   componentDidMount = () => {
-    // if (this.props.editing === this.props.id) {
-      // TODO: WHY setTimout, WHY?
-      // setTimeout(() => {
-      //   let range, selection
-        
-      //   if (document.body.createTextRange) {
-      //     range = document.body.createTextRange()
-      //     range.moveToElementText(this.contentEditable.current)
-      //     range.select()
-      //   } else if (window.getSelection) {
-      //     selection = window.getSelection()
-      //     range = document.createRange()
-      //     range.selectNodeContents(this.contentEditable.current)
-      //     selection.removeAllRanges()
-      //     selection.addRange(range)
-      //   }
-      // }, 1)
-
-      // this.props.setNotEditing()
-    // }
-
     const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
     const thisInfo = findDOMNode(this.draggable.current)
     this.setState({
       parentInfo: parentInfo,
       thisInfo: thisInfo,
     })
+    
+    if (this.props.hasFocus) {
+      window.setTimeout(() => {
+        this.editableInput.current.focus()
+      }, 1)
+    }
   }
 
   render() {
@@ -145,7 +156,6 @@ class Marker extends React.Component {
     return (
       <Draggable
         ref={this.draggable}
-        // bounds='parent'
         handle='.handle'
         position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
         onDrag={(e) => this.reportDragging(e)}
@@ -207,8 +217,7 @@ class Marker extends React.Component {
             <div
               className={`marker ${this.props.id}`}
               style={{
-                // display: 'inline-flex',
-                // alignItems: 'center',
+                position: 'relative',
                 padding: '3px 6px 4px 6px',
                 lineHeight: '18px',
                 borderRadius: '14px',
@@ -222,8 +231,25 @@ class Marker extends React.Component {
                 minWidth: '16px',
                 minHeight: '19px',
               }}
+              onClick={() => this.editableInput.current.focus()}
             >
-              <Editor
+              <ReactQuill
+                ref={this.editableInput}
+                theme="bubble"
+                value={this.props.content}
+                onFocus={this.onInputFocus}
+                onBlur={this.onInputBlur}
+                onChange={(e) => {this.handleChange(e)}}
+                modules={{
+                  toolbar: [
+                    ['bold', 'italic', 'underline', 'strike', { 'color': [] }, { 'background': [] }],
+                  ],
+                  clipboard: {
+                    matchVisual: false,
+                  },
+                }}
+              />
+              {/* <Editor
                 content={this.props.content}
                 parentId={this.props.id}
                 fileId={this.props.fileId}
@@ -231,7 +257,7 @@ class Marker extends React.Component {
                 onEditorChange={(e) => {this.handleChange(e)}}
                 onInputFocus={(e) => {this.onInputFocus(e)}}
                 onInputBlur={(e) => {this.onInputBlur(e)}}
-              />
+              /> */}
             </div>
             <div
               style={{
@@ -241,7 +267,7 @@ class Marker extends React.Component {
                 top: '0',
                 fontSize: 0,
                 paddingLeft: '4px',
-                opacity: this.state.hover ? '1' : '0',
+                opacity: this.state.hover && this.state.hasFocus ? '1' : '0',
                 transition: 'all 100ms ease-out',
               }}
             >

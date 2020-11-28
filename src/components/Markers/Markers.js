@@ -68,6 +68,8 @@ class Markers extends React.Component {
   componentDidMount = () => {
     // TODO: Fix timeout: check if all images have loaded and then set
     window.setTimeout(() => {
+      if (!this.markersRef.current) return
+
       this.setState({
         width: this.markersRef.current.offsetWidth,
         height: this.markersRef.current.offsetHeight,
@@ -90,10 +92,23 @@ class Markers extends React.Component {
           // minHeight: '1000px',
           // marginTop: '34px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
-          zIndex: this.props.isActive ? '5' : '1',
+          zIndex: this.props.isActive ? '5' : '3',
         }}
-        onDoubleClick={(e) => this.addNewMarker(e)}
+        onDoubleClick={(e) => {!this.props.isLocked && this.addNewMarker(e)}}
       >
+        {this.props.isLocked &&
+          <div
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              zIndex: '100',
+              // background: 'red',
+            }}
+            onClick={this.props.handleClickWhenLocked}
+          >
+          </div>
+        }
         {this.state.width > 0 && this.props.markers && this.props.markers.map((marker) => {
           return(
             <Marker

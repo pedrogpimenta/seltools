@@ -4,22 +4,23 @@ import { connect } from 'react-redux'
 import { Beforeunload } from 'react-beforeunload'
 import axios from 'axios'
 
+import io from 'socket.io-client'
+
 import {
   Intent,
   Button,
   Classes,
 } from "@blueprintjs/core"
 
-import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
+import { REACT_APP_SERVER_BASE_URL, REACT_APP_SERVER_WS_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
 import TextFile from '../TextFile/TextFile'
+import VideoEmbed from '../VideoEmbed/VideoEmbed'
 import FileWrapper from '../FileWrapper/FileWrapper'
 import Header from '../Header/Header'
 import Toolbar from '../Toolbar/Toolbar'
-
-// import { loadFile } from '../../helpers/render-docs'
 
 class Document extends React.Component {
   constructor() {
@@ -33,6 +34,7 @@ class Document extends React.Component {
     this.state = {
       id: '',
       name: '',
+      user: {},
       files: [],
       filesOnLoad: [],
       students: [],
@@ -42,76 +44,358 @@ class Document extends React.Component {
     }
   }
 
-  componentDidMount() {
-    if (!this.props.isStudent) {
-      this.getUser()
+  handleSaveAndLockDocument = () => {
+    this.props.dispatch({
+      type: 'DOCUMENT_IS_LOCKED',
+      locked: true,
+      isLocked: true,
+      lockedBy: 'teacher',
+    })
+
+    this.props.dispatch({
+      type: 'DOCUMENT_IS_SAVING',
+    })
+    
+    const documentObject = {
+      name: this.props.name,
+      teacher: this.props.teacher,
+      type: 'document',
+      files: this.props.files,
     }
 
-    if (!this.props.match.params.id) {
-      this.props.dispatch({
-        type: 'DOCUMENT_IS_LOADED',
+    for (let file in documentObject.files) {
+      for (let marker in documentObject.files[file].markers) {
+        delete documentObject.files[file].markers[marker].hasFocus
+      }
+    }
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(documentObject)
+    }
+    
+    fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        this.props.dispatch({
+          type: 'DOCUMENT_SAVED',
+        })
+
+        this.socket.emit('document saved after unlock', this.state.user._id, this.props.id)
       })
+    
+  }
 
-      this.props.dispatch({
-        type: 'LOAD_FILES',
-        files: [],
-      })
+  handleSaveDocument = (shouldUpdateDate) => {
+    if (this.props.isLocked) return false
 
-      this.props.dispatch({
-        type: 'CHANGE_DOCUMENT_SHAREDWITH',
-        sharedWith: [],
-      })
+    this.props.dispatch({
+      type: 'DOCUMENT_IS_SAVING',
+    })
 
-      this.props.dispatch({
-        type: 'CHANGE_DOCUMENT_ID',
-        id: '',
-      })
+    const documentObject = {
+      name: this.props.name,
+      teacher: this.props.teacher,
+      type: 'document',
+      files: this.props.files,
+    }
 
-      this.props.dispatch({
-        type: 'CHANGE_DOCUMENT_NAME',
-        name: '',
-      })
-    } else {
-      fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
-        .then(response => response.json())
-        .then(data => {
-          const LSfiles = data[0].files || []
+    if (this.props.location.search.length > 0) {
+      documentObject.parent = new URLSearchParams(this.props.location.search).get('parent')
+    }
 
-          document.title = `${data[0].name} -- Seltools`;
+    for (let file in documentObject.files) {
+      for (let marker in documentObject.files[file].markers) {
+        delete documentObject.files[file].markers[marker].hasFocus
+      }
+    }
 
-          if (LSfiles.length > 0) {
-            this.props.dispatch({
-              type: 'LOAD_FILES',
-              files: LSfiles,
-            })
-          }
+    const requestOptions = {
+      method: !this.props.id ? 'POST' : 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(documentObject)
+    }
 
-          // TODO: Improve so much dispatches
+    let fetchUrl = !this.props.id
+      ? `${REACT_APP_SERVER_BASE_URL}/document/`
+      : `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}?shouldUpdateDate=${shouldUpdateDate}`
 
-          if (!this.props.isStudent) {
-            this.props.dispatch({
-              type: 'CHANGE_DOCUMENT_SHAREDWITH',
-              sharedWith: data[0].sharedWith,
-            })
-          }
+    if (this.props.location.search.length > 0) {
+      const parent = new URLSearchParams(this.props.location.search).get('parent')
+      fetchUrl = fetchUrl + `?parent=${parent}`
+    }
+
+    fetch(fetchUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        if (!this.props.id) {
+          this.props.history.push(this.props.isStudent? `/alumno/documento/${data.id}` : `/documento/${data.id}`)
 
           this.props.dispatch({
             type: 'CHANGE_DOCUMENT_ID',
-            id: this.props.match.params.id,
+            id: data.id,
           })
+        }
 
-          this.props.dispatch({
-            type: 'CHANGE_DOCUMENT_NAME',
-            name: data[0].name,
-          })
-
-          this.props.dispatch({
-            type: "DOCUMENT_IS_LOADED",
-          }) 
+        this.props.dispatch({
+          type: 'DOCUMENT_SAVED',
         })
-    }
+
+        this.socket.emit('document saved', this.state.user._id, this.props.id)
+      })
+
   }
 
+  handleUnlock = () => {
+    this.socket.emit('unlock document', this.state.user._id, this.props.id)
+  }
+
+  socket = ''
+  
+  componentWillUnmount() {
+    this.socket.disconnect()
+  }
+
+  componentDidMount() {
+    const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Selen'
+
+    this.socket = io(REACT_APP_SERVER_WS_URL)
+
+    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${userName}`)
+    .then(response => response.json())
+    .then(data => {
+      this.setState({
+        user: data.user,
+      })
+
+      if (!this.props.match.params.id) {
+        const parent = new URLSearchParams(this.props.location.search).get('parent')
+
+        if (!!parent) {
+          fetch(`${REACT_APP_SERVER_BASE_URL}/document/${parent}`)
+            .then(response => response.json())
+            .then(data => {
+              let newBreadcrumbs = []
+
+              if (data.breadcrumbs) {
+                newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
+                  return({
+                    icon: 'folder-open',
+                    id: crumb._id,
+                    text: crumb.name,
+                    type: crumb.type,
+                    color: crumb.color
+                  })
+                })
+              }
+      
+              newBreadcrumbs.push({
+                icon: data.document.type === 'folder' ? 'folder-open' : 'user',
+                text: data.document.name,
+                id: data.document._id,
+                type: data.document.type,
+                color: data.document.color,
+              })
+
+              newBreadcrumbs.push({icon: 'document', text: '', id: '', type: 'document'})
+            
+              if (this.props.isStudent) {
+                newBreadcrumbs.shift()
+              }
+
+              this.props.dispatch({
+                type: 'LOAD_FILES',
+                files: [],
+              })
+
+              this.props.dispatch({
+                type: 'CHANGE_DOCUMENT_ID',
+                id: '',
+              })
+
+              this.props.dispatch({
+                type: 'CHANGE_DOCUMENT_NAME',
+                name: '',
+              })
+
+              this.props.dispatch({
+                type: 'DOCUMENT_IS_LOCKED',
+                locked: false,
+                isLocked: false,
+                lockedBy: '',
+              })
+      
+              this.props.dispatch({
+                type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+                breadcrumbs: newBreadcrumbs,
+              })
+
+              this.props.dispatch({
+                type: 'DOCUMENT_IS_LOADED',
+              })
+
+            })
+        } 
+      } else {
+        fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
+          .then(response => response.json())
+          .then(data => {
+            const LSfiles = data.document.files || []
+
+            document.title = `${data.document.name} -- Seltools`;
+
+            if (LSfiles.length > 0) {
+              this.props.dispatch({
+                type: 'LOAD_FILES',
+                files: LSfiles,
+              })
+            }
+
+            // TODO: Improve so much dispatches
+
+            if (!this.props.isStudent) {
+              this.props.dispatch({
+                type: 'CHANGE_DOCUMENT_SHAREDWITH',
+                sharedWith: data.document.sharedWith,
+              })
+            }
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_ID',
+              id: this.props.match.params.id,
+            })
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_NAME',
+              name: data.document.name,
+            })
+            
+            let newBreadcrumbs = [{icon: 'folder-open', text: this.props.isStudent ? localStorage.getItem('studentName') : 'Selen', id: '0', type: 'folder'}]
+
+            if (newBreadcrumbs.length > 0) {
+              newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
+                return({
+                  icon: 'folder-open',
+                  id: crumb._id,
+                  text: crumb.name,
+                  type: crumb.type,
+                  color: crumb.color,
+                })
+              })
+            }
+            
+            newBreadcrumbs.push({icon: 'document', text: data.document.name, id: data.document._id, type: data.document.type})
+          
+            if (this.props.isStudent) {
+              newBreadcrumbs.shift()
+            }
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+              breadcrumbs: newBreadcrumbs,
+            })
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_SHARED',
+              shared: data.document.shared,
+            })
+            
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+              modifiedDate: data.document.modifiedDate,
+            })
+
+            this.props.dispatch({
+              type: "DOCUMENT_IS_LOADED",
+            })
+
+            this.props.dispatch({
+              type: 'DOCUMENT_IS_LOCKED',
+              locked: data.document.locked,
+              isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
+              lockedBy: data.document.lockedBy,
+            })
+
+            // WebSockets
+
+            this.socket.emit('document open', this.state.user._id, data.document._id)
+            // this.socket.on('connect', () => {
+            //   console.log('1')
+
+            //   this.socket.emit('document open', this.state.user._id, data.document._id)
+            // })
+
+            this.socket.on('document reload', (documentId) => {
+              if (documentId === this.props.id) {
+                // TODO: make this a function
+              fetch(`${REACT_APP_SERVER_BASE_URL}/document/${documentId}`)
+                .then(response => response.json())
+                .then(data => {
+                  const LSfiles = data.document.files || []
+
+                  document.title = `${data.document.name} -- Seltools`;
+
+                  if (LSfiles.length > 0) {
+                    this.props.dispatch({
+                      type: 'LOAD_FILES',
+                      files: LSfiles,
+                      noReset: true,
+                    })
+                  }
+
+                  this.props.dispatch({
+                    type: 'CHANGE_DOCUMENT_NAME',
+                    name: data.document.name,
+                  })
+
+                  this.props.dispatch({
+                    type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+                    modifiedDate: data.document.modifiedDate,
+                  })
+      
+
+                  if (data.document.locked) {
+                    this.props.dispatch({
+                      type: 'DOCUMENT_IS_LOCKED',
+                      locked: data.document.locked,
+                      isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
+                      lockedBy: data.document.lockedBy,
+                    })
+
+                    this.props.dispatch({
+                      type: "DOCUMENT_IS_LOADED",
+                    })
+                  } else {
+                    this.props.dispatch({
+                      type: 'DOCUMENT_IS_LOCKED',
+                      locked: data.document.locked,
+                      isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
+                      lockedBy: data.document.lockedBy,
+                    })
+
+                    this.props.dispatch({
+                      type: "DOCUMENT_IS_LOADED",
+                    })
+
+                    this.handleSaveDocument()
+                  }
+                })
+              }
+            })
+
+            this.socket.on('save and lock document', (userId, documentId) => {
+              if (documentId === this.props.id && userId !== this.state.user._id) {
+                this.handleSaveAndLockDocument()
+              }
+            })
+          })
+      }
+    })
+
+  }
+
+ 
   handleFileInputChange = (e) => {
     this.setState({uploadingFiles: true})
 
@@ -121,6 +405,7 @@ class Document extends React.Component {
     for (let i = 0; i < files.length; i++) {
       let fileParts = files[i].name.split('.')
       let fileName = files[i].name.replace(/\s+/gi, '-').replace(/[^a-zA-Z0-9-]/gi, '_')
+      fileName = `${fileName}-${Math.floor((Math.random() * 100000) + 1)}`
       let fileType = fileParts[fileParts.length - 1]
 
       axios.post(`${REACT_APP_SERVER_BASE_URL}/sign_s3`, {
@@ -133,7 +418,7 @@ class Document extends React.Component {
           const url = returnData.url
 
           filesForState.push({
-            id: `${fileName}-${Math.floor((Math.random() * 100000) + 1)}`,
+            id: fileName,
             name: fileName,
             type: fileType,
             url: url,
@@ -189,14 +474,6 @@ class Document extends React.Component {
   }
 
   getUser = () => {
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/Selen`)
-      .then(response => response.json())
-      .then(data => {
-        this.props.dispatch({
-          type: 'LOAD_STUDENTS',
-          students: data[0].students,
-        })
-      })
   }
 
   handleMoveOneUp = (fileIndex) => {
@@ -233,11 +510,28 @@ class Document extends React.Component {
     })  
   }
 
-  handleAddFile = (e, fileIndex) => {
+  handleAddFile = (e, fileIndex, creator) => {
     this.setState({
       addFileIndex: fileIndex,
     })
     this.fileInput.current.click(e)
+  }
+
+  handleAddVideoEmbed = (fileIndex, creator) => {
+    const url = window.prompt('¿Cuál es la URL del vídeo? Ej: "https://www.youtube.com/watch?v=yfTCbVMmGa0"')
+
+    if (!(!!url && url.length > 0)) return false
+
+    this.props.dispatch({
+      type: "ADD_VIDEO_EMBED",
+      position: fileIndex,
+      creator: creator,
+      url: url,
+    })
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    })
   }
 
   handleDeleteFile = (fileId) => {
@@ -269,7 +563,7 @@ class Document extends React.Component {
   renderFileButtons = (i, fileIndex) => {
     return (
       <div
-        className='fileButtons'
+        className={`fileButtons ${this.props.isLocked ? 'locked' : ''}`}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -277,8 +571,22 @@ class Document extends React.Component {
           margin: '0 auto 4px',
           transition: 'all 100ms ease-out',
           opacity: '0',
+          pointerEvents: this.props.isLocked ? 'none' : 'all',
         }}
       >
+        {this.props.isLocked &&
+          <div
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              zIndex: '100',
+              // background: 'red',
+            }}
+            onClick={this.handleClickWhenLocked}
+          >
+          </div>
+        }
         {!this.props.isStudent && i !== 0 &&
           <Button
             style={{margin: '0 4px'}}
@@ -310,7 +618,7 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='media'
-          onClick={(e) => this.handleAddFile(e, i - 1)}
+          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 4px'}}
@@ -318,7 +626,15 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='music'
-          onClick={(e) => this.handleAddFile(e, i - 1)}
+          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+        />
+        <Button
+          style={{margin: '0 4px'}}
+          intent={Intent.DEFAULT}
+          className={Classes.MINIMAL}
+          loading={this.state.uploadingFiles}
+          icon='video'
+          onClick={(e) => this.handleAddVideoEmbed(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         {(!this.props.isStudent ? true : this.props.files[i].creator === localStorage.getItem('studentName')) &&
           <Button
@@ -348,7 +664,6 @@ class Document extends React.Component {
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           icon='new-text-box'
           large={true}
-          // text='Añadir texto'
           onClick={() => this.handleAddTextFile(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
@@ -358,8 +673,7 @@ class Document extends React.Component {
           loading={this.state.uploadingFiles}
           icon='media'
           large={true}
-          // text='Añadir archivos'
-          onClick={(e) => this.handleAddFile(e, this.props.files.length)}
+          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
         <Button
           style={{margin: '0 8px'}}
@@ -368,11 +682,22 @@ class Document extends React.Component {
           loading={this.state.uploadingFiles}
           icon='music'
           large={true}
-          // text='Añadir archivos'
-          onClick={(e) => this.handleAddFile(e, this.props.files.length)}
+          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+        />
+        <Button
+          style={{margin: '0 8px'}}
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          icon='video'
+          large={true}
+          onClick={(e) => this.handleAddVideoEmbed(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
         />
       </div>
     )
+  }
+
+  handleClickWhenLocked = () => {
+    alert('En este momento, tu profe está revisando el documento. Vuelve más tarde ;)')
   }
 
   render() {
@@ -381,11 +706,12 @@ class Document extends React.Component {
         className='App'
         style={{
           display: 'flex',
-          overflow: 'hidden',
+          minHeight: '100vh',
+          backgroundColor: '#f8f8f8',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
-        {!this.props.isSaved &&
+        {!this.props.isSaved && !this.props.isLocked &&
           <Beforeunload onBeforeunload={() => "No has guardado tus cambios!"} />
         }
         <div
@@ -395,17 +721,25 @@ class Document extends React.Component {
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Header isStudent={this.props.isStudent} />
+          <Header
+            handleSaveDocument={this.handleSaveDocument}
+            handleUnlock={this.handleUnlock}
+            socket={this.socket}
+            user={this.state.user}
+            isStudent={this.props.isStudent}
+          />
           <div
             className='document'
             style={{
               position: 'relative',
               marginTop: '50px',
               padding: '20px',
-              backgroundColor: 'rgb(250, 250, 250)'
             }}
           >
-            <Toolbar />
+            <Toolbar
+              isLocked={this.props.isLocked}
+              handleClickWhenLocked={this.handleClickWhenLocked}
+            />
             <div
               style={{
                 maxWidth: 'var(--doc-width)',
@@ -433,33 +767,53 @@ class Document extends React.Component {
                       isStudent={this.props.isStudent}
                       mode={this.props.editMode}
                       fileButtons={this.renderFileButtons(i, file.id)}
+                      isLocked={this.props.isLocked}
+                      handleClickWhenLocked={this.handleClickWhenLocked}
                     >
-                      {file.type === 'pdf' &&
+                      {(file.type && file.type.toLowerCase() === 'pdf') &&
                         <Canvas file={file} fileHasRendered={this.fileHasRendered} />
                       }
-                      {file.type === 'txt' &&
-                        <TextFile file={file} />
+                      {(file.type && file.type.toLowerCase() === 'txt') &&
+                        <TextFile
+                          file={file}
+                          isLocked={this.props.isLocked}
+                          handleClickWhenLocked={this.handleClickWhenLocked}
+                        />
                       }
-                      {(file.type === 'm4a' || file.type === 'aac' || file.type === 'mp3' || file.type === 'ogg' || file.type === 'opus' || file.type === 'wav' || file.type === 'webm') &&
+                      {((file.type && file.type.toLowerCase() === 'm4a') ||
+                        (file.type && file.type.toLowerCase() === 'aac') ||
+                        (file.type && file.type.toLowerCase() === 'mp3') ||
+                        (file.type && file.type.toLowerCase() === 'ogg') ||
+                        (file.type && file.type.toLowerCase() === 'opus') ||
+                        (file.type && file.type.toLowerCase() === 'wav') ||
+                        (file.type && file.type.toLowerCase() === 'webm')) &&
                         <AudioFile file={file} />
                       }
-                      {(file.type === 'jpg' || file.type === 'jpeg' || file.type === 'png') &&
+                      {((file.type && file.type.toLowerCase() === 'jpg') ||
+                        (file.type && file.type.toLowerCase() === 'jpeg') ||
+                        (file.type && file.type.toLowerCase() === 'jfif') ||
+                        (file.type && file.type.toLowerCase() === 'png')) &&
                         <Image file={file} />
+                      }
+                      {((file.type && file.type.toLowerCase() === 'videoembed')) &&
+                        <VideoEmbed file={file} />
                       }
                     </FileWrapper>
                   </div>
                 )
               })}
-              {this.renderAddButtons()}
-              <input
-                ref={this.fileInput}
-                multiple
-                // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
-                accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, audio/aac, audio/mpeg, audio/ogg, audio/opus, audio/wav, audio/webm'
-                type='file'
-                onChange={(e) => this.handleFileInputChange(e)}
-                style={{display: 'none'}}
-              />
+              {!this.props.isLocked && this.renderAddButtons()}
+              {!this.props.isLocked && 
+                <input
+                  ref={this.fileInput}
+                  multiple
+                  // accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, application/pdf'
+                  accept='image/png, image/jpeg, image/webp, image/svg+xml, image/bmp, image/gif, audio/aac, audio/mpeg, audio/ogg, audio/opus, audio/wav, audio/webm'
+                  type='file'
+                  onChange={(e) => this.handleFileInputChange(e)}
+                  style={{display: 'none'}}
+                />
+              }
             </div>
           </div>
         </div>
@@ -473,13 +827,16 @@ function mapStateToProps(state, ownProps) {
     id: state.id,
     name: state.name,
     students: state.students,
-    sharedWith: state.sharedWith || [],
+    shared: state.shared || false,
     files: state.files,
     filesOnLoad: state.filesOnLoad,
     isSaved: state.isSaved,
     isSaving: state.isSaving,
     dragging: state.dragging,
     documentIsLoading: state.documentIsLoading,
+    locked: state.locked,
+    isLocked: state.isLocked,
+    lockedBy: state.lockedBy,
     editMode: state.editMode,
   }
 }

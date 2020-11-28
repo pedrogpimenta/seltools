@@ -39,16 +39,28 @@ class FileWrapper extends React.Component {
             position: 'relative',
           }}
         >
-          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' &&
+          {this.props.fileType !== 'aac' &&
+            this.props.fileType !== 'mp3' &&
+            this.props.fileType !== 'ogg' &&
+            this.props.fileType !== 'opus' &&
+            this.props.fileType !== 'wav' &&
+            this.props.fileType !== 'webm' &&
             <Markers
               fileId={this.props.id}
               markers={this.props.markers}
               isStudent={this.props.isStudent}
               hasRendered={this.props.hasRendered}
               isActive={this.props.mode === 'marker'}
+              isLocked={this.props.isLocked}
+              handleClickWhenLocked={this.props.handleClickWhenLocked}
             />
           }
-          {this.props.fileType !== 'aac' && this.props.fileType !== 'mp3' && this.props.fileType !== 'ogg' && this.props.fileType !== 'opus' && this.props.fileType !== 'wav' && this.props.fileType !== 'webm' && this.props.fileType !== 'txt' &&
+          {this.props.fileType !== 'aac' &&
+            this.props.fileType !== 'mp3' &&
+            this.props.fileType !== 'ogg' &&
+            this.props.fileType !== 'opus' &&
+            this.props.fileType !== 'wav' &&
+            this.props.fileType !== 'webm' &&
             <Highlights
               fileId={this.props.id}
               highlights={this.props.highlights || []}

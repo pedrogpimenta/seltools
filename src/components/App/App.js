@@ -24,6 +24,9 @@ class App extends React.Component {
           <Route path="/alumno/documento/:id">
             <Document isStudent={true} />
           </Route>
+          <Route path="/alumno/documentos/:folder">
+            <Student />
+          </Route>
           <Route path="/alumno/documentos">
             <Student />
           </Route>
@@ -35,6 +38,9 @@ class App extends React.Component {
           </Route>
           <Route path="/documento">
             <Document isNew={true} />
+          </Route>
+          <Route path="/documentos/:folder">
+            <Documents />
           </Route>
           <Route path="/documentos">
             <Documents />

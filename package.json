@@ -14,13 +14,18 @@
     "rangy": "^1.3.0",
     "react": "^16.13.1",
     "react-beforeunload": "^2.2.2",
+    "react-color": "^2.19.3",
     "react-contenteditable": "^3.3.5",
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
+    "react-player": "^2.6.2",
+    "react-quill": "^1.3.5",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-time-ago": "^6.2.1",
     "redux": "^4.0.5",
+    "socket.io-client": "^3.0.3",
     "worker-loader": "^2.0.0"
   },
   "scripts": {

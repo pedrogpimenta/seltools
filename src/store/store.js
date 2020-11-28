@@ -35,7 +35,6 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         students: action.students,
-        // sharedWith: action.sharedWith,
       }
 
     case 'LOAD_FILES':
@@ -43,6 +42,10 @@ function reducer(state = initialState, action) {
       
       for (let file in filesOnLoad) {
         delete filesOnLoad[file].content
+      }
+      
+      if (!action.noReset) {
+        state = initialState
       }
 
       return {
@@ -103,7 +106,19 @@ function reducer(state = initialState, action) {
         ...state,
         name: action.name,
       }
+      
+    case 'CHANGE_DOCUMENT_BREADCRUMBS':
+      return {
+        ...state,
+        breadcrumbs: action.breadcrumbs,
+      }
 
+    case 'CHANGE_DOCUMENT_SHARED':
+      return {
+        ...state,
+        shared: action.shared,
+      }
+  
     case 'CHANGE_DOCUMENT_ID':
       // localStorage.setItem('id', JSON.stringify(action.id))
 
@@ -112,25 +127,25 @@ function reducer(state = initialState, action) {
         id: action.id,
       }
 
-    case 'CHANGE_DOCUMENT_SHAREDWITH':
-      // localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
+    // case 'CHANGE_DOCUMENT_SHAREDWITH':
+    //   // localStorage.setItem('sharedWith', JSON.stringify(action.sharedWith))
 
-      return {
-        ...state,
-        sharedWith: action.sharedWith || [],
-      }
+    //   return {
+    //     ...state,
+    //     sharedWith: action.sharedWith || [],
+    //   }
 
-    case 'FILE_HAS_RENDERED':
-      for (let file in updatedFiles) {
-        if (updatedFiles[file].id === action.fileId) {
-          updatedFiles[file].hasRendered = true
-        }
-      }
+    // case 'FILE_HAS_RENDERED':
+    //   for (let file in updatedFiles) {
+    //     if (updatedFiles[file].id === action.fileId) {
+    //       updatedFiles[file].hasRendered = true
+    //     }
+    //   }
 
-      return {
-        ...state,
-        files: updatedFiles,
-      }
+    //   return {
+    //     ...state,
+    //     files: updatedFiles,
+    //   }
 
     case 'MOVE_FILE_UP':
       updatedFiles = array_move(updatedFiles, action.position, action.position - 1)
@@ -325,6 +340,24 @@ function reducer(state = initialState, action) {
         ...state,
         files: filesForLS,
       }
+      
+    case 'ADD_VIDEO_EMBED':
+      filesForLS = updatedFiles.slice()
+      const embedToAdd = {
+        id: `video-embed-${Math.floor((Math.random() * 100000) + 1)}`,
+        type: 'videoembed',
+        name: null,
+        markers: [],
+        content: action.url,
+        creator: action.creator,
+      }
+
+      filesForLS.splice(action.position + 1, 0, embedToAdd)
+
+      return {
+        ...state,
+        files: filesForLS,
+      }
 
     case 'ADD_NEW_HIGHLIGHT':
       for (let file in updatedFiles) {
@@ -410,6 +443,12 @@ function reducer(state = initialState, action) {
         isSaving: false,
       }
 
+    case 'CHANGE_DOCUMENT_MODIFIED_DATE':
+      return {
+        ...state,
+        modifiedDate: action.modifiedDate,
+      }
+
     case 'DOCUMENT_IS_LOADED':
       return {
         ...state,
@@ -426,6 +465,14 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         dragging: false,
+      }
+
+    case 'DOCUMENT_IS_LOCKED':
+      return {
+        ...state,
+        locked: action.locked,
+        isLocked: action.isLocked,
+        lockedBy: action.lockedBy,
       }
 
     default:
