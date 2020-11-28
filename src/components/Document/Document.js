@@ -352,6 +352,12 @@ class Document extends React.Component {
                       name: data.document.name,
                     })
 
+                    this.props.dispatch({
+                      type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+                      modifiedDate: data.document.modifiedDate,
+                    })
+        
+
                     if (data.document.locked) {
                       this.props.dispatch({
                         type: 'DOCUMENT_IS_LOCKED',

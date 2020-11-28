@@ -2,6 +2,11 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 
+import TimeAgo from 'javascript-time-ago'
+import es from 'javascript-time-ago/locale/es'
+
+import ReactTimeAgo from 'react-time-ago'
+
 import {
   Alignment,
   Intent,
@@ -13,6 +18,7 @@ import {
   NavbarDivider,
   NavbarGroup,
   NavbarHeading,
+  Tag,
   Switch,
 } from "@blueprintjs/core"
 
@@ -20,6 +26,7 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 import IconSel from '../IconSel/IconSel'
 
+TimeAgo.addDefaultLocale(es)
 class Header extends React.Component {
   handleShareDocument = () => {
     const documentObject = {
@@ -71,7 +78,7 @@ class Header extends React.Component {
       if (!this.props.isSaved) {
         this.props.handleSaveDocument(true)
       }
-    }, 60000)
+    }, 10000)
   }
 
 
@@ -84,8 +91,7 @@ class Header extends React.Component {
       <Navbar
         fixedToTop={true}
         style={{
-          background: this.props.isLocked ? 'rgb(255, 192, 192)' : 'var(--c-primary-lightest)',
-          // background: 'var(--c-primary-lightest)',
+          background: 'var(--c-primary-lightest)',
         }}
       >
         <NavbarGroup align={Alignment.LEFT}>
@@ -201,21 +207,6 @@ class Header extends React.Component {
               )}
             </ul>
           </div>
-          {this.props.isLocked && !this.props.isStudent &&
-            <>
-              <Button
-                className={`btn--lock ${Classes.MINIMAL}`}
-                intent={Intent.DANGER}
-                style={{marginRight: '8px', marginLeft: '8px'}}
-                icon="lock"
-                text="Desbloquear"
-                onClick={this.props.handleUnlock}
-              />
-              <div>
-                ultima edición: {this.props.modifiedDate}
-              </div>
-            </>
-          }
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
           {!this.props.isStudent && !this.props.isLocked &&
@@ -245,13 +236,14 @@ class Header extends React.Component {
             </div>
           }
           {this.props.isLocked && this.props.isStudent &&
-            <Button
+            <Tag
+              className={Classes.Minimal}
               intent={Intent.DANGER}
-              style={{marginRight: '8px', marginLeft: '8px'}}
-              disabled={true}
-              icon="lock"
-              text="Documento bloqueado"
-            />
+              large='true'
+              icon='lock'
+            >
+              Documento bloqueado
+            </Tag>
           }
           {!this.props.isLocked &&
             <Button
@@ -263,6 +255,26 @@ class Header extends React.Component {
               text={this.props.isSaved ? "¡Guardado!" : "Guardar"}
               onClick={(e) => this.props.handleSaveDocument(true)}
             />
+          }
+          {this.props.isLocked && !this.props.isStudent &&
+            <>
+              <Button
+                className={`btn--lock ${Classes.MINIMAL}`}
+                intent={Intent.DANGER}
+                style={{marginRight: '8px', marginLeft: '8px'}}
+                icon="lock"
+                // text="Desbloquear"
+                onClick={this.props.handleUnlock}
+              />
+            <Tag
+              className={Classes.MINIMAL}
+              intent={Intent.DANGER}
+              large='true'
+              icon='time'
+            >
+              <ReactTimeAgo date={this.props.modifiedDate} locale="en-US"/>
+            </Tag>
+            </>
           }
           <NavbarDivider />
           <Button className={Classes.MINIMAL} icon="user" />
