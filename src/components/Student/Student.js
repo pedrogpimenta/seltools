@@ -235,7 +235,12 @@ class Student extends React.Component {
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Navbar fixedToTop={true}>
+          <Navbar
+            fixedToTop={true}
+            style={{
+              background: 'var(--c-primary-lightest)',
+            }}
+          >
             <NavbarGroup align={Alignment.LEFT}>
               <NavbarHeading
                 style={{

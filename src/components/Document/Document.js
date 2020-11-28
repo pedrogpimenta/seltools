@@ -160,7 +160,7 @@ class Document extends React.Component {
   componentDidMount() {
     const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Selen'
 
-    this.socket = io('ws://localhost:3000/')
+    this.socket = io('ws://192.168.8.180:3000/')
 
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${userName}`)
     .then(response => response.json())
@@ -697,7 +697,7 @@ class Document extends React.Component {
   }
 
   handleClickWhenLocked = () => {
-    alert('No!')
+    alert('En este momento, tu profe está revisando el documento. Vuelve más tarde ;)')
   }
 
   render() {
