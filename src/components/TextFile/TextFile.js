@@ -85,13 +85,21 @@ class TextFile extends React.Component {
   }
 
   handleChangeMode = () => {
-    this.setState({editMode: this.state.editMode === 'text' ? 'markers' : 'text'})
+    this.setState(
+      {editMode: this.state.editMode === 'text' ? 'markers' : 'text',
+    })
+  }
+
+  componentDidMount = () => {
+    this.setState(
+      {editMode: this.props.isLocked ? this.state.editMode : 'markers',
+    })
   }
 
   render() {
     return (
       <div
-        className={`text-editor ${this.state.editMode !== 'text' ? 'locked' : ''} ${this.props.file.id} bp3-running-text`}
+        className={`text-editor ${this.state.editMode === 'text' && !this.props.isLocked ? '' : 'locked'} ${this.props.file.id} bp3-running-text`}
         style={{
           position: 'relative',
           display: 'flex',
@@ -131,6 +139,7 @@ class TextFile extends React.Component {
           theme="snow"
           value={this.props.file.content}
           onChange={this.handleChange}
+          readOnly={this.props.isLocked}
           modules={{
             toolbar: [
               [{ 'font': ['opensans', 'comfortaa', 'lobster', 'amatic'] }],

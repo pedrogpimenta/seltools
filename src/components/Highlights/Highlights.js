@@ -174,7 +174,7 @@ class Highlights extends React.Component {
           width: '100%',
           height: '100%',
           // marginTop: '34px',
-          zIndex: this.props.isActive ? '5' : '1',
+          zIndex: this.props.isActive ? '5' : '2',
         }}
         onMouseMove={(e) => this.handleMouseMove(e)}
         // onMouseEnter={(e) => this.handleMouseEnter(e)}

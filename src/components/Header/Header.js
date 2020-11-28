@@ -152,12 +152,12 @@ class Header extends React.Component {
                             />
                           }
                           {this.props.isStudent &&
-                            crumb.text
+                            this.props.name
                           }
                           {!this.props.isStudent &&
                             <EditableText
                               style={{color: 'black'}}
-                              defaultValue={this.props.breadcrumbs[this.props.breadcrumbs.length - 1].text}
+                              defaultValue={this.props.name}
                               placeholder='Nuevo documento'
                               confirmOnEnterKey={true}
                               onConfirm={(e) => this.handleNameInputConfirm(e)}

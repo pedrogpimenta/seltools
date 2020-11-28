@@ -92,7 +92,7 @@ class Markers extends React.Component {
           // minHeight: '1000px',
           // marginTop: '34px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
-          zIndex: this.props.isActive ? '5' : '1',
+          zIndex: this.props.isActive ? '5' : '3',
         }}
         onDoubleClick={(e) => {!this.props.isLocked && this.addNewMarker(e)}}
       >

@@ -1,5 +1,4 @@
 import React from 'react'
-import io from 'socket.io-client'
 
 class TestFile extends React.Component {
  constructor(props){
@@ -9,15 +8,6 @@ class TestFile extends React.Component {
     }
   }
 
-  componentDidMount() {
-    const socket = io('ws://localhost:3000/')
-
-    socket.on('connect', () => {
-      console.log('1')
-
-      socket.emit('document open', 'userId', 'documentId')
-    });
-  }
   
   render() {
     return (

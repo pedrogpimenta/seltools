@@ -142,14 +142,12 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        console.log('saving...')
         this.socket.emit('document saved', this.state.user._id, this.props.id)
       })
 
   }
 
   handleUnlock = () => {
-    console.log('unlocking document')
     this.socket.emit('unlock document', this.state.user._id, this.props.id)
   }
 
@@ -162,10 +160,11 @@ class Document extends React.Component {
   componentDidMount() {
     const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Selen'
 
+    this.socket = io('ws://localhost:3000/')
+
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${userName}`)
     .then(response => response.json())
     .then(data => {
-      console.log('data:', data)
       this.setState({
         user: data.user,
       })
@@ -204,15 +203,6 @@ class Document extends React.Component {
               if (this.props.isStudent) {
                 newBreadcrumbs.shift()
               }
-      
-              this.props.dispatch({
-                type: 'CHANGE_DOCUMENT_BREADCRUMBS',
-                breadcrumbs: newBreadcrumbs,
-              })
-
-              this.props.dispatch({
-                type: 'DOCUMENT_IS_LOADED',
-              })
 
               this.props.dispatch({
                 type: 'LOAD_FILES',
@@ -234,6 +224,15 @@ class Document extends React.Component {
                 locked: false,
                 isLocked: false,
                 lockedBy: '',
+              })
+      
+              this.props.dispatch({
+                type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+                breadcrumbs: newBreadcrumbs,
+              })
+
+              this.props.dispatch({
+                type: 'DOCUMENT_IS_LOADED',
               })
 
             })
@@ -319,92 +318,74 @@ class Document extends React.Component {
             })
 
             // WebSockets
-            this.socket = io('ws://localhost:3000/')
 
-            this.socket.on('connect', () => {
-              console.log('1')
+            this.socket.emit('document open', this.state.user._id, data.document._id)
+            // this.socket.on('connect', () => {
+            //   console.log('1')
 
-              this.socket.emit('document open', this.state.user._id, data.document._id)
-            })
+            //   this.socket.emit('document open', this.state.user._id, data.document._id)
+            // })
 
             this.socket.on('document reload', (documentId) => {
-              console.log( 'reloooooad')
               if (documentId === this.props.id) {
                 // TODO: make this a function
-                fetch(`${REACT_APP_SERVER_BASE_URL}/document/${documentId}`)
-                  .then(response => response.json())
-                  .then(data => {
-                    const LSfiles = data.document.files || []
-                    console.log('here!')
+              fetch(`${REACT_APP_SERVER_BASE_URL}/document/${documentId}`)
+                .then(response => response.json())
+                .then(data => {
+                  const LSfiles = data.document.files || []
 
-                    document.title = `${data.document.name} -- Seltools`;
+                  document.title = `${data.document.name} -- Seltools`;
 
-                    if (LSfiles.length > 0) {
-                      this.props.dispatch({
-                        type: 'LOAD_FILES',
-                        files: LSfiles,
-                        noReset: true,
-                      })
-                    }
-
+                  if (LSfiles.length > 0) {
                     this.props.dispatch({
-                      type: 'CHANGE_DOCUMENT_NAME',
-                      name: data.document.name,
+                      type: 'LOAD_FILES',
+                      files: LSfiles,
+                      noReset: true,
                     })
+                  }
 
-                    this.props.dispatch({
-                      type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
-                      modifiedDate: data.document.modifiedDate,
-                    })
-        
-
-                    if (data.document.locked) {
-                      this.props.dispatch({
-                        type: 'DOCUMENT_IS_LOCKED',
-                        locked: data.document.locked,
-                        isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
-                        lockedBy: data.document.lockedBy,
-                      })
-
-                      this.props.dispatch({
-                        type: "DOCUMENT_IS_LOADED",
-                      })
-                    } else {
-                      this.props.dispatch({
-                        type: 'DOCUMENT_IS_LOCKED',
-                        locked: data.document.locked,
-                        isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
-                        lockedBy: data.document.lockedBy,
-                      })
-
-                      this.props.dispatch({
-                        type: "DOCUMENT_IS_LOADED",
-                      })
-
-                      this.handleSaveDocument()
-                    }
+                  this.props.dispatch({
+                    type: 'CHANGE_DOCUMENT_NAME',
+                    name: data.document.name,
                   })
-              // } else {
-                
-              //   this.props.dispatch({
-              //     type: 'DOCUMENT_IS_LOCKED',
-              //     locked: true,
-              //     isLocked: true,
-              //     lockedBy: this.state.user._id,
-              //   })
 
-              //   this.props.dispatch({
-              //     type: "DOCUMENT_IS_LOADED",
-              //   })
+                  this.props.dispatch({
+                    type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+                    modifiedDate: data.document.modifiedDate,
+                  })
+      
 
-              //   this.handleSaveDocument()
+                  if (data.document.locked) {
+                    this.props.dispatch({
+                      type: 'DOCUMENT_IS_LOCKED',
+                      locked: data.document.locked,
+                      isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
+                      lockedBy: data.document.lockedBy,
+                    })
+
+                    this.props.dispatch({
+                      type: "DOCUMENT_IS_LOADED",
+                    })
+                  } else {
+                    this.props.dispatch({
+                      type: 'DOCUMENT_IS_LOCKED',
+                      locked: data.document.locked,
+                      isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
+                      lockedBy: data.document.lockedBy,
+                    })
+
+                    this.props.dispatch({
+                      type: "DOCUMENT_IS_LOADED",
+                    })
+
+                    this.handleSaveDocument()
+                  }
+                })
               }
             })
 
             this.socket.on('save and lock document', (userId, documentId) => {
-                console.log('1saving and locking document')
               if (documentId === this.props.id && userId !== this.state.user._id) {
-                console.log('2saving and locking document')
                 this.handleSaveAndLockDocument()
               }
             })
@@ -541,7 +522,6 @@ class Document extends React.Component {
 
     if (!(!!url && url.length > 0)) return false
 
-    console.log('url:', url)
     this.props.dispatch({
       type: "ADD_VIDEO_EMBED",
       position: fileIndex,
@@ -727,12 +707,11 @@ class Document extends React.Component {
         style={{
           display: 'flex',
           minHeight: '100vh',
-          overflow: 'hidden',
           backgroundColor: '#f8f8f8',
           cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
-        {!this.props.isSaved &&
+        {!this.props.isSaved && !this.props.isLocked &&
           <Beforeunload onBeforeunload={() => "No has guardado tus cambios!"} />
         }
         <div

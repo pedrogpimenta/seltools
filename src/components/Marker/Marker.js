@@ -54,7 +54,8 @@ class Marker extends React.Component {
     }
 
     this.draggable = React.createRef()
-    this.contentEditable = React.createRef()
+    this.editableInput = React.createRef()
+    // this.contentEditable = React.createRef()
   }
 
   editMarker(e) {
@@ -132,6 +133,12 @@ class Marker extends React.Component {
       parentInfo: parentInfo,
       thisInfo: thisInfo,
     })
+    
+    if (this.props.hasFocus) {
+      window.setTimeout(() => {
+        this.editableInput.current.focus()
+      }, 1)
+    }
   }
 
   render() {
@@ -225,20 +232,24 @@ class Marker extends React.Component {
                 minWidth: '16px',
                 minHeight: '19px',
               }}
+              onClick={() => this.editableInput.current.focus()}
             >
-        <ReactQuill
-          theme="bubble"
-          value={this.props.content}
-          onChange={(e) => {this.handleChange(e)}}
-          modules={{
-            toolbar: [
-              ['bold', 'italic', 'underline', 'strike', { 'color': [] }, { 'background': [] }],
-            ],
-            clipboard: {
-              matchVisual: false,
-            },
-          }}
-        />
+              <ReactQuill
+                ref={this.editableInput}
+                theme="bubble"
+                value={this.props.content}
+                onFocus={this.onInputFocus}
+                onBlur={this.onInputBlur}
+                onChange={(e) => {this.handleChange(e)}}
+                modules={{
+                  toolbar: [
+                    ['bold', 'italic', 'underline', 'strike', { 'color': [] }, { 'background': [] }],
+                  ],
+                  clipboard: {
+                    matchVisual: false,
+                  },
+                }}
+              />
               {/* <Editor
                 content={this.props.content}
                 parentId={this.props.id}
@@ -257,7 +268,7 @@ class Marker extends React.Component {
                 top: '0',
                 fontSize: 0,
                 paddingLeft: '4px',
-                opacity: this.state.hover ? '1' : '0',
+                opacity: this.state.hover && this.state.hasFocus ? '1' : '0',
                 transition: 'all 100ms ease-out',
               }}
             >

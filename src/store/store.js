@@ -35,11 +35,9 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         students: action.students,
-        // sharedWith: action.sharedWith,
       }
 
     case 'LOAD_FILES':
-      console.log('jappen')
       const filesOnLoad = cloneDeep(action.files)
       
       for (let file in filesOnLoad) {

@@ -61,7 +61,6 @@ class FileWrapper extends React.Component {
             this.props.fileType !== 'opus' &&
             this.props.fileType !== 'wav' &&
             this.props.fileType !== 'webm' &&
-            this.props.fileType !== 'txt' &&
             <Highlights
               fileId={this.props.id}
               highlights={this.props.highlights || []}
