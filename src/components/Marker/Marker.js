@@ -6,7 +6,6 @@ import { findDOMNode } from 'react-dom'
 import {
   Icon,
 } from "@blueprintjs/core"
-import Editor from '../Editor/Editor'
 import ReactQuill, {Quill} from 'react-quill'
 import 'react-quill/dist/quill.bubble.css'
 

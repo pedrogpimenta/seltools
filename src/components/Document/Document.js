@@ -12,7 +12,7 @@ import {
   Classes,
 } from "@blueprintjs/core"
 
-import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
+import { REACT_APP_SERVER_BASE_URL, REACT_APP_SERVER_WS_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
@@ -160,7 +160,7 @@ class Document extends React.Component {
   componentDidMount() {
     const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Selen'
 
-    this.socket = io('ws://192.168.8.180:3000/')
+    this.socket = io(REACT_APP_SERVER_WS_URL)
 
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${userName}`)
     .then(response => response.json())

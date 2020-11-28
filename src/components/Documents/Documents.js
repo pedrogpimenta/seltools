@@ -381,7 +381,7 @@ class Documents extends React.Component {
         const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
         const newDoc = cloneDeep(updatedDocs[docIndex])
         newDoc._id = data.id
-        newDoc.name = newDoc.name + ' Clone'
+        newDoc.name = newDoc.name + ' (COPIA)'
         newDoc.shared = false
         updatedDocs.unshift(newDoc)
 
