@@ -140,7 +140,7 @@ button:focus {
 
 .document-item:hover .bp3-popover-wrapper,
 .folder-item:hover .bp3-popover-wrapper {
-  opacity: 100%;
+  opacity: 1;
   pointer-events: all;
 }
 
