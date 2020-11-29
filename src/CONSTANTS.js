@@ -1,2 +1,2 @@
-export const REACT_APP_SERVER_BASE_URL = process.env.REACT_APP_SERVER_BASE_URL || 'http://192.168.8.180:3000'
-export const REACT_APP_SERVER_WS_URL = process.env.REACT_APP_SERVER_WS_URL || 'ws://192.168.8.180:3000'
+export const REACT_APP_SERVER_BASE_URL = process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000'
+export const REACT_APP_SERVER_WS_URL = process.env.REACT_APP_SERVER_WS_URL || 'ws://localhost:3000'
