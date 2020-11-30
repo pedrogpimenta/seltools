@@ -222,6 +222,7 @@ body .quill .ql-bubble.ql-container {
 }
 
 body .quill .ql-bubble .ql-editor {
+  overflow: hidden;
   padding: 0;
 }
 
