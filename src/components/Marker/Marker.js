@@ -268,6 +268,7 @@ class Marker extends React.Component {
                 fontSize: 0,
                 paddingLeft: '4px',
                 opacity: this.state.hover && this.state.hasFocus ? '1' : '0',
+                pointerEvents: this.state.hover && this.state.hasFocus ? 'all' : 'none',
                 transition: 'all 100ms ease-out',
               }}
             >
