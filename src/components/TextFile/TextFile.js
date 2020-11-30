@@ -140,6 +140,7 @@ class TextFile extends React.Component {
           value={this.props.file.content}
           onChange={this.handleChange}
           readOnly={this.props.isLocked}
+          scrollingContainer="html"
           modules={{
             toolbar: [
               [{ 'font': ['opensans', 'comfortaa', 'lobster', 'amatic'] }],

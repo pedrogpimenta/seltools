@@ -216,7 +216,6 @@ body .quill span.redtext {
   color: var(--c-redtext)
 }
 
-
 body .quill .ql-bubble.ql-container {
   font-family: 'Open Sans', sans-serif;
 }
@@ -251,6 +250,10 @@ body .quill .ql-bubble .ql-tooltip .ql-tooltip-arrow {
 body .quill .ql-bubble .ql-tooltip .ql-formats {
   display: flex;
   margin: 6px;
+}
+
+body .quill .ql-bubble .ql-clipboard {
+  position: fixed;
 }
 
 body .medium-editor-element:focus {
