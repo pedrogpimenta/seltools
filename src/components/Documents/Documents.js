@@ -41,7 +41,7 @@ class Documents extends React.Component {
       isMoveDialogOpen: false,
       breadcrumbs: [
         { icon: 'folder-open',
-          text: 'Selen',
+          text: 'Sel',
         },
       ],
     }
@@ -59,7 +59,7 @@ class Documents extends React.Component {
   }
 
   getUser = () => {
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/Selen`)
+    fetch(`${REACT_APP_SERVER_BASE_URL}/user/Sel`)
       .then(response => response.json())
       .then(data => {
         this.setState({
@@ -701,7 +701,7 @@ class Documents extends React.Component {
   }
 
   render() {
-    if (!localStorage.getItem('isUserAllowed')) return <div>No eres Selen!</div>
+    if (!localStorage.getItem('isUserAllowed')) return <div>No eres Sel!</div>
 
     return (
       <div

@@ -158,7 +158,7 @@ class Document extends React.Component {
   }
 
   componentDidMount() {
-    const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Selen'
+    const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Sel'
 
     this.socket = io(REACT_APP_SERVER_WS_URL)
 
@@ -271,7 +271,7 @@ class Document extends React.Component {
               name: data.document.name,
             })
             
-            let newBreadcrumbs = [{icon: 'folder-open', text: this.props.isStudent ? localStorage.getItem('studentName') : 'Selen', id: '0', type: 'folder'}]
+            let newBreadcrumbs = [{icon: 'folder-open', text: this.props.isStudent ? localStorage.getItem('studentName') : 'Sel', id: '0', type: 'folder'}]
 
             if (newBreadcrumbs.length > 0) {
               newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
@@ -425,7 +425,7 @@ class Document extends React.Component {
             markers: [],
             highlights: [],
             stamps: [],
-            creator: this.props.isStudent ? localStorage.getItem('studentName') : 'Selen',
+            creator: this.props.isStudent ? localStorage.getItem('studentName') : 'Sel',
           })
 
           const options = {
@@ -610,7 +610,7 @@ class Document extends React.Component {
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
           icon='new-text-box'
-          onClick={() => this.handleAddTextFile(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={() => this.handleAddTextFile(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
           style={{margin: '0 4px'}}
@@ -618,7 +618,7 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='media'
-          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
           style={{margin: '0 4px'}}
@@ -626,7 +626,7 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='music'
-          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={(e) => this.handleAddFile(e, i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
           style={{margin: '0 4px'}}
@@ -634,7 +634,7 @@ class Document extends React.Component {
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
           icon='video'
-          onClick={(e) => this.handleAddVideoEmbed(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={(e) => this.handleAddVideoEmbed(i - 1, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
         {(!this.props.isStudent ? true : this.props.files[i].creator === localStorage.getItem('studentName')) &&
           <Button
@@ -664,7 +664,7 @@ class Document extends React.Component {
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           icon='new-text-box'
           large={true}
-          onClick={() => this.handleAddTextFile(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={() => this.handleAddTextFile(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
           style={{margin: '0 8px'}}
@@ -673,7 +673,7 @@ class Document extends React.Component {
           loading={this.state.uploadingFiles}
           icon='media'
           large={true}
-          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
           style={{margin: '0 8px'}}
@@ -682,7 +682,7 @@ class Document extends React.Component {
           loading={this.state.uploadingFiles}
           icon='music'
           large={true}
-          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
           style={{margin: '0 8px'}}
@@ -690,7 +690,7 @@ class Document extends React.Component {
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           icon='video'
           large={true}
-          onClick={(e) => this.handleAddVideoEmbed(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Selen')}
+          onClick={(e) => this.handleAddVideoEmbed(this.props.files.length, this.props.isStudent ? localStorage.getItem('studentName') : 'Sel')}
         />
       </div>
     )
