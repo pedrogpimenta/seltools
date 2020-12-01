@@ -335,6 +335,7 @@ body .medium-toolbar-arrow-under::after {
 }
 
 .text-editor .ql-container.ql-snow  {
+  height: auto;
   border: none
 }
 
