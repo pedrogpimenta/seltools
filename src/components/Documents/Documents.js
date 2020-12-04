@@ -62,12 +62,19 @@ class Documents extends React.Component {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/Sel`)
       .then(response => response.json())
       .then(data => {
+        const newBreadcrumbs = cloneDeep(this.state.breadcrumbs)
+
+        // console.log('data.user.userFolder:', data.user.userfolder)
+        newBreadcrumbs[newBreadcrumbs.length - 1].id = data.user.userfolder        
+
         this.setState({
           user: data.user,
+          breadcrumbs: newBreadcrumbs,
         })
 
         // this.getDocuments(this.props.match.params.folder || data.user.userfolder)
         this.props.history.push(`/documentos/${this.props.match.params.folder || data.user.userfolder}`)
+        // getDocuments(data.user.userfolder, true)
       })
 
   }
@@ -77,7 +84,11 @@ class Documents extends React.Component {
       isLoadingDocuments: true,
     })
 
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`)
+    fetch(
+      this.state.breadcrumbs[0].id === folderId ?
+      `${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}?isTeacherFolder=true` :
+      `${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`,
+    )
       .then(response => response.json())
       .then(data => {
         let newBreadcrumbs = [{
