@@ -10,6 +10,7 @@ import {
   Intent,
   Button,
   Classes,
+  Spinner,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL, REACT_APP_SERVER_WS_URL } from '../../CONSTANTS'
@@ -41,6 +42,7 @@ class Document extends React.Component {
       showEditDialog: false,
       fileUrls: [],
       uploadingFiles: false,
+      isLoadingDocument: true,
     }
   }
 
@@ -82,7 +84,7 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        this.socket.emit('document saved after unlock', this.state.user._id, this.props.id)
+        this.props.socket.emit('document saved after unlock', this.state.user._id, this.props.id)
       })
     
   }
@@ -142,25 +144,30 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        this.socket.emit('document saved', this.state.user._id, this.props.id)
+        this.props.socket.emit('document saved', this.state.user._id, this.props.id)
       })
 
   }
 
   handleUnlock = () => {
-    this.socket.emit('unlock document', this.state.user._id, this.props.id)
+    this.props.socket.emit('unlock document', this.state.user._id, this.props.id)
   }
 
-  socket = ''
+  // socket = ''
   
   componentWillUnmount() {
-    this.socket.disconnect()
+    // this.props.socket.disconnect()
   }
 
   componentDidMount() {
+    this.props.dispatch({
+      type: 'LOAD_FILES',
+      files: [],
+    })
+
     const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Sel'
 
-    this.socket = io(REACT_APP_SERVER_WS_URL)
+    // this.props.socket = io(REACT_APP_SERVER_WS_URL)
 
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/${userName}`)
     .then(response => response.json())
@@ -233,6 +240,10 @@ class Document extends React.Component {
 
               this.props.dispatch({
                 type: 'DOCUMENT_IS_LOADED',
+              })
+              
+              this.setState({
+                isLoadingDocument: false,
               })
 
             })
@@ -317,16 +328,20 @@ class Document extends React.Component {
               lockedBy: data.document.lockedBy,
             })
 
+            this.setState({
+              isLoadingDocument: false,
+            })
+
             // WebSockets
 
-            this.socket.emit('document open', this.state.user._id, data.document._id)
-            // this.socket.on('connect', () => {
+            this.props.socket.emit('document open', this.state.user._id, data.document._id)
+            // this.props.socket.on('connect', () => {
             //   console.log('1')
 
-            //   this.socket.emit('document open', this.state.user._id, data.document._id)
+            //   this.props.socket.emit('document open', this.state.user._id, data.document._id)
             // })
 
-            this.socket.on('document reload', (documentId) => {
+            this.props.socket.on('document reload', (documentId) => {
               if (documentId === this.props.id) {
                 // TODO: make this a function
               fetch(`${REACT_APP_SERVER_BASE_URL}/document/${documentId}`)
@@ -384,7 +399,7 @@ class Document extends React.Component {
               }
             })
 
-            this.socket.on('save and lock document', (userId, documentId) => {
+            this.props.socket.on('save and lock document', (userId, documentId) => {
               if (documentId === this.props.id && userId !== this.state.user._id) {
                 this.handleSaveAndLockDocument()
               }
@@ -724,7 +739,7 @@ class Document extends React.Component {
           <Header
             handleSaveDocument={this.handleSaveDocument}
             handleUnlock={this.handleUnlock}
-            socket={this.socket}
+            socket={this.props.socket}
             user={this.state.user}
             isStudent={this.props.isStudent}
           />
@@ -802,7 +817,7 @@ class Document extends React.Component {
                   </div>
                 )
               })}
-              {!this.props.isLocked && this.renderAddButtons()}
+              {!this.state.isLoadingDocument && !this.props.isLocked && this.renderAddButtons()}
               {!this.props.isLocked && 
                 <input
                   ref={this.fileInput}
@@ -815,6 +830,13 @@ class Document extends React.Component {
                 />
               }
             </div>
+            {this.state.isLoadingDocument &&
+              <Spinner 
+                style={{
+                  background: 'red',
+                }}
+              />
+            }
           </div>
         </div>
       </div>
@@ -828,7 +850,7 @@ function mapStateToProps(state, ownProps) {
     name: state.name,
     students: state.students,
     shared: state.shared || false,
-    files: state.files,
+    files: state.files || [],
     filesOnLoad: state.filesOnLoad,
     isSaved: state.isSaved,
     isSaving: state.isSaving,

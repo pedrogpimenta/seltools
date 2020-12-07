@@ -37,6 +37,11 @@ function reducer(state = initialState, action) {
         students: action.students,
       }
 
+    case 'RESET_FILES':
+      return {
+        ...initialState,
+      }
+
     case 'LOAD_FILES':
       const filesOnLoad = cloneDeep(action.files)
       

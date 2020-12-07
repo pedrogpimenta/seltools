@@ -35,26 +35,22 @@ class Documents extends React.Component {
       userFolders: [],
       userDocuments: [],
       students: [],
-      isUserAllowed: false,
       selectedDocumentId: null,
       selectedDocumentName: null,
       isMoveDialogOpen: false,
-      breadcrumbs: [
-        { icon: 'folder-open',
-          text: 'Sel',
-        },
-      ],
     }
   }
 
   auth = () => {
-    if (this.state.isUserAllowed) return null
+    console.log('eh')
+    if (localStorage.getItem('userType') === 'teacher') {
+      this.getUser() 
+    } else {
+      const pass = window.prompt('¿Cuál es tu contraseña?')
 
-    const pass = window.prompt('¿Cuál es tu contraseña?')
-
-    if (pass === 'amor') {
-      this.setState({isUserAllowed: true})
-      localStorage.setItem('isUserAllowed', true)
+      if (pass === 'amor') {
+        this.getUser() 
+      }
     }
   }
 
@@ -62,19 +58,18 @@ class Documents extends React.Component {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/Sel`)
       .then(response => response.json())
       .then(data => {
-        const newBreadcrumbs = cloneDeep(this.state.breadcrumbs)
+        const breadcrumbs = [
+          { 
+            _id: data.user.userfolder,
+            text: 'Sel',
+            icon: 'folder-open',
+          },
+        ]
 
-        // console.log('data.user.userFolder:', data.user.userfolder)
-        newBreadcrumbs[newBreadcrumbs.length - 1].id = data.user.userfolder        
+        this.props.setUser(data.user)
+        this.props.setLocation(breadcrumbs)
 
-        this.setState({
-          user: data.user,
-          breadcrumbs: newBreadcrumbs,
-        })
-
-        // this.getDocuments(this.props.match.params.folder || data.user.userfolder)
-        this.props.history.push(`/documentos/${this.props.match.params.folder || data.user.userfolder}`)
-        // getDocuments(data.user.userfolder, true)
+        this.getDocuments(data.user.userfolder, true)
       })
 
   }
@@ -84,11 +79,7 @@ class Documents extends React.Component {
       isLoadingDocuments: true,
     })
 
-    fetch(
-      this.state.breadcrumbs[0].id === folderId ?
-      `${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}?isTeacherFolder=true` :
-      `${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`,
-    )
+    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`,)
       .then(response => response.json())
       .then(data => {
         let newBreadcrumbs = [{
@@ -124,8 +115,9 @@ class Documents extends React.Component {
           students: data.students || [],
           userFolders: folders || [],
           userDocuments: documents || [],
-          breadcrumbs: newBreadcrumbs,
         })
+
+        this.props.setLocation(newBreadcrumbs)
 
         document.title = `${data.folder.name} -- Seltools`;
         // this.props.history.push(`/documentos/${folderId}`)
@@ -238,7 +230,7 @@ class Documents extends React.Component {
     const folderName = window.prompt('¿Qué nombre tiene la nueva carpeta?')
 
     if (!!folderName && folderName.length > 0) {
-      const parent = this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id
+      const parent = this.props.breadcrumbs[this.props.breadcrumbs.length - 1].id
 
       const requestOptions = {
         method: 'POST',
@@ -266,7 +258,7 @@ class Documents extends React.Component {
     const studentName = window.prompt('¿Cómo se llama tu nuevo alumno?')
 
     if (!!studentName && studentName.length > 0) {
-      const parent = this.state.breadcrumbs[0].id
+      const parent = this.props.breadcrumbs[0].id
 
       const requestOptions = {
         method: 'POST',
@@ -296,7 +288,7 @@ class Documents extends React.Component {
 
     if (!!newName) {
       const documentObject = {
-        parentId: this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id,
+        parentId: this.props.breadcrumbs[this.props.breadcrumbs.length - 1].id,
         name: newName,
       }
   
@@ -413,7 +405,7 @@ class Documents extends React.Component {
 
     return(
       <MoveDialog
-        initialFolder={this.state.breadcrumbs[0].id}
+        initialFolder={this.props.breadcrumbs[0].id}
         user={this.state.user}
         selectedDocumentId={this.state.selectedDocumentId}
         selectedDocumentName={this.state.selectedDocumentName}
@@ -509,7 +501,7 @@ class Documents extends React.Component {
                 documentName={document.name}
                 documentType={document.type}
                 documentShared={document.shared}
-                breadcrumbs={this.state.breadcrumbs}
+                breadcrumbs={this.props.breadcrumbs}
                 handleShareDocument={this.handleShareDocument}
                 handleRename={this.handleRename}
                 handleColorChange={this.handleColorChange}
@@ -675,7 +667,7 @@ class Documents extends React.Component {
 
     return (
       <div>
-        {this.state.breadcrumbs.length === 1 && students()}
+        {this.props.breadcrumbs.length === 1 && students()}
         {folders()}
         {documents()}
       </div>
@@ -683,25 +675,14 @@ class Documents extends React.Component {
   }
 
   componentDidMount = () => {
-    
+    // TODO: needed?
     store.dispatch({
-      type: 'CHANGE_DOCUMENT_BREADCRUMBS',
-      breadcrumbs: [],
-    })
-
-    store.dispatch({
-      type: 'LOAD_FILES',
+      type: 'RESET_FILES',
       files: [],
       filesOnLoad: [],
     })
 
-    if (!localStorage.getItem('isUserAllowed')) {
-      this.auth()
-    }
-
-    if (localStorage.getItem('isUserAllowed')) {
-      this.getUser()
-    }
+    this.auth()
     
     this.props.history.listen((location, action) => {
       if (action !== 'PUSH') return false
@@ -709,10 +690,13 @@ class Documents extends React.Component {
       const docId = locationArray[locationArray.length - 1]
       this.getDocuments(docId)
     })
+
   }
 
   render() {
-    if (!localStorage.getItem('isUserAllowed')) return <div>No eres Sel!</div>
+    if (!localStorage.getItem('userType') === 'teacher') return <div>No eres Sel!</div>
+
+    console.log('ops:', this.props.breadcrumbs)
 
     return (
       <div
@@ -745,11 +729,12 @@ class Documents extends React.Component {
               >
                 <div style={{
                   maxHeight: '44px',
+                  width: '43px',
                   overflow: 'hidden',
                 }}>
                   <img 
                     style={{
-                      maxHeight: '44px'
+                      maxHeight: '44px',
                     }}
                     src="/assets/images/logo-seltools.png"
                     alt= "Seltools"
@@ -761,14 +746,14 @@ class Documents extends React.Component {
                 style={{marginLeft: '8px'}}
               >
                 <ul className='bp3-overflow-list bp3-breadcrumbs'>
-                  {this.state.breadcrumbs.map((crumb, i) => {
+                  {this.props.breadcrumbs.map((crumb, i) => {
                     const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
                     return (
                       <li key={`crumb-${crumb.id}`}>
                         <span
-                          className={`bp3-breadcrumb ${this.state.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
+                          className={`bp3-breadcrumb ${this.props.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
                           onClick={() => {
-                            this.state.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb.id}`)
+                            this.props.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb.id}`)
                           }}
                         >
                           {crumb.type === 'student' && 
