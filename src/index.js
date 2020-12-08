@@ -1,16 +1,34 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './components/App/App'
 import * as serviceWorker from './serviceWorker'
 
 // redux for state
 import { Provider } from 'react-redux'
 import { store } from './store/store'
 
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom"
+
+import Landing from './components/Landing/Landing'
+import App from './components/App/App'
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Landing />
+          </Route>
+          <Route path="/">
+            <App />
+          </Route>
+        </Switch>
+      </Router>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

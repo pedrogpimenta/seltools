@@ -10,7 +10,6 @@ import './App.css'
 import io from 'socket.io-client'
 
 import { REACT_APP_SERVER_BASE_URL, REACT_APP_SERVER_WS_URL } from '../../CONSTANTS'
-import Landing from '../Landing/Landing'
 import Documents from '../Documents/Documents'
 import Document from '../Document/Document'
 import Student from '../Student/Student'
@@ -23,12 +22,13 @@ class App extends React.Component {
     this.state = {
       user: {},
       breadcrumbs: [],
+      connectedUsers: [],
     }
 
     // this.socket = io(REACT_APP_SERVER_WS_URL)
   }
 
-  socket = io(REACT_APP_SERVER_WS_URL)
+  socket = ''
 
   setUser = (user) => {
     this.setState({
@@ -39,31 +39,29 @@ class App extends React.Component {
     localStorage.setItem('userName', user.username)
     localStorage.setItem('userType', user.type)
 
-    this.socket.emit('user login', user)
+    this.socket = io(REACT_APP_SERVER_WS_URL, {query: `userId=${user._id}`})
   }
 
   setLocation = (breadcrumbs) => {
-    console.log('doin:', breadcrumbs)
     this.setState({
       breadcrumbs: breadcrumbs,
     })
 
   }
 
-  componentDidMount = () => {
+  // componentDidMount = () => {
     // console.log( 'mount:', this.state.user.name)
     // this.socket = io(REACT_APP_SERVER_WS_URL)
+  // }
+
+  componentWillUnmount() {
+    this.socket.disconnect()
   }
 
   render() {
     return (
       <Router>
         <Switch>
-          <Route exact path="/">
-            <Landing 
-              studentLogin={this.studentLogin}
-            />
-          </Route>
           <Route path="/testfile">
             <TestFile />
           </Route>
@@ -94,8 +92,9 @@ class App extends React.Component {
             <Documents
               socket={this.socket}
               user={this.state.user}
-              setUser={this.setUser}
               breadcrumbs={this.state.breadcrumbs}
+              connectedUsers={this.state.connectedUsers}
+              setUser={this.setUser}
               setLocation={this.setLocation}
             />
           </Route>

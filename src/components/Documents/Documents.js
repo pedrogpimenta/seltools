@@ -23,6 +23,7 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 import MoveDialog from '../MoveDialog/MoveDialog'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
+import TopBar from '../TopBar/TopBar'
 import IconSel from '../IconSel/IconSel'
 
 class Documents extends React.Component {
@@ -31,7 +32,6 @@ class Documents extends React.Component {
 
     this.state = {
       isLoadingDocuments: true,
-      user: {},
       userFolders: [],
       userDocuments: [],
       students: [],
@@ -44,17 +44,17 @@ class Documents extends React.Component {
   auth = () => {
     console.log('eh')
     if (localStorage.getItem('userType') === 'teacher') {
-      this.getUser() 
+      this.getUserInfo() 
     } else {
       const pass = window.prompt('¿Cuál es tu contraseña?')
 
       if (pass === 'amor') {
-        this.getUser() 
+        this.getUserInfo() 
       }
     }
   }
 
-  getUser = () => {
+  getUserInfo = () => {
     fetch(`${REACT_APP_SERVER_BASE_URL}/user/Sel`)
       .then(response => response.json())
       .then(data => {
@@ -79,13 +79,13 @@ class Documents extends React.Component {
       isLoadingDocuments: true,
     })
 
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`,)
+    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`,)
       .then(response => response.json())
       .then(data => {
         let newBreadcrumbs = [{
           icon: <IconSel />,
-          text: this.state.user.name,
-          id: this.state.user._id,
+          text: this.props.user.name,
+          id: this.props.user._id,
           type: 'folder'
         }]
 
@@ -104,7 +104,7 @@ class Documents extends React.Component {
         newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type, color: data.folder.color})
       
         if (newBreadcrumbs[0].type === 'student') {
-          newBreadcrumbs.unshift({icon: 'folder-open', text: this.state.user.username, id: this.state.user.userfolder, type: 'folder'})
+          newBreadcrumbs.unshift({icon: 'folder-open', text: this.props.user.username, id: this.props.user.userfolder, type: 'folder'})
         }
 
         const folders = data.documents.filter(doc => doc.type === 'folder')
@@ -112,9 +112,9 @@ class Documents extends React.Component {
 
         this.setState({
           isLoadingDocuments: false,
-          students: data.students || [],
-          userFolders: folders || [],
-          userDocuments: documents || [],
+          students: data.students,
+          userFolders: folders,
+          userDocuments: documents,
         })
 
         this.props.setLocation(newBreadcrumbs)
@@ -696,8 +696,6 @@ class Documents extends React.Component {
   render() {
     if (!localStorage.getItem('userType') === 'teacher') return <div>No eres Sel!</div>
 
-    console.log('ops:', this.props.breadcrumbs)
-
     return (
       <div
         className='App'
@@ -706,133 +704,38 @@ class Documents extends React.Component {
           minHeight: '100vh',
           overflow: 'hidden',
           backgroundColor: '#f8f8f8',
-          // cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
+        <TopBar
+          isLoadingDocuments={this.state.isLoadingDocuments}
+          breadcrumbs={this.props.breadcrumbs}
+        />
         <div
           style={{
-            width: '100%',
-            // cursor: this.props.dragging ? 'grabbing' : 'default',
+            width: '1100px',
+            maxWidth: '100%',
+            margin: '0 auto',
+            paddingTop: '70px',
+            paddingLeft: '16px',
+            paddingRight: '16px',
           }}
         >
-          <Navbar
-            fixedToTop={true}
-            style={{
-              background: 'var(--c-primary-lightest)',
-            }}
-          >
-            <NavbarGroup align={Alignment.LEFT}>
-              <NavbarHeading
+          <div style={{
+            margin: '0 0 32px',
+          }}>
+            {!this.state.isLoadingDocuments &&
+              this.renderDocuments()
+            }
+            {this.state.isLoadingDocuments &&
+              <Spinner 
                 style={{
-                  marginRight: '8px'
+                  background: 'red',
                 }}
-              >
-                <div style={{
-                  maxHeight: '44px',
-                  width: '43px',
-                  overflow: 'hidden',
-                }}>
-                  <img 
-                    style={{
-                      maxHeight: '44px',
-                    }}
-                    src="/assets/images/logo-seltools.png"
-                    alt= "Seltools"
-                  />
-                </div>
-              </NavbarHeading>
-              <NavbarDivider />
-              <div
-                style={{marginLeft: '8px'}}
-              >
-                <ul className='bp3-overflow-list bp3-breadcrumbs'>
-                  {this.props.breadcrumbs.map((crumb, i) => {
-                    const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
-                    return (
-                      <li key={`crumb-${crumb.id}`}>
-                        <span
-                          className={`bp3-breadcrumb ${this.props.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
-                          onClick={() => {
-                            this.props.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb.id}`)
-                          }}
-                        >
-                          {crumb.type === 'student' && 
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center', 
-                                width: '18px',
-                                height: '18px',
-                                backgroundColor: crumb.color || 'black',
-                                color: 'white',
-                                borderRadius: '50%',
-                                marginRight: '6px',
-                                fontSize: '12px',
-                                fontWeight: '700',
-                              }}
-                            >
-                              {crumb.text.substr(0, 1).toUpperCase()}
-                            </div>
-                          }
-                          {crumb.type !== 'student' && 
-                            <Icon
-                              icon={icon}
-                              color={crumb.color || '#666'}
-                              className='bp3-icon'
-                            />
-                          }
-                          {crumb.text}
-                        </span>
-                      </li>
-                    )}
-                  )}
-                </ul>
-              </div>
-            </NavbarGroup>
-            <NavbarGroup align={Alignment.RIGHT}>
-            </NavbarGroup>
-          </Navbar>
-          <div
-            style={{
-              maxWidth: '1100px',
-              margin: '0 auto',
-              paddingTop: '70px',
-              paddingLeft: '16px',
-              paddingRight: '16px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'space-between',
-              }}
-              >
-              <div
-                style={{
-                  width: '100%',
-                }}
-              >
-                <div style={{
-                  margin: '0 0 32px',
-                }}>
-                  {!this.state.isLoadingDocuments &&
-                    this.renderDocuments()
-                  }
-                </div>
-              </div>
-            </div>
+              />
+            }
           </div>
-          {this.state.isLoadingDocuments &&
-            <Spinner 
-              style={{
-                background: 'red',
-              }}
-            />
-          }
-          {this.renderMoveDialog()}
         </div>
+        {this.renderMoveDialog()}
       </div>
     )
   }
