@@ -548,6 +548,17 @@ class Document extends React.Component {
       }) 
     }
   }
+  
+  handleHideFile = (fileId) => {
+    this.props.dispatch({
+      type: "HIDE_FILE",
+      fileId: fileId,
+    }) 
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
+  }
 
   openEditNameDialog = () => {
     this.setState({showEditDialog: true})
@@ -586,6 +597,15 @@ class Document extends React.Component {
             onClick={this.handleClickWhenLocked}
           >
           </div>
+        }
+        {!this.props.isStudent &&
+          <Button
+            style={{margin: '0 4px'}}
+            intent={Intent.DEFAULT}
+            className={Classes.MINIMAL}
+            icon={this.props.files[i].hidden ? 'eye-open' : 'eye-off'}
+            onClick={() => this.handleHideFile(fileIndex)}
+          />
         }
         {!this.props.isStudent && i !== 0 &&
           <Button
@@ -750,12 +770,14 @@ class Document extends React.Component {
               }}
             >
               {this.props.files.map((file, i) => {
+                if (this.props.isStudent && file.hidden) return null
                 return(
                   <div
                     key={file.id}
                     className='file'
                     style={{
                       textAlign: 'center',
+                      opacity: file.hidden ? '.5' : '1',
                     }}
                   >
                     <FileWrapper
