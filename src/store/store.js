@@ -96,6 +96,19 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
+      
+    case 'HIDE_FILE':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          updatedFiles[file].hidden = !updatedFiles[file].hidden
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
     case 'RESET_DOCUMENT':
       return {
         ...state,
