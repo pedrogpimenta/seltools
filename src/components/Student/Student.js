@@ -186,8 +186,8 @@ class Student extends React.Component {
           newBreadcrumbs.unshift({icon: 'folder-open', text: this.state.user.username, id: this.state.user._id, type: 'folder'})
         }
 
-        const folders = data.documents.filter(doc => doc.type === 'folder')
-        const documents = data.documents.filter(doc => doc.type === 'document')
+        const folders = data.documents.filter(doc => doc.type === 'folder' && doc.shared === true)
+        const documents = data.documents.filter(doc => doc.type === 'document' && doc.shared === true)
 
         this.setState({
           isLoadingDocuments: false,
