@@ -4,17 +4,12 @@ import { store } from '../../store/store'
 import { cloneDeep } from 'lodash'
 
 import {
-  Alignment,
   AnchorButton,
   Button,
   Classes,
   Card,
   Icon,
   Intent,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
   Popover,
   Spinner,
 } from "@blueprintjs/core"
@@ -22,9 +17,9 @@ import {
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 import MoveDialog from '../MoveDialog/MoveDialog'
+import AddStudentDialog from '../AddStudentDialog/AddStudentDialog'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
 import TopBar from '../TopBar/TopBar'
-import IconSel from '../IconSel/IconSel'
 
 class Documents extends React.Component {
   constructor() {
@@ -41,71 +36,32 @@ class Documents extends React.Component {
     }
   }
 
-  auth = () => {
-    console.log('eh')
-    if (localStorage.getItem('userType') === 'teacher') {
-      this.getUserInfo() 
-    } else {
-      const pass = window.prompt('¿Cuál es tu contraseña?')
-
-      if (pass === 'amor') {
-        this.getUserInfo() 
-      }
-    }
-  }
-
-  getUserInfo = () => {
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/Sel`)
-      .then(response => response.json())
-      .then(data => {
-        const breadcrumbs = [
-          { 
-            _id: data.user.userfolder,
-            text: 'Sel',
-            icon: 'folder-open',
-          },
-        ]
-
-        this.props.setUser(data.user)
-        this.props.setLocation(breadcrumbs)
-
-        this.getDocuments(data.user.userfolder, true)
-      })
-
-  }
-  
   getDocuments = (folderId) => {
     this.setState({
       isLoadingDocuments: true,
     })
 
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`,)
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
+    }
+
+    let fetchUrl = localStorage.getItem('seltoolsuserfolder') === folderId ?
+      `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?isTeacherFolder=true` :
+      `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`
+
+    fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        let newBreadcrumbs = [{
-          icon: <IconSel />,
-          text: this.props.user.name,
-          id: this.props.user._id,
-          type: 'folder'
-        }]
-
-        if (newBreadcrumbs.length > 0) {
-          newBreadcrumbs = data.breadcrumbs.map(crumb => {
-            return({
-              icon: 'folder-open',
-              id: crumb._id,
-              text: crumb.name,
-              type: crumb.type,
-              color: crumb.color,
-            })
-          })
+        const newBreadcrumbs = data.breadcrumbs
+        newBreadcrumbs.push({icon: 'folder-open', name: data.folder.name, _id: data.folder._id, type: data.folder.type, color: data.folder.color})
+        if (this.props.user.type === 'student') {
+          newBreadcrumbs.shift()
         }
-        
-        newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type, color: data.folder.color})
-      
-        if (newBreadcrumbs[0].type === 'student') {
-          newBreadcrumbs.unshift({icon: 'folder-open', text: this.props.user.username, id: this.props.user.userfolder, type: 'folder'})
-        }
+        this.props.setLocation(newBreadcrumbs)
 
         const folders = data.documents.filter(doc => doc.type === 'folder')
         const documents = data.documents.filter(doc => doc.type === 'document')
@@ -117,10 +73,7 @@ class Documents extends React.Component {
           userDocuments: documents,
         })
 
-        this.props.setLocation(newBreadcrumbs)
-
-        document.title = `${data.folder.name} -- Seltools`;
-        // this.props.history.push(`/documentos/${folderId}`)
+        document.title = `${data.folder.name} - Seltools`;
       })
   }
 
@@ -130,6 +83,10 @@ class Documents extends React.Component {
     if (confirmDelete) {
       const requestOptions = {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        },
       }
 
       const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -170,7 +127,11 @@ class Documents extends React.Component {
     const requestOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -209,7 +170,11 @@ class Documents extends React.Component {
     const requestOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentmove/${this.state.selectedDocumentId}`
@@ -230,7 +195,7 @@ class Documents extends React.Component {
     const folderName = window.prompt('¿Qué nombre tiene la nueva carpeta?')
 
     if (!!folderName && folderName.length > 0) {
-      const parent = this.props.breadcrumbs[this.props.breadcrumbs.length - 1].id
+      const parent = this.props.breadcrumbs[this.props.breadcrumbs.length - 1]._id
 
       const requestOptions = {
         method: 'POST',
@@ -239,7 +204,11 @@ class Documents extends React.Component {
           name: folderName,
           parent: parent,
           type: 'folder',
-        })
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        },
       }
 
       const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`
@@ -247,41 +216,52 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then((data) => {
-
-          this.getDocuments(parent)
-          // this.props.history.push(`/documentos/${parent}`)
-        })
-    }
-  }
-
-  handleAddStudent = () => {
-    const studentName = window.prompt('¿Cómo se llama tu nuevo alumno?')
-
-    if (!!studentName && studentName.length > 0) {
-      const parent = this.props.breadcrumbs[0].id
-
-      const requestOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          name: studentName,
-          parent: parent,
-          type: 'student',
-        })
-      }
-
-      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`
-
-      fetch(fetchUrl, requestOptions)
-        .then(response => response.json())
-        .then((data) => {
+          const folders = this.state.userFolders
+          folders.unshift({
+            _id: data.insertedId,
+            name: folderName,
+            type: 'folder',
+          })
 
           this.setState({
-            students: data,
+            userFolders: folders,
           })
         })
     }
   }
+
+  // handleAddStudent = () => {
+  //   const studentName = window.prompt('¿Cómo se llama tu nuevo alumno?')
+
+  //   if (!!studentName && studentName.length > 0) {
+  //     const parent = this.props.breadcrumbs[this.props.breadcrumbs.length - 1]._id
+
+  //     const requestOptions = {
+  //       method: 'POST',
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: JSON.stringify({
+  //         name: studentName,
+  //         teacherId: localStorage.getItem('seltoolsuserid'),
+  //         teacherFolder: localStorage.getItem('seltoolsuserfolder'),
+  //       }),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+  //       },
+  //     }
+
+  //     const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`
+
+  //     fetch(fetchUrl, requestOptions)
+  //       .then(response => response.json())
+  //       .then((data) => {
+
+  //         this.setState({
+  //           students: data,
+  //         })
+  //       })
+  //   }
+  // }
 
   handleRename = (documentId, documentName, documentType) => {
     const newName = window.prompt('Cambia el nombre:', documentName)
@@ -295,7 +275,11 @@ class Documents extends React.Component {
       const requestOptions = {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(documentObject)
+        body: JSON.stringify(documentObject),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        },
       }
   
       let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -336,7 +320,11 @@ class Documents extends React.Component {
     const requestOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -371,6 +359,10 @@ class Documents extends React.Component {
   handleCloneDocument = (documentId) => {
     const requestOptions = {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentclone/${documentId}`
@@ -405,15 +397,29 @@ class Documents extends React.Component {
 
     return(
       <MoveDialog
-        initialFolder={this.props.breadcrumbs[0].id}
-        user={this.state.user}
+        initialFolder={this.props.user.userfolder}
+        user={this.props.user}
         selectedDocumentId={this.state.selectedDocumentId}
         selectedDocumentName={this.state.selectedDocumentName}
         handleCloseButton={() => this.setState({isMoveDialogOpen: false})}
         handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+        setLocation={this.props.setLocation}
       >
       </MoveDialog>
     )
+  }
+
+  renderAddStudentDialog = () => {
+    if (!this.state.isAddStudentDialogOpen) return false
+
+    return(
+      <AddStudentDialog
+        getDocuments={this.getDocuments}
+        handleCloseButton={() => this.setState({isAddStudentDialogOpen: false})}
+      >
+      </AddStudentDialog>
+    )
+
   }
 
   renderDocuments = () => {
@@ -494,6 +500,7 @@ class Documents extends React.Component {
               </h4>
             </Link>
           </Card>
+          {this.props.user.type === 'teacher' &&
             <Popover
               autoFocus={false}
               content={<DropdownMenu
@@ -525,6 +532,7 @@ class Documents extends React.Component {
                 />
               </div>
             </Popover>
+          }
         </li>
       )
     }
@@ -552,7 +560,7 @@ class Documents extends React.Component {
                 className={Classes.MINIMAL}
                 intent={Intent.PRIMARY}
                 text='Nuevo alumno'
-                onClick={this.handleAddStudent}
+                onClick={() => this.setState({isAddStudentDialogOpen: true})}
               />
             </div>
           </div>
@@ -590,16 +598,18 @@ class Documents extends React.Component {
             >
               Carpetas
             </div>
-            <div>
-              <Button
-                type='button'
-                icon='folder-new'
-                className={Classes.MINIMAL}
-                intent={Intent.PRIMARY}
-                text='Nueva carpeta'
-                onClick={this.handleAddFolder}
-              />
-            </div>
+            {this.props.user.type === 'teacher' &&
+              <div>
+                <Button
+                  type='button'
+                  icon='folder-new'
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nueva carpeta'
+                  onClick={this.handleAddFolder}
+                />
+              </div>
+            }
           </div>
           <ul
             className='documents__documents'
@@ -636,17 +646,21 @@ class Documents extends React.Component {
             >
               Documentos
             </div>
-            <div>
-              <AnchorButton
-                type='button'
-                icon='add'
-                className={Classes.MINIMAL}
-                intent={Intent.PRIMARY}
-                text='Nuevo documento'
-                href={`/documento?parent=${this.props.match.params.folder}`}
-                style={{marginRight: '8px'}}
-              />
-            </div>
+            {this.props.user.type === 'teacher' &&
+              //TODO: Don't realod page, use onClick
+              <div>
+                <Button
+                  type='button'
+                  icon='add'
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nuevo documento'
+                  // href={`/documento?parent=${this.props.match.params.folder}`}
+                  style={{marginRight: '8px'}}
+                  onClick={() => this.props.history.push(`/documento?parent=${this.props.match.params.folder}`)}
+                />
+              </div>
+            }
           </div>
           <ul
             className='documents__documents'
@@ -667,7 +681,7 @@ class Documents extends React.Component {
 
     return (
       <div>
-        {this.props.breadcrumbs.length === 1 && students()}
+        {this.props.breadcrumbs.length === 1 && this.props.user.type == 'teacher' && students()}
         {folders()}
         {documents()}
       </div>
@@ -681,21 +695,23 @@ class Documents extends React.Component {
       files: [],
       filesOnLoad: [],
     })
-
-    this.auth()
     
+    if (!this.props.match.params.folder) {
+      this.getDocuments(this.props.user.userfolder)
+    } else {
+      this.getDocuments(this.props.match.params.folder)
+    }
+
     this.props.history.listen((location, action) => {
-      if (action !== 'PUSH') return false
+      if (location.pathname.indexOf('documentos') < 0) return
+
       const locationArray = location.pathname.split('/')
       const docId = locationArray[locationArray.length - 1]
       this.getDocuments(docId)
     })
-
   }
 
   render() {
-    if (!localStorage.getItem('userType') === 'teacher') return <div>No eres Sel!</div>
-
     return (
       <div
         className='App'
@@ -707,8 +723,11 @@ class Documents extends React.Component {
         }}
       >
         <TopBar
-          isLoadingDocuments={this.state.isLoadingDocuments}
+          isDocument={false}
+          isLoading={this.state.isLoadingDocuments}
+          user={this.props.user}
           breadcrumbs={this.props.breadcrumbs}
+          connectedStudents={this.props.connectedStudents}
         />
         <div
           style={{
@@ -723,10 +742,8 @@ class Documents extends React.Component {
           <div style={{
             margin: '0 0 32px',
           }}>
-            {!this.state.isLoadingDocuments &&
-              this.renderDocuments()
-            }
-            {this.state.isLoadingDocuments &&
+            {!this.state.isLoadingDocuments ?
+              this.renderDocuments() :
               <Spinner 
                 style={{
                   background: 'red',
@@ -736,6 +753,7 @@ class Documents extends React.Component {
           </div>
         </div>
         {this.renderMoveDialog()}
+        {this.renderAddStudentDialog()}
       </div>
     )
   }

@@ -82,9 +82,9 @@ class Header extends React.Component {
   }
 
 
-  componentDidMount() {
-    this.handleUnsaveDocument()
-  }
+  // componentDidMount() {
+  //   this.handleUnsaveDocument()
+  // }
 
   render() {
     return(
@@ -170,7 +170,7 @@ class Header extends React.Component {
                   return (
                     <li style={{cursor: 'pointer'}}>
                       <span className='bp3-breadcrumb' onClick={() => {
-                        this.props.history.push(this.props.isStudent ? `/alumno/documentos/${crumb.id}` : `/documentos/${crumb.id}`)
+                        this.props.history.push(this.props.isStudent ? `/alumno/documentos/${crumb._id}` : `/documentos/${crumb._id}`)
                       }}>
                         {crumb.type === 'student' && 
                           <div

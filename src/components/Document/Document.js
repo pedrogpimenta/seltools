@@ -21,6 +21,7 @@ import TextFile from '../TextFile/TextFile'
 import VideoEmbed from '../VideoEmbed/VideoEmbed'
 import FileWrapper from '../FileWrapper/FileWrapper'
 import Header from '../Header/Header'
+import TopBar from '../TopBar/TopBar'
 import Toolbar from '../Toolbar/Toolbar'
 
 class Document extends React.Component {
@@ -74,7 +75,11 @@ class Document extends React.Component {
     const requestOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
     
     fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`, requestOptions)
@@ -84,7 +89,8 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        this.props.socket.emit('document saved after unlock', this.state.user._id, this.props.id)
+        console.log('after unlockY')
+        this.props.socket.emit('document saved after unlock', this.props.user._id, this.props.id)
       })
     
   }
@@ -116,7 +122,11 @@ class Document extends React.Component {
     const requestOptions = {
       method: !this.props.id ? 'POST' : 'PUT',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = !this.props.id
@@ -144,19 +154,21 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        this.props.socket.emit('document saved', this.state.user._id, this.props.id)
+        console.log('sabed')
+        this.props.socket.emit('document saved', this.props.user._id, this.props.id || data.id)
       })
 
   }
 
   handleUnlock = () => {
-    this.props.socket.emit('unlock document', this.state.user._id, this.props.id)
+    this.props.socket.emit('unlock document', this.props.user._id, this.props.id)
   }
 
-  // socket = ''
-  
   componentWillUnmount() {
-    // this.props.socket.disconnect()
+    clearInterval(this.saveInterval)
+    if (!this.props.id) return
+
+    this.props.socket.emit('document close', this.props.user._id, this.props.id)
   }
 
   componentDidMount() {
@@ -165,252 +177,216 @@ class Document extends React.Component {
       files: [],
     })
 
-    const userName = this.props.isStudent ? localStorage.getItem('studentName') : 'Sel'
+    if (!this.props.match.params.id) {
+      const parent = new URLSearchParams(this.props.location.search).get('parent')
 
-    // this.props.socket = io(REACT_APP_SERVER_WS_URL)
-
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${userName}`)
-    .then(response => response.json())
-    .then(data => {
-      this.setState({
-        user: data.user,
-      })
-
-      if (!this.props.match.params.id) {
-        const parent = new URLSearchParams(this.props.location.search).get('parent')
-
-        if (!!parent) {
-          fetch(`${REACT_APP_SERVER_BASE_URL}/document/${parent}`)
-            .then(response => response.json())
-            .then(data => {
-              let newBreadcrumbs = []
-
-              if (data.breadcrumbs) {
-                newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
-                  return({
-                    icon: 'folder-open',
-                    id: crumb._id,
-                    text: crumb.name,
-                    type: crumb.type,
-                    color: crumb.color
-                  })
-                })
-              }
-      
-              newBreadcrumbs.push({
-                icon: data.document.type === 'folder' ? 'folder-open' : 'user',
-                text: data.document.name,
-                id: data.document._id,
-                type: data.document.type,
-                color: data.document.color,
-              })
-
-              newBreadcrumbs.push({icon: 'document', text: '', id: '', type: 'document'})
-            
-              if (this.props.isStudent) {
-                newBreadcrumbs.shift()
-              }
-
-              this.props.dispatch({
-                type: 'LOAD_FILES',
-                files: [],
-              })
-
-              this.props.dispatch({
-                type: 'CHANGE_DOCUMENT_ID',
-                id: '',
-              })
-
-              this.props.dispatch({
-                type: 'CHANGE_DOCUMENT_NAME',
-                name: '',
-              })
-
-              this.props.dispatch({
-                type: 'DOCUMENT_IS_LOCKED',
-                locked: false,
-                isLocked: false,
-                lockedBy: '',
-              })
-      
-              this.props.dispatch({
-                type: 'CHANGE_DOCUMENT_BREADCRUMBS',
-                breadcrumbs: newBreadcrumbs,
-              })
-
-              this.props.dispatch({
-                type: 'DOCUMENT_IS_LOADED',
-              })
-              
-              this.setState({
-                isLoadingDocument: false,
-              })
-
-            })
-        } 
-      } else {
-        fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
+      if (!!parent) {
+        fetch(`${REACT_APP_SERVER_BASE_URL}/document/${parent}`)
           .then(response => response.json())
           .then(data => {
-            const LSfiles = data.document.files || []
-
-            document.title = `${data.document.name} -- Seltools`;
-
-            if (LSfiles.length > 0) {
-              this.props.dispatch({
-                type: 'LOAD_FILES',
-                files: LSfiles,
-              })
+            const newBreadcrumbs = data.breadcrumbs
+            newBreadcrumbs.push({
+              icon: data.document.type === 'folder' ? 'folder-open' : 'document',
+              name: data.document.name,
+              _id: data.document._id,
+              type: data.document.type,
+              color: data.document.color,
+            })
+            newBreadcrumbs.push({
+              icon: 'document',
+              name: '',
+              _id: '',
+              type: 'document',
+            })
+            if (this.props.user.type === 'student') {
+              newBreadcrumbs.shift()
             }
+            this.props.setLocation(newBreadcrumbs)
 
-            // TODO: Improve so much dispatches
-
-            if (!this.props.isStudent) {
-              this.props.dispatch({
-                type: 'CHANGE_DOCUMENT_SHAREDWITH',
-                sharedWith: data.document.sharedWith,
-              })
-            }
+            this.props.dispatch({
+              type: 'LOAD_FILES',
+              files: [],
+            })
 
             this.props.dispatch({
               type: 'CHANGE_DOCUMENT_ID',
-              id: this.props.match.params.id,
+              id: '',
             })
 
             this.props.dispatch({
               type: 'CHANGE_DOCUMENT_NAME',
-              name: data.document.name,
+              name: '',
             })
-            
-            let newBreadcrumbs = [{icon: 'folder-open', text: this.props.isStudent ? localStorage.getItem('studentName') : 'Sel', id: '0', type: 'folder'}]
 
-            if (newBreadcrumbs.length > 0) {
-              newBreadcrumbs = data.breadcrumbs.map((crumb, i) => {
-                return({
-                  icon: 'folder-open',
-                  id: crumb._id,
-                  text: crumb.name,
-                  type: crumb.type,
-                  color: crumb.color,
-                })
-              })
-            }
-            
-            newBreadcrumbs.push({icon: 'document', text: data.document.name, id: data.document._id, type: data.document.type})
-          
-            if (this.props.isStudent) {
-              newBreadcrumbs.shift()
-            }
-
+            this.props.dispatch({
+              type: 'DOCUMENT_IS_LOCKED',
+              locked: false,
+              isLocked: false,
+              lockedBy: '',
+            })
+    
             this.props.dispatch({
               type: 'CHANGE_DOCUMENT_BREADCRUMBS',
               breadcrumbs: newBreadcrumbs,
             })
 
             this.props.dispatch({
-              type: 'CHANGE_DOCUMENT_SHARED',
-              shared: data.document.shared,
+              type: 'DOCUMENT_IS_LOADED',
             })
             
-            this.props.dispatch({
-              type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
-              modifiedDate: data.document.modifiedDate,
-            })
-
-            this.props.dispatch({
-              type: "DOCUMENT_IS_LOADED",
-            })
-
-            this.props.dispatch({
-              type: 'DOCUMENT_IS_LOCKED',
-              locked: data.document.locked,
-              isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
-              lockedBy: data.document.lockedBy,
-            })
-
             this.setState({
               isLoadingDocument: false,
             })
-
-            // WebSockets
-
-            this.props.socket.emit('document open', this.state.user._id, data.document._id)
-            // this.props.socket.on('connect', () => {
-            //   console.log('1')
-
-            //   this.props.socket.emit('document open', this.state.user._id, data.document._id)
-            // })
-
-            this.props.socket.on('document reload', (documentId) => {
-              if (documentId === this.props.id) {
-                // TODO: make this a function
-              fetch(`${REACT_APP_SERVER_BASE_URL}/document/${documentId}`)
-                .then(response => response.json())
-                .then(data => {
-                  const LSfiles = data.document.files || []
-
-                  document.title = `${data.document.name} -- Seltools`;
-
-                  if (LSfiles.length > 0) {
-                    this.props.dispatch({
-                      type: 'LOAD_FILES',
-                      files: LSfiles,
-                      noReset: true,
-                    })
-                  }
-
-                  this.props.dispatch({
-                    type: 'CHANGE_DOCUMENT_NAME',
-                    name: data.document.name,
-                  })
-
-                  this.props.dispatch({
-                    type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
-                    modifiedDate: data.document.modifiedDate,
-                  })
-      
-
-                  if (data.document.locked) {
-                    this.props.dispatch({
-                      type: 'DOCUMENT_IS_LOCKED',
-                      locked: data.document.locked,
-                      isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
-                      lockedBy: data.document.lockedBy,
-                    })
-
-                    this.props.dispatch({
-                      type: "DOCUMENT_IS_LOADED",
-                    })
-                  } else {
-                    this.props.dispatch({
-                      type: 'DOCUMENT_IS_LOCKED',
-                      locked: data.document.locked,
-                      isLocked: data.document.locked && data.document.lockedBy !== this.state.user._id,
-                      lockedBy: data.document.lockedBy,
-                    })
-
-                    this.props.dispatch({
-                      type: "DOCUMENT_IS_LOADED",
-                    })
-
-                    this.handleSaveDocument()
-                  }
-                })
-              }
-            })
-
-            this.props.socket.on('save and lock document', (userId, documentId) => {
-              if (documentId === this.props.id && userId !== this.state.user._id) {
-                this.handleSaveAndLockDocument()
-              }
-            })
           })
-      }
-    })
+      } 
+    } else {
+      fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
+        .then(response => response.json())
+        .then(data => {
+          const LSfiles = data.document.files || []
 
+          document.title = `${data.document.name} -- Seltools`
+
+          const newBreadcrumbs = data.breadcrumbs
+          newBreadcrumbs.push({
+            icon: data.document.type === 'folder' ? 'folder-open' : 'document',
+            name: data.document.name,
+            _id: data.document._id,
+            type: data.document.type,
+            color: data.document.color,
+          })
+          if (this.props.user.type === 'student') {
+            newBreadcrumbs.shift()
+          }
+          this.props.setLocation(newBreadcrumbs)
+
+          if (LSfiles.length > 0) {
+            this.props.dispatch({
+              type: 'LOAD_FILES',
+              files: LSfiles,
+            })
+          }
+
+          if (!this.props.isStudent) {
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_SHAREDWITH',
+              sharedWith: data.document.sharedWith,
+            })
+          }
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_ID',
+            id: this.props.match.params.id,
+          })
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_NAME',
+            name: data.document.name,
+          })
+          
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_BREADCRUMBS',
+            breadcrumbs: newBreadcrumbs,
+          })
+
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_SHARED',
+            shared: data.document.shared,
+          })
+          
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+            modifiedDate: data.document.modifiedDate,
+          })
+
+          this.props.dispatch({
+            type: "DOCUMENT_IS_LOADED",
+          })
+
+          this.props.dispatch({
+            type: 'DOCUMENT_IS_LOCKED',
+            locked: data.document.locked,
+            isLocked: data.document.locked && data.document.lockedBy !== this.props.user._id,
+            lockedBy: data.document.lockedBy,
+          })
+
+          this.setState({
+            isLoadingDocument: false,
+          })
+
+          // WebSockets
+
+          this.props.socket.emit('document open', this.props.user._id, data.document._id)
+
+          this.props.socket.on('document reload', (documentId) => {
+            if (documentId === this.props.id) {
+              // TODO: make this a function
+            fetch(`${REACT_APP_SERVER_BASE_URL}/document/${documentId}`)
+              .then(response => response.json())
+              .then(data => {
+                const LSfiles = data.document.files || []
+
+                document.title = `${data.document.name} -- Seltools`;
+
+                if (LSfiles.length > 0) {
+                  this.props.dispatch({
+                    type: 'LOAD_FILES',
+                    files: LSfiles,
+                    noReset: true,
+                  })
+                }
+
+                this.props.dispatch({
+                  type: 'CHANGE_DOCUMENT_NAME',
+                  name: data.document.name,
+                })
+
+                this.props.dispatch({
+                  type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+                  modifiedDate: data.document.modifiedDate,
+                })
+    
+
+                if (data.document.locked) {
+                  this.props.dispatch({
+                    type: 'DOCUMENT_IS_LOCKED',
+                    locked: data.document.locked,
+                    isLocked: data.document.locked && data.document.lockedBy !== this.props.user._id,
+                    lockedBy: data.document.lockedBy,
+                  })
+
+                  this.props.dispatch({
+                    type: "DOCUMENT_IS_LOADED",
+                  })
+                } else {
+                  this.props.dispatch({
+                    type: 'DOCUMENT_IS_LOCKED',
+                    locked: data.document.locked,
+                    isLocked: data.document.locked && data.document.lockedBy !== this.props.user._id,
+                    lockedBy: data.document.lockedBy,
+                  })
+
+                  this.props.dispatch({
+                    type: "DOCUMENT_IS_LOADED",
+                  })
+
+                  this.handleSaveDocument()
+                }
+              })
+            }
+          })
+
+          this.props.socket.on('save and lock document', (userId, documentId) => {
+            if (documentId === this.props.id && userId !== this.props.user._id) {
+              this.handleSaveAndLockDocument()
+            }
+          })
+        })
+    }
+
+    this.handleUnsaveDocument()
   }
 
- 
   handleFileInputChange = (e) => {
     this.setState({uploadingFiles: true})
 
@@ -486,9 +462,6 @@ class Document extends React.Component {
       type: 'CHANGE_DOCUMENT_NAME',
       name: e,
     })
-  }
-
-  getUser = () => {
   }
 
   handleMoveOneUp = (fileIndex) => {
@@ -735,6 +708,67 @@ class Document extends React.Component {
     alert('En este momento, tu profe está revisando el documento. Vuelve más tarde ;)')
   }
 
+  // functions for topbar
+  handleShareDocument = () => {
+    console.log('1')
+    const documentObject = {
+      shared: !this.props.shared,
+    }
+
+    const requestOptions = {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
+    }
+
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`
+
+    fetch(fetchUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        fetch(fetchUrl)
+        .then(response => response.json())
+        .then(data => {
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_SHARED',
+            shared: data.document.shared,
+          })
+
+        })
+      })
+  }
+
+  handleNameInputConfirm = (e) => {
+    if (e.trim() === '') return
+
+    this.props.dispatch({
+      type: 'CHANGE_DOCUMENT_NAME',
+      name: e,
+    })
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
+
+    this.setState({
+      showEditDialog: false,
+    })
+  }
+
+  handleUnsaveDocument = () => {
+    this.saveInterval = setInterval(() => {
+      console.log('doin 1')
+      if (!this.props.isSaved) {
+      console.log('doin 2')
+        this.handleSaveDocument(true)
+      }
+    }, 10000)
+  }
+
   render() {
     return (
       <div
@@ -756,12 +790,25 @@ class Document extends React.Component {
             cursor: this.props.dragging ? 'grabbing' : 'default',
           }}
         >
-          <Header
+          <TopBar
+            socket={this.props.socket}
+            user={this.props.user}
+            isLoading={this.state.isLoadingDocument}
+            breadcrumbs={this.props.breadcrumbs}
+            connectedStudents={this.props.connectedStudents}
+            
+            isDocument={true}
+            documentName={this.props.name}
+            documentIsLocked={this.props.isLocked}
+            documentIsSaved={this.props.isSaved}
+            documentIsSaving={this.props.isSaving}
+            documentIsShared={this.props.shared}
+            
+            handleShareDocument={this.handleShareDocument}
+            handleNameInputConfirm={this.handleNameInputConfirm}
             handleSaveDocument={this.handleSaveDocument}
             handleUnlock={this.handleUnlock}
-            socket={this.props.socket}
-            user={this.state.user}
-            isStudent={this.props.isStudent}
+            // isStudent={this.props.isStudent}
           />
           <div
             className='document'

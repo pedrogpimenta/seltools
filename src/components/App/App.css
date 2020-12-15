@@ -85,7 +85,7 @@ button:focus {
 /* Navbar */
 .bp3-navbar {
   display: flex;
-  overflow: auto;
+  overflow: hidden;
   justify-content: space-between;
   /* background-color: var(--c-primary-lightest); */
   box-shadow: none;

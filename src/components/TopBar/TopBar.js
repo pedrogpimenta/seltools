@@ -1,25 +1,38 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
 
 import {
   Alignment,
-  Intent,
   Button,
   Classes,
   EditableText,
   Icon,
+  Intent,
+  Menu,
+  MenuItem,
   Navbar,
   NavbarDivider,
   NavbarGroup,
   NavbarHeading,
   Tag,
+  Tooltip,
   Switch,
+  Popover,
+  PopoverInteractionKind,
+  Position,
 } from "@blueprintjs/core"
 
 import IconSel from '../IconSel/IconSel'
 
 class TopBar extends React.Component {
+  handleLogout = () => {
+    localStorage.removeItem('seltoolstoken')
+    localStorage.removeItem('seltoolsuserid')
+    localStorage.removeItem('seltoolsuserfolder')
+
+    this.props.history.push('/')
+  }
+
   render() {
     return(
       <Navbar
@@ -52,16 +65,24 @@ class TopBar extends React.Component {
           <div
             style={{marginLeft: '8px'}}
           >
-            {!this.props.isLoadingDocuments &&
+            {!this.props.isLoading &&
               <ul className='bp3-overflow-list bp3-breadcrumbs'>
                 {this.props.breadcrumbs.map((crumb, i) => {
-                  const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
+                  const icon =
+                    crumb.name === 'Sel' ?
+                    <IconSel /> :
+                    crumb.type === 'folder' ?
+                      'folder-open' :
+                      crumb.type === 'user' ?
+                        <Icon icon='user' /> :
+                        'document'
+
                   return (
-                    <li key={`crumb-${crumb.id}`}>
+                    <li key={`crumb-${crumb._id}`}>
                       <span
                         className={`bp3-breadcrumb ${this.props.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
                         onClick={() => {
-                          this.props.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb.id}`)
+                          this.props.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb._id}`)
                         }}
                       >
                         {crumb.type === 'student' && 
@@ -80,7 +101,7 @@ class TopBar extends React.Component {
                               fontWeight: '700',
                             }}
                           >
-                            {crumb.text.substr(0, 1).toUpperCase()}
+                            {crumb.name && crumb.name.substr(0, 1).toUpperCase()}
                           </div>
                         }
                         {crumb.type !== 'student' && 
@@ -90,7 +111,18 @@ class TopBar extends React.Component {
                             className='bp3-icon'
                           />
                         }
-                        {crumb.text}
+                        {this.props.user.type === 'teacher' && crumb.type === 'document' &&
+                          <EditableText
+                            style={{color: 'black'}}
+                            defaultValue={this.props.documentName}
+                            placeholder='Nuevo documento'
+                            confirmOnEnterKey={true}
+                            onConfirm={(e) => this.props.handleNameInputConfirm(e)}
+                          ></EditableText>
+                        }
+                        {crumb.type !== 'document' && 
+                          crumb.name
+                        }
                       </span>
                     </li>
                   )}
@@ -100,28 +132,108 @@ class TopBar extends React.Component {
           </div>
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
+          {this.props.connectedStudents &&
+            <div
+              style={{
+                display: 'flex',
+              }}
+            >
+              {this.props.connectedStudents.map((student) => {
+                return(
+                  <Tooltip
+                    key={student._id}
+                    content={student.username}
+                    position={Position.BOTTOM}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center', 
+                        width: '18px',
+                        height: '18px',
+                        backgroundColor: document.color || 'black',
+                        color: 'white',
+                        borderRadius: '50%',
+                        marginRight: '6px',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        userSelect: 'none',
+                      }}
+                    >
+                      {student.username.substr(0, 1).toUpperCase()}
+                    </div>
+                  </Tooltip>
+                )
+              })}
+            </div>
+          }
+          {this.props.isDocument && 
+            <>
+              <NavbarDivider />
+              {!this.props.isStudent && !this.props.isLocked &&
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderRadius: '3px',
+                    fontSize: '14px',
+                    justifyContent: 'center',
+                    padding: '5px 10px',
+                    textAlign: 'left',
+                    verticalAlign: 'middle',
+                    minHeight: '30px',
+                    minWidth: '30px',
+                    border: '1px solid rgba(24,32,38,.2)',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <Switch
+                    style={{marginBottom: '0'}}
+                    checked={this.props.documentIsShared}
+                    label="Compartido"
+                    onChange={this.props.handleShareDocument}
+                  />
+                </div>
+              }
+              {this.props.isDocument && !this.props.documentIsLocked &&
+                <Button
+                  intent={this.props.documentName ? this.props.documentIsSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
+                  loading={this.props.documentIsSaving}
+                  style={{marginRight: '8px', marginLeft: '8px'}}
+                  disabled={!this.props.documentName}
+                  icon="floppy-disk"
+                  text={this.props.documentIsSaved ? "¡Guardado!" : "Guardar"}
+                  onClick={(e) => this.props.handleSaveDocument(true)}
+                />
+              }
+            </>
+          }
+          <NavbarDivider />
+          <Popover
+              autoFocus={false}
+              interactionKind={PopoverInteractionKind.HOVER}
+              position={Position.BOTTOM_RIGHT}
+              hoverOpenDelay={0}
+              content={
+                <Menu
+                  className={Classes.ELEVATION_2}
+                >
+                  <MenuItem
+                    icon='log-out'
+                    text="Salir"
+                    onClick={this.handleLogout}
+                  />
+                </Menu>
+              }
+            >
+              <Button className={Classes.MINIMAL} icon="user" />
+            </Popover>
         </NavbarGroup>
       </Navbar>
     )
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    // id: state.id,
-    // name: state.name,
-    // breadcrumbs: state.breadcrumbs || [],
-    // files: state.files,
-    // students: state.students,
-    // shared: state.shared || false,
-    // isSaved: state.isSaved,
-    // isSaving: state.isSaving,
-    // locked: state.locked,
-    // isLocked: state.isLocked,
-    // lockedBy: state.lockedBy,
-    // editMode: state.editMode,
-    // modifiedDate: state.modifiedDate,
-  }
-}
-
-export default connect(mapStateToProps)(withRouter(TopBar))
+export default withRouter(TopBar)

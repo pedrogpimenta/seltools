@@ -1,7 +1,10 @@
 import React from 'react'
 import {
-  AnchorButton,
-  Card,
+  withRouter
+} from "react-router-dom"
+import {
+  Button,
+  Classes,
   Intent,
 } from "@blueprintjs/core"
 
@@ -34,11 +37,19 @@ class Landing extends React.Component {
               />
             </div>
             <div>
-              <AnchorButton
+              <Button
                 type='button'
                 intent={Intent.PRIMARY}
-                text='Área de profe'
-                href='/documentos'
+                text='Registro'
+                onClick={() => this.props.history.push('/registro')}
+              />
+            </div>
+            <div>
+              <Button
+                type='button'
+                intent={Intent.PRIMARY}
+                text='Entrar'
+                onClick={() => this.props.history.push('/entrar')}
               />
             </div>
           </div>
@@ -67,29 +78,6 @@ class Landing extends React.Component {
                 Una ayudita para profes y alumnos online
               </h1>
             </div>
-            <div>
-              <Card
-                style={{
-                  width: '300px',
-                  padding: '4px 16px 24px',
-                  marginBottom: '12px',
-                  border: 'none',
-                  boxShadow: 'none',
-                }}
-              >
-                <h2
-                  style={{
-                    marginBottom: '30px',
-                  }}
-                >¿Eres alumno?</h2>
-                <AnchorButton
-                  type='button'
-                  intent={Intent.PRIMARY}
-                  text='Entra en el área de alumno'
-                  href='/alumno/documentos'
-                />
-              </Card>
-            </div>
           </div>
         </div>
       </div>
@@ -97,4 +85,4 @@ class Landing extends React.Component {
   }
 }
 
-export default Landing
+export default withRouter(Landing)

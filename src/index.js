@@ -10,10 +10,11 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect,
 } from "react-router-dom"
 
 import Landing from './components/Landing/Landing'
+import Login from './components/Login/Login'
+import Register from './components/Register/Register'
 import App from './components/App/App'
 
 ReactDOM.render(
@@ -23,6 +24,12 @@ ReactDOM.render(
         <Switch>
           <Route exact path="/">
             <Landing />
+          </Route>
+          <Route exact path="/registro">
+            <Register />
+          </Route>
+          <Route exact path="/entrar">
+            <Login />
           </Route>
           <Route path="/">
             <App />

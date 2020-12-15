@@ -41,11 +41,13 @@ class DropdownMenu extends React.Component {
             onClick={(e) => this.props.handleShareDocument(this.props.documentId, this.props.documentShared, this.props.documentType)}
           />
         }
-        <MenuItem
-          icon="edit"
-          text="Cambiar nombre..."
-          onClick={(e) => this.props.handleRename(this.props.documentId, this.props.documentName, this.props.documentType)}
-        />
+        {this.props.documentType !== 'student' &&
+          <MenuItem
+            icon="edit"
+            text="Cambiar nombre..."
+            onClick={(e) => this.props.handleRename(this.props.documentId, this.props.documentName, this.props.documentType)}
+          />
+        }
         <MenuItem
           icon="tint"
           text="Color"
