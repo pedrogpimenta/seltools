@@ -5,10 +5,8 @@ import {
   Classes,
   Dialog,
   FormGroup,
-  Icon,
   InputGroup,
   Intent,
-  Spinner,
 } from "@blueprintjs/core"
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
@@ -30,7 +28,6 @@ class MoveDialog extends React.Component {
   handleAddStudent = () => {
     const requestOptions = {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         name: this.state.name,
         email: this.state.email,

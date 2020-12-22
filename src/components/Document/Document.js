@@ -4,8 +4,6 @@ import { connect } from 'react-redux'
 import { Beforeunload } from 'react-beforeunload'
 import axios from 'axios'
 
-import io from 'socket.io-client'
-
 import {
   Intent,
   Button,
@@ -13,7 +11,7 @@ import {
   Spinner,
 } from "@blueprintjs/core"
 
-import { REACT_APP_SERVER_BASE_URL, REACT_APP_SERVER_WS_URL } from '../../CONSTANTS'
+import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
@@ -73,7 +71,6 @@ class Document extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject),
       headers: {
         'Content-Type': 'application/json',
@@ -120,7 +117,6 @@ class Document extends React.Component {
 
     const requestOptions = {
       method: !this.props.id ? 'POST' : 'PUT',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject),
       headers: {
         'Content-Type': 'application/json',
@@ -723,7 +719,6 @@ class Document extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject),
       headers: {
         'Content-Type': 'application/json',

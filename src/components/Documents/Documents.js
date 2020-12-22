@@ -1,10 +1,9 @@
 import React from 'react'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { store } from '../../store/store'
 import { cloneDeep } from 'lodash'
 
 import {
-  AnchorButton,
   Button,
   Classes,
   Card,
@@ -131,7 +130,6 @@ class Documents extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject),
       headers: {
         'Content-Type': 'application/json',
@@ -174,7 +172,6 @@ class Documents extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject),
       headers: {
         'Content-Type': 'application/json',
@@ -204,7 +201,6 @@ class Documents extends React.Component {
 
       const requestOptions = {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           name: folderName,
           parent: parent,
@@ -235,39 +231,6 @@ class Documents extends React.Component {
     }
   }
 
-  // handleAddStudent = () => {
-  //   const studentName = window.prompt('¿Cómo se llama tu nuevo alumno?')
-
-  //   if (!!studentName && studentName.length > 0) {
-  //     const parent = this.props.breadcrumbs[this.props.breadcrumbs.length - 1]._id
-
-  //     const requestOptions = {
-  //       method: 'POST',
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: JSON.stringify({
-  //         name: studentName,
-  //         teacherId: localStorage.getItem('seltoolsuserid'),
-  //         teacherFolder: localStorage.getItem('seltoolsuserfolder'),
-  //       }),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
-  //       },
-  //     }
-
-  //     const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`
-
-  //     fetch(fetchUrl, requestOptions)
-  //       .then(response => response.json())
-  //       .then((data) => {
-
-  //         this.setState({
-  //           students: data,
-  //         })
-  //       })
-  //   }
-  // }
-
   handleRename = (documentId, documentName, documentType) => {
     const newName = window.prompt('Cambia el nombre:', documentName)
 
@@ -279,7 +242,6 @@ class Documents extends React.Component {
   
       const requestOptions = {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(documentObject),
         headers: {
           'Content-Type': 'application/json',
@@ -324,7 +286,6 @@ class Documents extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(documentObject),
       headers: {
         'Content-Type': 'application/json',
@@ -692,7 +653,7 @@ class Documents extends React.Component {
 
     return (
       <div>
-        {this.props.breadcrumbs.length === 1 && this.props.user.type == 'teacher' && students()}
+        {this.props.breadcrumbs.length === 1 && this.props.user.type === 'teacher' && students()}
         {folders()}
         {documents()}
       </div>

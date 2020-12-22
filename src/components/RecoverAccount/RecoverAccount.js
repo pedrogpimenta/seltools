@@ -6,17 +6,12 @@ import {
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 import {
-  AnchorButton,
   Button,
-  Classes,
   Card,
   Elevation,
   FormGroup,
-  Icon,
   InputGroup,
   Intent,
-  Popover,
-  Spinner,
 } from "@blueprintjs/core"
 
 class RecoverAccount extends React.Component {
