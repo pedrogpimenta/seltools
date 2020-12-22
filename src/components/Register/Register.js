@@ -26,6 +26,7 @@ class Register extends React.Component {
     this.state = {
       email: '',
       password: '',
+      secret: '',
       name: '',
       type: '',
       teacher: '',
@@ -157,10 +158,25 @@ class Register extends React.Component {
                 onChange={(e) => this.setState({password: e.target.value})}
               />
             </FormGroup>
+            <FormGroup
+              label="Código secreto"
+              labelFor="secret-input"
+              helperText="Puedes encontrar tu código secreto junto a tu invitación a Seldocs."
+              style={{
+                margin: '8px 0',
+              }}
+            >
+              <InputGroup
+                id="secret-input"
+                type="text"
+                onChange={(e) => this.setState({secret: e.target.value})}
+              />
+            </FormGroup>
             <Button
               type='submit'
               intent={Intent.PRIMARY}
-              className={Classes.MINIMAL}
+              disabled={this.state.secret !== '12345'}
+              // className={Classes.MINIMAL}
               text='Regístrate'
               style={{
                 alignSelf: 'center',
@@ -177,7 +193,7 @@ class Register extends React.Component {
                 color: '#5c7080',
               }}
             >
-              Seltools no está listo todavía. Si quieres probarlo, <a href="mailto:seltools@hablaconsel.com">mandame un email y hablamos</a>.
+              Seldocs no está listo todavía. Si quieres probarlo, <a href="mailto:hola@seldocs.com">mandame un email y hablamos</a>.
             </p>
           </form>
         </Card>

@@ -49,9 +49,14 @@ class Documents extends React.Component {
       },
     }
 
-    let fetchUrl = localStorage.getItem('seltoolsuserfolder') === folderId ?
-      `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?isTeacherFolder=true` :
-      `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`
+
+
+    let fetchUrl =
+      this.props.user.type === 'student' ? // is user a student?
+        `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?userIsStudent=true` :
+        localStorage.getItem('seltoolsuserfolder') === folderId ? // is current folder the root teacher folder?
+          `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?isTeacherFolder=true` :
+          `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
@@ -73,7 +78,7 @@ class Documents extends React.Component {
           userDocuments: documents,
         })
 
-        document.title = `${data.folder.name} - Seltools`;
+        document.title = `${data.folder.name} - Seldocs`;
       })
   }
 
@@ -439,7 +444,7 @@ class Documents extends React.Component {
               padding: '0',
             }}
           >
-            <Link
+            <div
               style={{
                 position: 'relative',
                 display: 'flex',
@@ -450,7 +455,11 @@ class Documents extends React.Component {
                 padding: '8px',
                 overflow: 'hidden',
               }}
-              to={`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`}
+              onClick={() => {
+                this.props.history.push(`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`)
+                if (document.type !== 'document') this.getDocuments(document._id)
+              }}
+              // to={`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`}
             >
               {document.type === 'student' &&
                 <div
@@ -474,7 +483,9 @@ class Documents extends React.Component {
               }
               {document.type !== 'student' &&
                 <Icon
-                  icon={document.type === 'document' && document.shared === true ? 'document-share' :
+                  icon={this.props.user.type === 'student' && document.type === 'document' ? 'document' : 
+                        this.props.user.type === 'student' && document.type === 'folder' ? 'folder-close' : 
+                        document.type === 'document' && document.shared === true ? 'document-share' :
                         document.type === 'document' ? 'document' :
                         document.type === 'folder' && document.shared === true ? 'folder-shared' :
                         document.type === 'folder' ? 'folder-close' :
@@ -498,7 +509,7 @@ class Documents extends React.Component {
               >
                 {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
               </h4>
-            </Link>
+            </div>
           </Card>
           {this.props.user.type === 'teacher' &&
             <Popover
@@ -703,7 +714,7 @@ class Documents extends React.Component {
     }
 
     this.props.history.listen((location, action) => {
-      if (location.pathname.indexOf('documentos') < 0) return
+      if (action !== 'POP') return
 
       const locationArray = location.pathname.split('/')
       const docId = locationArray[locationArray.length - 1]
@@ -728,6 +739,8 @@ class Documents extends React.Component {
           user={this.props.user}
           breadcrumbs={this.props.breadcrumbs}
           connectedStudents={this.props.connectedStudents}
+          getDocuments={this.getDocuments}
+          isStudent={this.props.user.type === 'student'}
         />
         <div
           style={{

@@ -1,6 +1,10 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 
+import TimeAgo from 'javascript-time-ago'
+import es from 'javascript-time-ago/locale/es'
+import ReactTimeAgo from 'react-time-ago'
+
 import {
   Alignment,
   Button,
@@ -23,6 +27,8 @@ import {
 } from "@blueprintjs/core"
 
 import IconSel from '../IconSel/IconSel'
+
+TimeAgo.addDefaultLocale(es)
 
 class TopBar extends React.Component {
   handleLogout = () => {
@@ -57,7 +63,7 @@ class TopBar extends React.Component {
                   maxHeight: '44px',
                 }}
                 src="/assets/images/logo-seltools.png"
-                alt= "Seltools"
+                alt= "Seldocs"
               />
             </div>
           </NavbarHeading>
@@ -82,7 +88,10 @@ class TopBar extends React.Component {
                       <span
                         className={`bp3-breadcrumb ${this.props.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
                         onClick={() => {
-                          this.props.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb._id}`)
+                          if (this.props.breadcrumbs.length - 1 !== i) {
+                            this.props.history.push(`/documentos/${crumb._id}`)
+                            if (!this.props.isDocument) this.props.getDocuments(crumb._id)
+                          }
                         }}
                       >
                         {crumb.type === 'student' && 
@@ -120,6 +129,9 @@ class TopBar extends React.Component {
                             onConfirm={(e) => this.props.handleNameInputConfirm(e)}
                           ></EditableText>
                         }
+                        {this.props.user.type !== 'teacher' && crumb.type === 'document' &&
+                          crumb.name
+                        }
                         {crumb.type !== 'document' && 
                           crumb.name
                         }
@@ -132,7 +144,7 @@ class TopBar extends React.Component {
           </div>
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
-          {this.props.connectedStudents &&
+          {!this.props.isStudent && this.props.connectedStudents &&
             <div
               style={{
                 display: 'flex',
@@ -166,12 +178,42 @@ class TopBar extends React.Component {
                   </Tooltip>
                 )
               })}
+              <NavbarDivider />
             </div>
           }
           {this.props.isDocument && 
             <>
-              <NavbarDivider />
-              {!this.props.isStudent && !this.props.isLocked &&
+              {!this.props.isStudent && this.props.documentIsLocked &&
+                <>
+                  <Button
+                    className={`btn--lock ${Classes.MINIMAL}`}
+                    intent={Intent.DANGER}
+                    style={{marginRight: '8px', marginLeft: '8px'}}
+                    icon="lock"
+                    // text="Desbloquear"
+                    onClick={this.props.handleUnlock}
+                  />
+                  <Tag
+                    className={Classes.MINIMAL}
+                    intent={Intent.DANGER}
+                    large='true'
+                    icon='time'
+                  >
+                    <ReactTimeAgo date={this.props.modifiedDate} locale="en-US"/>
+                  </Tag>
+                </>
+              }
+              {this.props.isStudent && this.props.documentIsLocked && 
+                <Tag
+                  className={Classes.Minimal}
+                  intent={Intent.DANGER}
+                  large='true'
+                  icon='lock'
+                >
+                  Documento bloqueado
+                </Tag>
+              }
+              {!this.props.isStudent && !this.props.documentIsLocked &&
                 <div
                   style={{
                     display: 'inline-flex',
@@ -197,7 +239,7 @@ class TopBar extends React.Component {
                   />
                 </div>
               }
-              {this.props.isDocument && !this.props.documentIsLocked &&
+              {!this.props.documentIsLocked &&
                 <Button
                   intent={this.props.documentName ? this.props.documentIsSaved ? Intent.SUCCESS : Intent.PRIMARY : Intent.DEFAULT}
                   loading={this.props.documentIsSaving}
@@ -208,9 +250,9 @@ class TopBar extends React.Component {
                   onClick={(e) => this.props.handleSaveDocument(true)}
                 />
               }
+              <NavbarDivider />
             </>
           }
-          <NavbarDivider />
           <Popover
               autoFocus={false}
               interactionKind={PopoverInteractionKind.HOVER}

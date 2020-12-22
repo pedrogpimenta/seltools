@@ -110,7 +110,7 @@ class Header extends React.Component {
                   maxHeight: '44px',
                 }}
                 src="/assets/images/logo-seltools.png"
-                alt= "Seltools"
+                alt= "Seldocs"
               />
             </div>
           </NavbarHeading>

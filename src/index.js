@@ -15,6 +15,8 @@ import {
 import Landing from './components/Landing/Landing'
 import Login from './components/Login/Login'
 import Register from './components/Register/Register'
+import RecoverAccount from './components/RecoverAccount/RecoverAccount'
+import ResetPass from './components/ResetPass/ResetPass'
 import App from './components/App/App'
 
 ReactDOM.render(
@@ -30,6 +32,12 @@ ReactDOM.render(
           </Route>
           <Route exact path="/entrar">
             <Login />
+          </Route>
+          <Route exact path="/recuperar">
+            <RecoverAccount />
+          </Route>
+          <Route exact path="/restablecer/:recoveryId">
+            <ResetPass />
           </Route>
           <Route path="/">
             <App />

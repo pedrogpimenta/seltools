@@ -129,7 +129,6 @@ class Login extends React.Component {
             <Button
               type='submit'
               intent={Intent.PRIMARY}
-              className={Classes.MINIMAL}
               text='Entrar'
               style={{
                 alignSelf: 'center',

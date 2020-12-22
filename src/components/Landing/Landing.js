@@ -33,7 +33,7 @@ class Landing extends React.Component {
                   height: '80px',
                 }}
                 src="/assets/images/logo-seltools.png"
-                alt= "Seltools"
+                alt= "Seldocs"
               />
             </div>
             <div>
