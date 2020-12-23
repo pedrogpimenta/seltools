@@ -16,6 +16,7 @@ import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
 import AudioFile from '../AudioFile/AudioFile'
 import TextFile from '../TextFile/TextFile'
+import DrawFile from '../DrawFile/DrawFile'
 import VideoEmbed from '../VideoEmbed/VideoEmbed'
 import FileWrapper from '../FileWrapper/FileWrapper'
 import TopBar from '../TopBar/TopBar'
@@ -500,6 +501,18 @@ class Document extends React.Component {
     })  
   }
 
+  handleAddDrawFile = (fileIndex, creator) => {
+    this.props.dispatch({
+      type: "ADD_DRAW_FILE",
+      position: fileIndex,
+      creator: creator,
+    })
+
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    })  
+  }
+
   handleAddFile = (e, fileIndex, creator) => {
     this.setState({
       addFileIndex: fileIndex,
@@ -619,6 +632,13 @@ class Document extends React.Component {
           style={{margin: '0 4px'}}
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
+          icon='draw'
+          onClick={() => this.handleAddDrawFile(this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
+        />
+        <Button
+          style={{margin: '0 4px'}}
+          intent={Intent.DEFAULT}
+          className={Classes.MINIMAL}
           icon='new-text-box'
           onClick={() => this.handleAddTextFile(i - 1, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
@@ -668,6 +688,14 @@ class Document extends React.Component {
         margin: '18px auto',
         opacity: '.6',
       }}>
+        <Button
+          style={{margin: '0 8px'}}
+          intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
+          className={this.props.files.length > 0 ? Classes.MINIMAL : null}
+          icon='draw'
+          large={true}
+          onClick={() => this.handleAddDrawFile(this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
+        />
         <Button
           style={{margin: '0 8px'}}
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
@@ -883,6 +911,9 @@ class Document extends React.Component {
                       }
                       {((file.type && file.type.toLowerCase() === 'videoembed')) &&
                         <VideoEmbed file={file} />
+                      }
+                      {(file.type && file.type.toLowerCase() === 'draw') &&
+                        <DrawFile file={file} fileHasRendered={this.fileHasRendered} />
                       }
                     </FileWrapper>
                   </div>

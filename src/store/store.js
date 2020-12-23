@@ -358,6 +358,25 @@ function reducer(state = initialState, action) {
         ...state,
         files: filesForLS,
       }
+
+    case 'ADD_DRAW_FILE':
+      filesForLS = updatedFiles.slice()
+      const drawFileToAdd = {
+        id: `draw-file-${Math.floor((Math.random() * 100000) + 1)}`,
+        type: 'draw',
+        name: null,
+        markers: [],
+        content: '',
+        creator: action.creator,
+      }
+
+      filesForLS.splice(action.position + 1, 0, drawFileToAdd)
+
+      return {
+        ...state,
+        files: filesForLS,
+      }
+
       
     case 'ADD_VIDEO_EMBED':
       filesForLS = updatedFiles.slice()
