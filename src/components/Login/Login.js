@@ -21,6 +21,7 @@ class Login extends React.Component {
     this.state = {
       email: '',
       password: '',
+      loginFailed: false,
     }
   }
 
@@ -41,13 +42,18 @@ class Login extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then((data) => {
-        if (data.message !== 'ok') return false
+        if (data.message === 'ok') {
+          localStorage.setItem('seltoolstoken', data.token)
+          localStorage.setItem('seltoolsuserid', data.user._id)
+          localStorage.setItem('seltoolsuserfolder', data.user.userfolder)
+  
+          this.props.history.push(`/documentos/${data.user.userfolder}`)
+        } else {
+          this.setState({
+            loginFailed: true,
+          })
+        }
 
-        localStorage.setItem('seltoolstoken', data.token)
-        localStorage.setItem('seltoolsuserid', data.user._id)
-        localStorage.setItem('seltoolsuserfolder', data.user.userfolder)
-
-        this.props.history.push(`/documentos/${data.user.userfolder}`)
       })
   }
 
@@ -87,6 +93,12 @@ class Login extends React.Component {
           >
             Entrar
           </h3>
+          {this.state.loginFailed &&
+            <>
+              <p>Hubo un problema al entrar. Verifica que tus datos son correctos.</p>
+              <p>Si tienes alguna duda, escribenos: <a href="mailto:hola@seldocs.com">hola@seldocs.com</a>.</p>
+            </>
+          }
           <form
             action="submit"
             style={{
@@ -124,6 +136,7 @@ class Login extends React.Component {
             <Button
               type='submit'
               intent={Intent.PRIMARY}
+              disabled={!this.state.email || !this.state.password}
               text='Entrar'
               style={{
                 alignSelf: 'center',
