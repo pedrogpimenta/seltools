@@ -109,6 +109,11 @@ button:focus {
   background-color: var(--c-primary-light);
 }
 
+.bp3-button svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* Navbar */
 .bp3-navbar {
   display: flex;
@@ -438,12 +443,12 @@ body .medium-toolbar-arrow-under::after {
   min-width: 0;
 }
 
-.tools-menu .bp3-menu-item > .bp3-icon {
+.tools-menu .bp3-menu-item > svg {
   margin-right: 0;
   margin-bottom: 2px;
 }
 
-.tools-menu .bp3-icon + div {
+.tools-menu svg + div {
   opacity: 0;
   width: 0;
   padding-left: 0;
@@ -451,7 +456,7 @@ body .medium-toolbar-arrow-under::after {
   transition: all 100ms ease-out;
 }
 
-.tools-menu:hover .bp3-icon + div {
+.tools-menu:hover svg + div {
   opacity: 1;
   width: 100%;
   padding-left: 8px;

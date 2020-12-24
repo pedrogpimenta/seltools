@@ -6,6 +6,11 @@ import {
   Intent,
 } from "@blueprintjs/core"
 
+import {
+  RiLock2Fill,
+  RiPencilFill,
+} from 'react-icons/ri'
+
 import ReactQuill, {Quill} from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 
@@ -128,10 +133,13 @@ class TextFile extends React.Component {
           }}
         >
           <Button
-            style={{margin: '0 4px'}}
+            style={{
+              margin: '0 4px',
+              height: '31px',
+            }}
             intent={this.state.editMode === 'markers' ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.state.editMode === 'markers' && Classes.MINIMAL}
-            icon={this.state.editMode === 'markers' ? 'edit' : 'lock'}
+            icon={this.state.editMode === 'markers' ? <RiPencilFill /> : <RiLock2Fill />}
             onClick={this.handleChangeMode}
           />
         </div>

@@ -3,11 +3,16 @@ import Draggable from 'react-draggable'
 import { connect } from 'react-redux'
 import { store } from '../../store/store'
 import { findDOMNode } from 'react-dom'
+import ReactQuill, {Quill} from 'react-quill'
+import 'react-quill/dist/quill.bubble.css'
+
 import {
   Icon,
 } from "@blueprintjs/core"
-import ReactQuill, {Quill} from 'react-quill'
-import 'react-quill/dist/quill.bubble.css'
+
+import {
+  RiDragMove2Fill,
+} from 'react-icons/ri'
 
 var FontAttributor = Quill.import('attributors/class/font');
 
@@ -204,14 +209,14 @@ class Marker extends React.Component {
                 style={{
                   background: 'white',
                   borderRadius: '40px',
-                  fontSize: '0',
-                  padding: '5px',
+                  // fontSize: '0',
+                  padding: '4px',
                   width: '26px',
                   height: '26px',
                   boxShadow: markerShadow,
                 }}
               >
-                <Icon icon='move' />
+                <RiDragMove2Fill size='1.1em' />
               </div>
             </div>
             <div

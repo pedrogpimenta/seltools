@@ -8,6 +8,13 @@ import {
   Intent,
 } from "@blueprintjs/core"
 
+import {
+  RiArrowGoBackLine,
+  RiCloseCircleLine,
+  RiLock2Fill,
+  RiPencilFill,
+} from 'react-icons/ri'
+
 import CanvasDraw from 'react-canvas-draw'
 
 class DrawFile extends React.Component {
@@ -20,6 +27,7 @@ class DrawFile extends React.Component {
       brushSize: 3,
       brushX: 0,
       brushY: 0,
+      isHover: false,
     }
 
     this.draw = React.createRef()
@@ -118,10 +126,13 @@ class DrawFile extends React.Component {
           }}
         >
           <Button
-            style={{margin: '0 4px'}}
+            style={{
+              margin: '0 4px',
+              height: '31px',
+            }}
             intent={this.state.editMode === 'markers' ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.state.editMode === 'markers' && Classes.MINIMAL}
-            icon={this.state.editMode === 'markers' ? 'edit' : 'lock'}
+            icon={this.state.editMode === 'markers' ? <RiPencilFill /> : <RiLock2Fill />}
             onClick={this.handleChangeMode}
           />
         </div>
@@ -140,12 +151,12 @@ class DrawFile extends React.Component {
             minimal={true}
           >
             <Button
-              icon='delete'
+              icon={<RiCloseCircleLine />}
               onClick={this.handleClear}
             >
             </Button>
             <Button
-              icon='undo'
+              icon={<RiArrowGoBackLine />}
               onClick={this.handleUndo}
             >
             </Button>
@@ -269,10 +280,12 @@ class DrawFile extends React.Component {
           }}
           ref={this.pointerContainer}
           onMouseMove={(e) => this.handleMouseMove(e)}
+          onMouseEnter={() => this.setState({isHover: true})}
+          onMouseLeave={() => this.setState({isHover: false})}
         >
           <div
             style={{
-              opacity: this.state.editMode === 'markers' ? '0' : '1',
+              opacity: this.state.editMode === 'markers' || !this.state.isHover ? '0' : '1',
               position: 'absolute',
               width: this.state.brushSize * 2,
               height: this.state.brushSize * 2,

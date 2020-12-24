@@ -53,7 +53,7 @@ class MoveDialog extends React.Component {
     return (
       <>
         <Dialog
-          title={`Añadir estudiante:`}
+          title={`Añadir estudiante`}
           isOpen={true}
           onClose={() => this.props.handleCloseButton()}
           style={{

@@ -9,6 +9,11 @@ import {
   MenuDivider,
 } from "@blueprintjs/core"
 
+import {
+  RiMarkPenFill,
+  RiTBoxLine,
+} from 'react-icons/ri'
+
 class Toolbar extends React.Component {
   changeEditMode = (newEditMode) => {
     this.props.dispatch({
@@ -42,14 +47,14 @@ class Toolbar extends React.Component {
         <Menu className={`tools-menu ${Classes.ELEVATION_1}`}>
           <MenuItem
             active={this.props.editMode === 'marker'}
-            icon="widget"
+            icon={<RiTBoxLine size='1.2em' />}
             onClick={() => this.changeEditMode('marker')}
             text="Notas"
           />
           <MenuDivider />
           <MenuItem
             active={this.props.editMode === 'highlight'}
-            icon="highlight"
+            icon={<RiMarkPenFill size='1.2em' />}
             onClick={() => this.changeEditMode('highlight')}
             text="Resaltar"
           />

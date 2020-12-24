@@ -11,6 +11,19 @@ import {
   Spinner,
 } from "@blueprintjs/core"
 
+import {
+  RiArrowDownSLine,
+  RiArrowUpSLine,
+  RiBrushFill,
+  RiDeleteBinLine,
+  RiEyeFill,
+  RiEyeOffLine,
+  RiFileTextLine,
+  RiImage2Fill,
+  RiMusic2Fill,
+  RiYoutubeLine,
+} from 'react-icons/ri'
+
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import Canvas from '../Canvas/Canvas'
 import Image from '../Image/Image'
@@ -606,7 +619,7 @@ class Document extends React.Component {
             style={{margin: '0 4px'}}
             intent={Intent.DEFAULT}
             className={Classes.MINIMAL}
-            icon={this.props.files[i].hidden ? 'eye-open' : 'eye-off'}
+            icon={this.props.files[i].hidden ? <RiEyeFill /> : <RiEyeOffLine />}
             onClick={() => this.handleHideFile(fileIndex)}
           />
         }
@@ -615,7 +628,7 @@ class Document extends React.Component {
             style={{margin: '0 4px'}}
             intent={Intent.DEFAULT}
             className={Classes.MINIMAL}
-            icon='chevron-up'
+            icon={<RiArrowUpSLine />}
             onClick={() => this.handleMoveOneUp(i)}
           />
         }
@@ -624,7 +637,7 @@ class Document extends React.Component {
             style={{margin: '0 4px'}}
             intent={Intent.DEFAULT}
             className={Classes.MINIMAL}
-            icon='chevron-down'
+            icon={<RiArrowDownSLine />}
             onClick={() => this.handleMoveOneDown(i)}
           />
         }
@@ -632,14 +645,14 @@ class Document extends React.Component {
           style={{margin: '0 4px'}}
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
-          icon='draw'
-          onClick={() => this.handleAddDrawFile(this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
+          icon={<RiBrushFill />}
+          onClick={() => this.handleAddDrawFile(i - 1, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
           style={{margin: '0 4px'}}
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
-          icon='new-text-box'
+          icon={<RiFileTextLine />}
           onClick={() => this.handleAddTextFile(i - 1, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
@@ -647,7 +660,7 @@ class Document extends React.Component {
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
-          icon='media'
+          icon={<RiImage2Fill />}
           onClick={(e) => this.handleAddFile(e, i - 1, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
@@ -655,7 +668,7 @@ class Document extends React.Component {
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
-          icon='music'
+          icon={<RiMusic2Fill />}
           onClick={(e) => this.handleAddFile(e, i - 1, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
         <Button
@@ -663,7 +676,7 @@ class Document extends React.Component {
           intent={Intent.DEFAULT}
           className={Classes.MINIMAL}
           loading={this.state.uploadingFiles}
-          icon='video'
+          icon={<RiYoutubeLine />}
           onClick={(e) => this.handleAddVideoEmbed(i - 1, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
         {(this.props.user.type !== 'student' ? true : this.props.files[i].creator === localStorage.getItem('studentName')) &&
@@ -671,7 +684,7 @@ class Document extends React.Component {
             style={{margin: '0 4px'}}
             intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.props.files.length > 0 ? Classes.MINIMAL : null}
-            icon='delete'
+            icon={<RiDeleteBinLine />}
             onClick={() => this.handleDeleteFile(fileIndex)}
           />
         }
@@ -692,7 +705,7 @@ class Document extends React.Component {
           style={{margin: '0 8px'}}
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
-          icon='draw'
+          icon={<RiBrushFill size='1.2em' />}
           large={true}
           onClick={() => this.handleAddDrawFile(this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
@@ -700,7 +713,7 @@ class Document extends React.Component {
           style={{margin: '0 8px'}}
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
-          icon='new-text-box'
+          icon={<RiFileTextLine size='1.2em' />}
           large={true}
           onClick={() => this.handleAddTextFile(this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
@@ -709,7 +722,7 @@ class Document extends React.Component {
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           loading={this.state.uploadingFiles}
-          icon='media'
+          icon={<RiImage2Fill size='1.2em' />}
           large={true}
           onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
@@ -718,7 +731,7 @@ class Document extends React.Component {
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
           loading={this.state.uploadingFiles}
-          icon='music'
+          icon={<RiMusic2Fill size='1.2em' />}
           large={true}
           onClick={(e) => this.handleAddFile(e, this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />
@@ -726,7 +739,7 @@ class Document extends React.Component {
           style={{margin: '0 8px'}}
           intent={this.props.files.length > 0 ? Intent.DEFAULT : Intent.PRIMARY}
           className={this.props.files.length > 0 ? Classes.MINIMAL : null}
-          icon='video'
+          icon={<RiYoutubeLine size='1.2em' />}
           large={true}
           onClick={(e) => this.handleAddVideoEmbed(this.props.files.length, this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel')}
         />

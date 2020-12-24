@@ -4,10 +4,15 @@ import {
   Button,
   Classes,
   Dialog,
-  Icon,
   Intent,
   Spinner,
 } from "@blueprintjs/core"
+
+import {
+  RiFile3Line,
+  RiFolderFill,
+  RiFolder5Fill,
+} from 'react-icons/ri'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import IconSel from '../IconSel/IconSel'
@@ -52,7 +57,7 @@ class MoveDialog extends React.Component {
           newBreadcrumbs.shift()
         }
 
-        const folders = data.documents.filter(doc => doc.type === 'folder')
+        const folders = data.documents.filter(doc => doc.type === 'folder').sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
         const documents = data.documents.filter(doc => doc.type === 'document')
         const folder = newBreadcrumbs[newBreadcrumbs.length - 1]
 
@@ -108,7 +113,7 @@ class MoveDialog extends React.Component {
             >
               <ul className='bp3-overflow-list bp3-breadcrumbs'>
                 {this.state.breadcrumbs.map((crumb, i) => {
-                    const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
+                    const icon = crumb.type === 'folder' ? <RiFolder5Fill size='1.2em' color={crumb.color || '#888'} style={{marginRight: '5px'}} /> : <IconSel />
                     return (
                       <li key={`menuitem-${crumb}`}>
                         <span
@@ -136,13 +141,7 @@ class MoveDialog extends React.Component {
                               {crumb.name.substr(0, 1).toUpperCase()}
                             </div>
                           }
-                          {crumb.type !== 'student' && 
-                            <Icon
-                              icon={icon}
-                              color={crumb.color || '#666'}
-                              className='bp3-icon'
-                            />
-                          }
+                          {crumb.type !== 'student' && icon}
                           {crumb.name}
                         </span>
                       </li>
@@ -204,7 +203,7 @@ class MoveDialog extends React.Component {
                                 backgroundColor: student.color || 'black',
                                 color: 'white',
                                 borderRadius: '50%',
-                                marginRight: '6px',
+                                marginRight: '2px',
                                 fontSize: '12px',
                                 fontWeight: '700',
                               }}
@@ -255,10 +254,7 @@ class MoveDialog extends React.Component {
                               cursor: 'pointer',
                             }}
                           >
-                            <Icon
-                              icon='folder-close'
-                              color={doc.color || '#666'}
-                            />
+                            <RiFolderFill size='1.2em' color={doc.color || '#888'} />
                             <span
                               style={{
                                 marginLeft: '8px',
@@ -301,10 +297,7 @@ class MoveDialog extends React.Component {
                             boxShadow: '0 0 2px 0 gray',
                           }}
                         >
-                          <Icon
-                            icon='document'
-                            color={doc.color || '#666'}
-                          />
+                          <RiFile3Line size='1.2em' color={doc.color || '#666'} style={{opacity: '.4'}} />
                           <span
                             style={{
                               marginLeft: '8px',

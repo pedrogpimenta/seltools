@@ -10,7 +10,6 @@ import {
   Button,
   Classes,
   EditableText,
-  Icon,
   Intent,
   Menu,
   MenuItem,
@@ -25,6 +24,18 @@ import {
   PopoverInteractionKind,
   Position,
 } from "@blueprintjs/core"
+
+import {
+  RiFile3Line,
+  RiFileLockFill,
+  RiFolder5Fill,
+  RiLock2Fill,
+  RiLogoutCircleRLine,
+  RiSave3Fill,
+  RiTimeLine,
+  RiUserSmileFill,
+  RiUserFill,
+} from 'react-icons/ri'
 
 import IconSel from '../IconSel/IconSel'
 
@@ -78,10 +89,10 @@ class TopBar extends React.Component {
                     crumb.name === 'Sel' ?
                     <IconSel /> :
                     crumb.type === 'folder' ?
-                      'folder-open' :
+                      <RiFolder5Fill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
                       crumb.type === 'user' ?
-                        <Icon icon='user' /> :
-                        'document'
+                        <RiUserFill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                        <RiFile3Line size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} />
 
                   return (
                     <li key={`crumb-${crumb._id}`}>
@@ -113,13 +124,7 @@ class TopBar extends React.Component {
                             {crumb.name && crumb.name.substr(0, 1).toUpperCase()}
                           </div>
                         }
-                        {crumb.type !== 'student' && 
-                          <Icon
-                            icon={icon}
-                            color={crumb.color || '#666'}
-                            className='bp3-icon'
-                          />
-                        }
+                        {crumb.type !== 'student' && icon}
                         {this.props.user.type === 'teacher' && crumb.type === 'document' &&
                           <EditableText
                             style={{color: 'black'}}
@@ -189,7 +194,7 @@ class TopBar extends React.Component {
                     className={`btn--lock ${Classes.MINIMAL}`}
                     intent={Intent.DANGER}
                     style={{marginRight: '8px', marginLeft: '8px'}}
-                    icon="lock"
+                    icon={<RiFileLockFill size='1.2em' />}
                     // text="Desbloquear"
                     onClick={this.props.handleUnlock}
                   />
@@ -197,7 +202,7 @@ class TopBar extends React.Component {
                     className={Classes.MINIMAL}
                     intent={Intent.DANGER}
                     large='true'
-                    icon='time'
+                    icon={<RiTimeLine size='1.2em' />}
                   >
                     <ReactTimeAgo date={this.props.modifiedDate} locale="en-US"/>
                   </Tag>
@@ -208,7 +213,7 @@ class TopBar extends React.Component {
                   className={Classes.Minimal}
                   intent={Intent.DANGER}
                   large='true'
-                  icon='lock'
+                  icon={<RiLock2Fill size='1.2em' />}
                 >
                   Documento bloqueado
                 </Tag>
@@ -245,7 +250,7 @@ class TopBar extends React.Component {
                   loading={this.props.documentIsSaving}
                   style={{marginRight: '8px', marginLeft: '8px'}}
                   disabled={!this.props.documentName}
-                  icon="floppy-disk"
+                  icon={<RiSave3Fill size='1.2em' />}
                   text={this.props.documentIsSaved ? "¡Guardado!" : "Guardar"}
                   onClick={(e) => this.props.handleSaveDocument(true)}
                 />
@@ -263,14 +268,14 @@ class TopBar extends React.Component {
                   className={Classes.ELEVATION_2}
                 >
                   <MenuItem
-                    icon='log-out'
+                    icon={<RiLogoutCircleRLine size='1.2em' />}
                     text="Salir"
                     onClick={this.handleLogout}
                   />
                 </Menu>
               }
             >
-              <Button className={Classes.MINIMAL} icon="user" />
+              <RiUserSmileFill size='1.4em' />
             </Popover>
         </NavbarGroup>
       </Navbar>

@@ -13,6 +13,18 @@ import {
   Spinner,
 } from "@blueprintjs/core"
 
+import {
+  RiFile3Line,
+  RiFileAddFill,
+  RiFileUserLine,
+  RiFolderAddFill,
+  RiFolderFill,
+  RiFolderUserFill,
+  RiMenuLine,
+  RiUserAddFill,
+  RiUserFill,
+} from 'react-icons/ri'
+
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 import MoveDialog from '../MoveDialog/MoveDialog'
@@ -67,7 +79,7 @@ class Documents extends React.Component {
         }
         this.props.setLocation(newBreadcrumbs)
 
-        const folders = data.documents.filter(doc => doc.type === 'folder')
+        const folders = data.documents.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0).filter(doc => doc.type === 'folder')
         const documents = data.documents.filter(doc => doc.type === 'document')
 
         this.setState({
@@ -103,7 +115,7 @@ class Documents extends React.Component {
           const updatedDocs = documentType === 'document' ?
             this.state.userDocuments.filter((doc) => doc._id !== documentId) :
             documentType === 'folder' ?
-              this.state.userFolders.filter((doc) => doc._id !== documentId) :
+              this.state.userFolders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0).filter((doc) => doc._id !== documentId) :
               this.state.students.filter((doc) => doc._id !== documentId)
 
           if (documentType === 'document') {
@@ -217,7 +229,7 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then((data) => {
-          const folders = this.state.userFolders
+          const folders = this.state.userFolders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
           folders.unshift({
             _id: data.insertedId,
             name: folderName,
@@ -433,7 +445,7 @@ class Documents extends React.Component {
                     backgroundColor: document.color || 'black',
                     color: 'white',
                     borderRadius: '50%',
-                    marginRight: '6px',
+                    marginRight: '2px',
                     fontSize: '12px',
                     fontWeight: '700',
                     userSelect: 'none',
@@ -443,21 +455,15 @@ class Documents extends React.Component {
                 </div>
               }
               {document.type !== 'student' &&
-                <Icon
-                  icon={this.props.user.type === 'student' && document.type === 'document' ? 'document' : 
-                        this.props.user.type === 'student' && document.type === 'folder' ? 'folder-close' : 
-                        document.type === 'document' && document.shared === true ? 'document-share' :
-                        document.type === 'document' ? 'document' :
-                        document.type === 'folder' && document.shared === true ? 'folder-shared' :
-                        document.type === 'folder' ? 'folder-close' :
-                        'user'}
-                  color={document.color || '#888'}
-                  style={{
-                    marginRight: '6px',
-                    // pointerEvents: 'none',
-                    userSelect: 'none',
-                  }}
-                />
+                <>
+                  {this.props.user.type === 'student' && document.type === 'document' ? <RiFile3Line color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
+                  this.props.user.type === 'student' && document.type === 'folder' ? <RiFolderFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
+                  document.type === 'document' && document.shared === true ? <RiFileUserLine color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  document.type === 'document' ? <RiFile3Line color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  document.type === 'folder' && document.shared === true ? <RiFolderUserFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  document.type === 'folder' ? <RiFolderFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  <RiUserFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} />}
+                </>
               }
               <h4
                 style={{
@@ -499,7 +505,7 @@ class Documents extends React.Component {
                 }}
               >
                 <Icon
-                  icon='more'
+                  icon={<RiMenuLine size='1.2em' color='white' />}
                   color='white'
                 />
               </div>
@@ -528,7 +534,7 @@ class Documents extends React.Component {
             <div>
               <Button
                 type='button'
-                icon='new-person'
+                icon={<RiUserAddFill />}
                 className={Classes.MINIMAL}
                 intent={Intent.PRIMARY}
                 text='Nuevo alumno'
@@ -574,7 +580,7 @@ class Documents extends React.Component {
               <div>
                 <Button
                   type='button'
-                  icon='folder-new'
+                  icon={<RiFolderAddFill />}
                   className={Classes.MINIMAL}
                   intent={Intent.PRIMARY}
                   text='Nueva carpeta'
@@ -623,7 +629,7 @@ class Documents extends React.Component {
               <div>
                 <Button
                   type='button'
-                  icon='add'
+                  icon={<RiFileAddFill />}
                   className={Classes.MINIMAL}
                   intent={Intent.PRIMARY}
                   text='Nuevo documento'
