@@ -11,6 +11,7 @@ import {
 } from "@blueprintjs/core"
 
 import {
+  RiCloseCircleLine,
   RiDragMove2Fill,
 } from 'react-icons/ri'
 
@@ -254,15 +255,6 @@ class Marker extends React.Component {
                   },
                 }}
               />
-              {/* <Editor
-                content={this.props.content}
-                parentId={this.props.id}
-                fileId={this.props.fileId}
-                hasFocus={this.props.hasFocus}
-                onEditorChange={(e) => {this.handleChange(e)}}
-                onInputFocus={(e) => {this.onInputFocus(e)}}
-                onInputBlur={(e) => {this.onInputBlur(e)}}
-              /> */}
             </div>
             <div
               style={{
@@ -280,10 +272,10 @@ class Marker extends React.Component {
               <div
                 className='delete'
                 style={{
-                  fontSize: 0,
+                  fontSize: '1rem',
                   background: 'white',
                   borderRadius: '40px',
-                  padding: '5px',
+                  padding: '3px',
                   width: '26px',
                   height: '26px',
                   marginRight: '4px',
@@ -291,7 +283,7 @@ class Marker extends React.Component {
                 }}
                 onClick={this.handleDelete}
               >
-                <Icon icon='delete' />
+                <RiCloseCircleLine size='1.25em' />
               </div>
               {!this.props.isStudent &&
                 <>

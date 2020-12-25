@@ -128,7 +128,7 @@ class DrawFile extends React.Component {
           <Button
             style={{
               margin: '0 4px',
-              height: '31px',
+              height: '38px',
             }}
             intent={this.state.editMode === 'markers' ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.state.editMode === 'markers' && Classes.MINIMAL}

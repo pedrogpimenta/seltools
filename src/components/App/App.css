@@ -423,7 +423,7 @@ body .medium-toolbar-arrow-under::after {
   }
 }
 
-.file-wrapper:hover .text-editor__edit-button {
+.file-wrapper:hover .text-editor.locked .text-editor__edit-button {
   opacity: .6 !important;
 }
 
