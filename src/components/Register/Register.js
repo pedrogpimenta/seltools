@@ -8,17 +8,23 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import {
   Button,
   Card,
+  Callout,
   Elevation,
   FormGroup,
   InputGroup,
   Intent,
 } from "@blueprintjs/core"
 
+import {
+  RiErrorWarningLine
+} from 'react-icons/ri'
+
 class Register extends React.Component {
   constructor() {
     super()
 
     this.state = {
+      isWaitingResponse: false,
       email: '',
       password: '',
       secret: '',
@@ -26,11 +32,16 @@ class Register extends React.Component {
       type: '',
       teacher: '',
       teacherFolder: '',
+      hasError: false,
+      errorMessage: '',
     }
   }
 
   handleRegister = (e) => {
     e.preventDefault()
+
+    this.setState({isWaitingResponse: true})
+
     const registerRequestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -47,29 +58,36 @@ class Register extends React.Component {
     fetch(fetchUrl, registerRequestOptions)
       .then(response => response.json())
       .then((data) => {
-        if (data.message !== 'ok') return false
+        this.setState({isWaitingResponse: false})
 
-        const loginRequestOptions = {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            email: this.state.email,
-            password: this.state.password,
+        if (data.message === 'ok') {
+          const loginRequestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              email: this.state.email,
+              password: this.state.password,
+            })
+          }
+          const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/login`
+
+          fetch(fetchUrl, loginRequestOptions)
+            .then(response => response.json())
+            .then((data) => {
+              if (data.message !== 'ok') return false
+      
+              localStorage.setItem('seltoolstoken', data.token)
+              localStorage.setItem('seltoolsuserid', data.user._id)
+              localStorage.setItem('seltoolsuserfolder', data.user.userfolder)
+      
+              this.props.history.push(`/documentos/${data.user.userfolder}`)
+            })
+        } else {
+          this.setState({
+            hasError: true,
+            errorMessage: data.details,
           })
         }
-        const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/login`
-
-        fetch(fetchUrl, loginRequestOptions)
-          .then(response => response.json())
-          .then((data) => {
-            if (data.message !== 'ok') return false
-    
-            localStorage.setItem('seltoolstoken', data.token)
-            localStorage.setItem('seltoolsuserid', data.user._id)
-            localStorage.setItem('seltoolsuserfolder', data.user.userfolder)
-    
-            this.props.history.push(`/documentos/${data.user.userfolder}`)
-          })
       })
   }
 
@@ -167,10 +185,25 @@ class Register extends React.Component {
                 onChange={(e) => this.setState({secret: e.target.value})}
               />
             </FormGroup>
+            {this.state.hasError &&
+              <Callout
+                intent={Intent.DANGER}
+                title='Hubo un error al registrar:'
+              >
+                <p>{this.state.errorMessage}</p>
+                <p
+                  style={{
+                    fontSize: '12px',
+                    color: 'rgba(0, 0, 0, .7)',
+                  }}
+                >Si necesitas ayuda escríbenos a <a href="mailto:hola@seldocs.com">hola@seldocs.com</a>.</p>
+              </Callout>
+            }
             <Button
               type='submit'
               intent={Intent.PRIMARY}
               disabled={this.state.secret !== '12345'}
+              loading={this.state.isWaitingResponse}
               // className={Classes.MINIMAL}
               text='Regístrate'
               style={{
