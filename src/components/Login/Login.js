@@ -8,6 +8,7 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import {
   Button,
   Card,
+  Callout,
   Elevation,
   FormGroup,
   InputGroup,
@@ -19,14 +20,18 @@ class Login extends React.Component {
     super()
 
     this.state = {
+      isWaitingResponse: false,
       email: '',
       password: '',
       loginFailed: false,
+      errorMessage: '',
     }
   }
 
   handleLogin = (e) => {
     e.preventDefault()
+
+    this.setState({isWaitingResponse: true})
 
     const requestOptions = {
       method: 'POST',
@@ -42,6 +47,8 @@ class Login extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then((data) => {
+        this.setState({isWaitingResponse: false})
+
         if (data.message === 'ok') {
           localStorage.setItem('seltoolstoken', data.token)
           localStorage.setItem('seltoolsuserid', data.user._id)
@@ -51,6 +58,7 @@ class Login extends React.Component {
         } else {
           this.setState({
             loginFailed: true,
+            errorMessage: data.message,
           })
         }
 
@@ -91,14 +99,8 @@ class Login extends React.Component {
               margin: '0 0 16px 0',
             }}
           >
-            Entrar
+            Entrar en Seldocs
           </h3>
-          {this.state.loginFailed &&
-            <>
-              <p>Hubo un problema al entrar. Verifica que tus datos son correctos.</p>
-              <p>Si tienes alguna duda, escribenos: <a href="mailto:hola@seldocs.com">hola@seldocs.com</a>.</p>
-            </>
-          }
           <form
             action="submit"
             style={{
@@ -121,7 +123,7 @@ class Login extends React.Component {
               />
             </FormGroup>
             <FormGroup
-              label="Password"
+              label="Contraseña"
               labelFor="password-input"
               style={{
                 margin: '8px 0',
@@ -133,9 +135,27 @@ class Login extends React.Component {
                 onChange={(e) => this.setState({password: e.target.value})}
               />
             </FormGroup>
+            {this.state.loginFailed &&
+              <Callout
+                intent={Intent.DANGER}
+                title='Hubo un problema al entrar:'
+                style={{
+                  marginTop: '16px',
+                }}
+              >
+                <p>{this.state.errorMessage}</p>
+                <p
+                  style={{
+                    fontSize: '12px',
+                    color: 'rgba(0, 0, 0, .7)',
+                  }}
+                >Si necesitas ayuda escríbenos a <a href="mailto:hola@seldocs.com">hola@seldocs.com</a>.</p>
+              </Callout>
+            }
             <Button
               type='submit'
               intent={Intent.PRIMARY}
+              loading={this.state.isWaitingResponse}
               disabled={!this.state.email || !this.state.password}
               text='Entrar'
               style={{
@@ -154,7 +174,7 @@ class Login extends React.Component {
                 color: '#5c7080',
               }}
             >
-              <a href="/recuperar">¿Olvidaste tu password?</a>
+              <a href="/recuperar">¿Olvidaste tu contraseña?</a>
             </p>
           </form>
         </Card>
