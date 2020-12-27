@@ -15,10 +15,6 @@ import {
   Intent,
 } from "@blueprintjs/core"
 
-import {
-  RiErrorWarningLine
-} from 'react-icons/ri'
-
 class Register extends React.Component {
   constructor() {
     super()
