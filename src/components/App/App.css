@@ -128,6 +128,10 @@ button:focus {
   z-index: 20;
 }
 
+.bp3-navbar .bp3-popover-wrapper {
+  line-height: 0;
+}
+
 .bp3-breadcrumb:not(.bp3-breadcrumb-current) {
   cursor: pointer;
 }
