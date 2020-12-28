@@ -52,7 +52,7 @@ class ResetPass extends React.Component {
   }
 
   componentDidMount = () => {
-    if (window.goatcounter.counter) {
+    if (window.goatcounter.count) {
       window.goatcounter.count({
         path: this.props.location.pathname + this.props.location.search + this.props.location.hash,
       })

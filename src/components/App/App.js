@@ -110,7 +110,7 @@ class App extends React.Component {
     this.getUserInfo()
 
     this.props.history.listen((location) => {
-      if (window.goatcounter.counter) {
+      if (window.goatcounter.count) {
         window.goatcounter.count({
           path: location.pathname + location.search + location.hash,
         })
