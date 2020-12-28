@@ -109,6 +109,12 @@ class App extends React.Component {
     
     this.getUserInfo()
 
+    this.props.history.listen((location) => {
+      window.goatcounter.count({
+        path: location.pathname + location.search + location.hash,
+      })
+    })
+
   }
 
   componentWillUnmount() {

@@ -86,6 +86,16 @@ class Register extends React.Component {
         }
       })
   }
+  
+  componentDidMount = () => {
+    window.goatcounter.count({
+      path: this.props.location.pathname + this.props.location.search + this.props.location.hash,
+    })
+    
+    if (localStorage.getItem('seltoolsuserfolder')) {
+      this.props.history.push(`/documentos/${localStorage.getItem('seltoolsuserfolder')}`)
+    }
+  }
 
   render() {
     return (

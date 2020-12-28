@@ -47,6 +47,12 @@ class RecoverAccount extends React.Component {
       })
   }
 
+  componentDidMount = () => {
+    window.goatcounter.count({
+      path: this.props.location.pathname + this.props.location.search + this.props.location.hash,
+    })
+  }
+
   render() {
     return (
       <div

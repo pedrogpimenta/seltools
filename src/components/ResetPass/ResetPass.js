@@ -52,6 +52,10 @@ class ResetPass extends React.Component {
   }
 
   componentDidMount = () => {
+    window.goatcounter.count({
+      path: this.props.location.pathname + this.props.location.search + this.props.location.hash,
+    })
+    
     const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/resetexists/${this.props.match.params.recoveryId}`
     fetch(fetchUrl)
       .then(response => response.json())
