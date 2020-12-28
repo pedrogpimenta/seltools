@@ -8,6 +8,7 @@ import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import {
   Button,
   Card,
+  Callout,
   Elevation,
   FormGroup,
   InputGroup,
@@ -78,8 +79,14 @@ class RecoverAccount extends React.Component {
               >
                 Recuperar cuenta
               </h3>
-              <p>Has olvidado tu contraseña. ¡No te preocupes!</p>
-              <p>Escribe tu dirección de email. Enseguida recibirás un mensaje con un enlace para poder restablecer la contraseña.</p>
+              <Callout
+                style={{
+                  marginBottom: '16px',
+                }}
+              >
+                <p>Has olvidado tu contraseña. ¡No te preocupes!</p>
+                <p>Escribe tu dirección de email. Enseguida recibirás un mensaje con un enlace para poder restablecer la contraseña.</p>
+              </Callout>
               <form
                 action="submit"
                 style={{
