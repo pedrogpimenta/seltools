@@ -170,7 +170,7 @@ button:focus {
 .folder-item .bp3-popover-wrapper {
   position: absolute;
   right: 6px;
-  top: calc(50% - 1px);
+  top: calc(50%);
   transform: translateY(-50%);
   opacity: 0;
   cursor: pointer;

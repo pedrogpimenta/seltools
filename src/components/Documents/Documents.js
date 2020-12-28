@@ -20,7 +20,7 @@ import {
   RiFolderAddFill,
   RiFolderFill,
   RiFolderUserFill,
-  RiMenuLine,
+  RiMoreFill,
   RiUserAddFill,
   RiUserFill,
 } from 'react-icons/ri'
@@ -505,7 +505,7 @@ class Documents extends React.Component {
                 }}
               >
                 <Icon
-                  icon={<RiMenuLine size='1.2em' color='white' />}
+                  icon={<RiMoreFill size='1.2em' color='white' />}
                   color='white'
                 />
               </div>
