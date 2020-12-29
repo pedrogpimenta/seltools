@@ -34,7 +34,6 @@ import {
   RiSave3Fill,
   RiTimeLine,
   RiUserSmileFill,
-  RiUserFill,
 } from 'react-icons/ri'
 
 import IconSel from '../IconSel/IconSel'
@@ -90,8 +89,8 @@ class TopBar extends React.Component {
                     <IconSel /> :
                     crumb.type === 'folder' ?
                       <RiFolder5Fill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
-                      crumb.type === 'user' ?
-                        <RiUserFill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                      crumb.type === 'teacher' ?
+                        <RiUserSmileFill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
                         <RiFile3Line size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} />
 
                   return (

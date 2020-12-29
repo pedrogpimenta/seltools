@@ -12,6 +12,7 @@ import {
   RiFile3Line,
   RiFolderFill,
   RiFolder5Fill,
+  RiUserSmileFill,
 } from 'react-icons/ri'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
@@ -113,7 +114,15 @@ class MoveDialog extends React.Component {
             >
               <ul className='bp3-overflow-list bp3-breadcrumbs'>
                 {this.state.breadcrumbs.map((crumb, i) => {
-                    const icon = crumb.type === 'folder' ? <RiFolder5Fill size='1.2em' color={crumb.color || '#888'} style={{marginRight: '5px'}} /> : <IconSel />
+                    const icon =
+                      crumb.name === 'Sel' ?
+                      <IconSel /> :
+                      crumb.type === 'folder' ?
+                        <RiFolder5Fill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                        crumb.type === 'teacher' ?
+                          <RiUserSmileFill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                          <RiFile3Line size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} />
+
                     return (
                       <li key={`menuitem-${crumb}`}>
                         <span
