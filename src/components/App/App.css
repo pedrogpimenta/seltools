@@ -27,6 +27,40 @@
   font-style: italic;
 }
 
+@font-face {
+  font-family: 'Lobster';
+  src: url('../../fonts/lobster.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Amatic SC';
+  src: url('../../fonts/amatic-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Amatic SC';
+  src: url('../../fonts/amatic-bold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Comfortaa';
+  src: url('../../fonts/comfortaa-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Comfortaa';
+  src: url('../../fonts/comfortaa-bold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
 
 
 :root {
@@ -340,10 +374,7 @@ body .medium-toolbar-arrow-under::after {
 }
 
 .text-editor .ql-container {
-  /* font-family: 'Roboto', sans-serif; */
   font-family: 'Open Sans', sans-serif;
-  /* font-size: 16px;
-  line-height: 1.5; */
 }
 
 .text-editor .ql-editor {

@@ -18,7 +18,7 @@ import {
 var FontAttributor = Quill.import('attributors/class/font');
 
 FontAttributor.whitelist = [
-  'roboto', 'comfortaa', 'lobster', 'amatic',
+  'opensans', 'comfortaa', 'lobster', 'amatic',
 ];
 Quill.register(FontAttributor, true);
 

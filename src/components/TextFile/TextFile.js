@@ -47,26 +47,6 @@ export class TagBlot extends Inline {
 Quill.register(TagBlot)
 
 
-// class MyCustomInline extends Inline {
-//   static blotName = 'redtext'
-//   static tagName = 'span'
-//   static className = 'redtext'
-
-//   formats() {
-//     return MyCustomInline.tagName
-//   }
-// }
-
-// Quill.register(MyCustomInline)
-
-
-// class RedTextBlot extends Inline { } 
-// RedTextBlot.blotName = 'redtext';
-// RedTextBlot.tagName = 'SPAN';
-// RedTextBlot.className = 'redtext';
-// Quill.register(RedTextBlot)
-
-
 class TextFile extends React.Component {
   constructor() {
     super();
