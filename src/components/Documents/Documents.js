@@ -79,13 +79,13 @@ class Documents extends React.Component {
         }
         this.props.setLocation(newBreadcrumbs)
 
-        const folders = data.documents.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0).filter(doc => doc.type === 'folder')
+        const folders = data.documents.filter(doc => doc.type === 'folder')
         const documents = data.documents.filter(doc => doc.type === 'document')
 
         this.setState({
           isLoadingDocuments: false,
           students: data.students,
-          userFolders: folders,
+          userFolders: folders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0),
           userDocuments: documents,
         })
 
@@ -115,7 +115,7 @@ class Documents extends React.Component {
           const updatedDocs = documentType === 'document' ?
             this.state.userDocuments.filter((doc) => doc._id !== documentId) :
             documentType === 'folder' ?
-              this.state.userFolders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0).filter((doc) => doc._id !== documentId) :
+              this.state.userFolders.filter((doc) => doc._id !== documentId) :
               this.state.students.filter((doc) => doc._id !== documentId)
 
           if (documentType === 'document') {
@@ -124,7 +124,7 @@ class Documents extends React.Component {
             })
           } else if (documentType === 'folder') {
             this.setState({
-              userFolders: updatedDocs
+              userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
             })
           } else {
             this.setState({
@@ -167,7 +167,7 @@ class Documents extends React.Component {
           })
         } else if (documentType === 'folder') {
           this.setState({
-            userFolders: updatedDocs
+            userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
           })
         } else {
           this.setState({
@@ -229,7 +229,8 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then((data) => {
-          const folders = this.state.userFolders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
+          const folders = this.state.userFolders
+
           folders.unshift({
             _id: data.insertedId,
             name: folderName,
@@ -237,7 +238,7 @@ class Documents extends React.Component {
           })
 
           this.setState({
-            userFolders: folders,
+            userFolders: folders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0),
           })
         })
     }
@@ -625,7 +626,6 @@ class Documents extends React.Component {
               Documentos
             </div>
             {this.props.user.type === 'teacher' &&
-              //TODO: Don't realod page, use onClick
               <div>
                 <Button
                   type='button'
