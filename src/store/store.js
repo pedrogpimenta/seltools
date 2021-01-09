@@ -331,6 +331,7 @@ function reducer(state = initialState, action) {
         type: 'txt',
         name: null,
         markers: [],
+        highlights: [],
         content: '',
         creator: action.creator,
       }
@@ -366,6 +367,7 @@ function reducer(state = initialState, action) {
         type: 'draw',
         name: null,
         markers: [],
+        highlights: [],
         content: '',
         creator: action.creator,
       }
@@ -385,6 +387,7 @@ function reducer(state = initialState, action) {
         type: 'videoembed',
         name: null,
         markers: [],
+        highlights: [],
         content: action.url,
         creator: action.creator,
       }
