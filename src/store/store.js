@@ -470,7 +470,7 @@ function reducer(state = initialState, action) {
     case 'DOCUMENT_UNSAVED':
       return {
         ...state,
-        isSaved: false,
+        isSaved: state.isLocked ? true : false,
       }
     
     case 'DOCUMENT_SAVED':
