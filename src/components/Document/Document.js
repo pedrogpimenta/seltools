@@ -99,7 +99,6 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        console.log('after unlockY')
         this.props.socket.emit('document saved after unlock', this.props.user._id, this.props.id)
       })
     
@@ -163,7 +162,6 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
-        console.log('sabed')
         this.props.socket.emit('document saved', this.props.user._id, this.props.id || data.id)
       })
 
@@ -174,14 +172,12 @@ class Document extends React.Component {
   }
 
   componentWillUnmount() {
-    console.log('document unmount')
     clearInterval(this.saveInterval)
     this.props.socket.removeAllListeners('document reload')
     this.props.socket.removeAllListeners('save and lock document')
 
     if (!this.props.id) return
 
-    console.log('closing...')
     this.props.socket.emit('document close', this.props.user._id, this.props.id)
   }
 
@@ -333,9 +329,8 @@ class Document extends React.Component {
           this.props.socket.emit('document open', this.props.user._id, data.document._id)
 
           this.props.socket.on('document reload', (documentId) => {
-            console.log('document reloaindg:', documentId === this.props.id, this.props.isSaved)
             if (documentId === this.props.id && this.props.isSaved) {
-              console.log('ola')
+              
               // TODO: make this a function
               fetch(`${REACT_APP_SERVER_BASE_URL}/document/${documentId}`)
                 .then(response => response.json())
@@ -753,7 +748,6 @@ class Document extends React.Component {
 
   // functions for topbar
   handleShareDocument = () => {
-    console.log('1')
     const documentObject = {
       shared: !this.props.shared,
     }
@@ -803,9 +797,7 @@ class Document extends React.Component {
 
   handleUnsaveDocument = () => {
     this.saveInterval = setInterval(() => {
-      console.log('doin 1')
       if (!this.props.isSaved) {
-      console.log('doin 2')
         this.handleSaveDocument(true)
       }
     }, 10000)

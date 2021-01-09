@@ -43,7 +43,6 @@ class App extends React.Component {
     
     if (this.state.user.type === 'teacher') {
       this.socket.on('connected students', (students) => {
-        console.log('students:', students)
         this.setState({
           connectedStudents: students,
         })
