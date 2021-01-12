@@ -55,7 +55,6 @@ class TopBar extends React.Component {
         fixedToTop={true}
         style={{
           background: 'var(--c-primary-lightest)',
-          overflowX: 'auto',
         }}
       >
         <NavbarGroup align={Alignment.LEFT}>
