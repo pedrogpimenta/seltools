@@ -55,52 +55,59 @@ class Document extends React.Component {
       fileUrls: [],
       uploadingFiles: false,
       isLoadingDocument: true,
+      dateInterval: '',
+      hasUpdatedSinceOffline: true,
     }
   }
 
-  handleSaveAndLockDocument = () => {
+  handleLockDocument = (options) => {
     this.props.dispatch({
       type: 'DOCUMENT_IS_LOCKED',
       locked: true,
       isLocked: true,
-      lockedBy: 'teacher',
+      lockedBy: options.lockedByUserId,
     })
 
-    this.props.dispatch({
-      type: 'DOCUMENT_IS_SAVING',
-    })
+    this.props.socket.emit('document unlock', this.props.user._id, this.props.id)
+
+    // this.props.dispatch({
+    //   type: 'DOCUMENT_IS_SAVING',
+    // })
     
-    const documentObject = {
-      name: this.props.name,
-      teacher: this.props.teacher,
-      type: 'document',
-      files: this.props.files,
-    }
+    // const documentObject = {
+    //   name: this.props.name,
+    //   teacher: this.props.teacher,
+    //   type: 'document',
+    //   files: this.props.files,
+    // }
 
-    for (let file in documentObject.files) {
-      for (let marker in documentObject.files[file].markers) {
-        delete documentObject.files[file].markers[marker].hasFocus
-      }
-    }
+    // for (let file in documentObject.files) {
+    //   for (let marker in documentObject.files[file].markers) {
+    //     delete documentObject.files[file].markers[marker].hasFocus
+    //   }
+    // }
 
-    const requestOptions = {
-      method: 'PUT',
-      body: JSON.stringify(documentObject),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
-      },
-    }
+    // const requestOptions = {
+    //   method: 'PUT',
+    //   body: JSON.stringify(documentObject),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+    //   },
+    // }
     
-    fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        this.props.dispatch({
-          type: 'DOCUMENT_SAVED',
-        })
+    // fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`, requestOptions)
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     this.props.dispatch({
+    //       type: 'DOCUMENT_SAVED',
+    //     })
 
-        this.props.socket.emit('document saved after unlock', this.props.user._id, this.props.id)
-      })
+    //     if (options.shouldUnlock) {
+    //       this.props.socket.emit('document unlock', this.props.user._id, this.props.id)
+    //     }
+    //     this.props.socket.emit('document saved after unlock', this.props.user._id, this.props.id)
+    //   })
     
   }
 
@@ -162,6 +169,13 @@ class Document extends React.Component {
           type: 'DOCUMENT_SAVED',
         })
 
+        this.props.dispatch({
+          type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+          modifiedDate: new Date(),
+        })
+
+        this.handleInactivityLock()
+
         this.props.socket.emit('document saved', this.props.user._id, this.props.id || data.id)
       })
 
@@ -169,16 +183,73 @@ class Document extends React.Component {
 
   handleUnlock = () => {
     this.props.socket.emit('unlock document', this.props.user._id, this.props.id)
+
+    // TODO: make this a function
+    fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`)
+      .then(response => response.json())
+      .then(data => {
+        const LSfiles = data.document.files || []
+
+        document.title = `${data.document.name} -- Seldocs`;
+
+        if (LSfiles.length > 0) {
+          this.props.dispatch({
+            type: 'LOAD_FILES',
+            files: LSfiles,
+            noReset: true,
+          })
+        }
+
+        this.props.dispatch({
+          type: 'CHANGE_DOCUMENT_NAME',
+          name: data.document.name,
+        })
+
+        this.props.dispatch({
+          type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+          modifiedDate: data.document.modifiedDate,
+        })
+
+
+        if (data.document.locked) {
+          this.props.dispatch({
+            type: 'DOCUMENT_IS_LOCKED',
+            locked: data.document.locked,
+            isLocked: data.document.locked && data.document.lockedBy !== this.props.user._id,
+            lockedBy: data.document.lockedBy,
+          })
+
+          this.props.dispatch({
+            type: "DOCUMENT_IS_LOADED",
+          })
+        } else {
+          this.props.dispatch({
+            type: 'DOCUMENT_IS_LOCKED',
+            locked: data.document.locked,
+            isLocked: data.document.locked && data.document.lockedBy !== this.props.user._id,
+            lockedBy: data.document.lockedBy,
+          })
+
+          this.props.dispatch({
+            type: "DOCUMENT_IS_LOADED",
+          })
+
+          // this.handleSaveDocument()
+        }
+
+        this.handleInactivityLock()
+      })
   }
 
   componentWillUnmount() {
     clearInterval(this.saveInterval)
-    this.props.socket.removeAllListeners('document reload')
-    this.props.socket.removeAllListeners('save and lock document')
+    clearTimeout(this.saveDateInterval)
+    if (this.props.socket) this.props.socket.removeAllListeners('document reload')
+    if (this.props.socket) this.props.socket.removeAllListeners('lock document')
 
     if (!this.props.id) return
 
-    this.props.socket.emit('document close', this.props.user._id, this.props.id)
+    if (this.props.socket) this.props.socket.emit('document unlock', this.props.user._id, this.props.id)
   }
 
   componentDidMount() {
@@ -326,9 +397,9 @@ class Document extends React.Component {
 
           // WebSockets
 
-          this.props.socket.emit('document open', this.props.user._id, data.document._id)
+          if (this.props.socket) this.props.socket.emit('document open', this.props.user._id, data.document._id)
 
-          this.props.socket.on('document reload', (documentId) => {
+          if (this.props.socket) this.props.socket.on('document reload', (documentId) => {
             if (documentId === this.props.id && this.props.isSaved) {
               
               // TODO: make this a function
@@ -387,15 +458,109 @@ class Document extends React.Component {
             }
           })
 
-          this.props.socket.on('save and lock document', (userId, documentId) => {
+          if (this.props.socket) this.props.socket.on('lock document', (userId, documentId) => {
             if (documentId === this.props.id && userId !== this.props.user._id) {
-              this.handleSaveAndLockDocument()
+              this.handleLockDocument({lockedByUserId: userId, shouldUnlock: false})
             }
           })
         })
     }
 
     this.handleUnsaveDocument()
+    this.handleOfflineState()
+  }
+
+  handleOfflineState = () => {
+    if (this.props.socket) this.props.socket.on('connect', () => {
+      if (!this.state.hasUpdatedSinceOffline) {
+        fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`)
+          .then(response => response.json())
+          .then(data => {
+            const LSfiles = data.document.files || []
+
+            document.title = `${data.document.name} -- Seldocs`;
+
+            if (LSfiles.length > 0) {
+              this.props.dispatch({
+                type: 'LOAD_FILES',
+                files: LSfiles,
+                noReset: true,
+              })
+            }
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_NAME',
+              name: data.document.name,
+            })
+
+            this.props.dispatch({
+              type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
+              modifiedDate: data.document.modifiedDate,
+            })
+
+
+            if (data.document.locked) {
+              this.props.dispatch({
+                type: 'DOCUMENT_IS_LOCKED',
+                locked: data.document.locked,
+                isLocked: data.document.locked && data.document.lockedBy !== this.props.user._id,
+                lockedBy: data.document.lockedBy,
+              })
+
+              this.props.dispatch({
+                type: "DOCUMENT_IS_LOADED",
+              })
+            } else {
+              this.props.dispatch({
+                type: 'DOCUMENT_IS_LOCKED',
+                locked: data.document.locked,
+                isLocked: data.document.locked && data.document.lockedBy !== this.props.user._id,
+                lockedBy: data.document.lockedBy,
+              })
+
+              this.props.dispatch({
+                type: "DOCUMENT_IS_LOADED",
+              })
+
+              this.setState({
+                hasUpdatedSinceOffline: true,
+              })
+
+              // this.handleSaveDocument()
+            }
+          })
+      }
+    })
+    
+    window.addEventListener('offline', () => {
+      this.setState({
+        hasUpdatedSinceOffline: false,
+      })
+    })
+  }
+
+  handleUnsaveDocument = () => {
+    this.saveInterval = setInterval(() => {
+      if (!this.props.isSaved) {
+        this.handleSaveDocument(true)
+      }
+    }, 5000)
+  }
+
+  handleInactivityLock = () => {
+    if (this.props.user.type !== 'teacher') return false
+
+    clearTimeout(this.saveDateInterval)
+
+    this.saveDateInterval = setTimeout(() => {
+      const modifiedDate = new Date(this.props.modifiedDate).getTime()
+      const currentDate = new Date().getTime()
+
+      if (modifiedDate < currentDate) {
+        this.handleLockDocument({lockedByUserId: '', shouldUnlock: true})
+      }
+
+    }, 15000)
   }
 
   handleFileInputChange = (e) => {
@@ -795,13 +960,6 @@ class Document extends React.Component {
     })
   }
 
-  handleUnsaveDocument = () => {
-    this.saveInterval = setInterval(() => {
-      if (!this.props.isSaved) {
-        this.handleSaveDocument(true)
-      }
-    }, 10000)
-  }
 
   render() {
     return (

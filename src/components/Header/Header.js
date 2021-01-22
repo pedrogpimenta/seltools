@@ -263,7 +263,7 @@ class Header extends React.Component {
                 intent={Intent.DANGER}
                 style={{marginRight: '8px', marginLeft: '8px'}}
                 icon="lock"
-                // text="Desbloquear"
+                text="Desbloquear"
                 onClick={this.props.handleUnlock}
               />
             <Tag
