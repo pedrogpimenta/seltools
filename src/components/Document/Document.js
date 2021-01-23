@@ -560,7 +560,7 @@ class Document extends React.Component {
         this.handleLockDocument({lockedByUserId: '', shouldUnlock: true})
       }
 
-    }, 15000)
+    }, 60000)
   }
 
   handleFileInputChange = (e) => {
