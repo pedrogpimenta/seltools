@@ -549,6 +549,7 @@ class Document extends React.Component {
 
   handleInactivityLock = () => {
     if (this.props.user.type !== 'teacher') return false
+    if (this.props.shared !== true) return false
 
     clearTimeout(this.saveDateInterval)
 
@@ -560,7 +561,7 @@ class Document extends React.Component {
         this.handleLockDocument({lockedByUserId: '', shouldUnlock: true})
       }
 
-    }, 3600000)
+    }, 15000)
   }
 
   handleFileInputChange = (e) => {
