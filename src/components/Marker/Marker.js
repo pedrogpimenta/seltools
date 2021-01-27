@@ -172,6 +172,7 @@ class Marker extends React.Component {
           style={{
             position: 'absolute',
             lineHeight: '0',
+            zIndex: this.state.hasFocus ? '30' : '1',
           }}
         >
           <div
