@@ -202,11 +202,18 @@ function reducer(state = initialState, action) {
       }
 
       filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+      
+    case 'DELETE_ALL_HIGHLIGHTS':
+      for (let file in updatedFiles) {
+        updatedFiles[file].highlights = []
       }
 
-      // localStorage.setItem('files', JSON.stringify(filesForLS))
+      filesForLS = updatedFiles.slice()
 
       return {
         ...state,

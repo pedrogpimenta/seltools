@@ -482,6 +482,10 @@ body .medium-toolbar-arrow-under::after {
   min-width: 0;
 }
 
+.tools-menu li + li {
+  margin-top: 6px;
+}
+
 .tools-menu .bp3-menu-item > svg {
   margin-right: 0;
   margin-bottom: 2px;
@@ -516,7 +520,7 @@ body .medium-toolbar-arrow-under::after {
 
 /* Draggable stuff */
 .react-draggable:hover {
-  z-index: 20;
+  z-index: 20 !important;
 }
 
 .react-draggable-dragging {
