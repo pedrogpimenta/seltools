@@ -1013,6 +1013,7 @@ class Document extends React.Component {
             }}
           >
             <Toolbar
+              user={this.props.user}
               isLocked={this.props.isLocked}
               handleClickWhenLocked={this.handleClickWhenLocked}
             />

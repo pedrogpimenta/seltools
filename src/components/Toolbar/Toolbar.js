@@ -39,12 +39,18 @@ class Toolbar extends React.Component {
     this.props.dispatch({
       type: "DELETE_ALL_HIGHLIGHTS",
     }) 
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
     this.setState({showRemoveAllHighlightsDialog: false})
   }
 
   handleRemoveAllMarkers = () => {
     this.props.dispatch({
       type: "DELETE_ALL_MARKERS",
+    }) 
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
     }) 
     this.setState({showRemoveAllMarkersDialog: false})
   }
@@ -79,11 +85,13 @@ class Toolbar extends React.Component {
               onClick={() => this.changeEditMode('marker')}
               text="Notas"
             />
-            <MenuItem
-              icon={<RiCloseCircleLine size='1.2em' />}
-              onClick={() => this.setState({showRemoveAllMarkersDialog: true})}
-              text="Eliminar Notas"
-            />
+            {this.props.user.type === 'teacher' &&
+              <MenuItem
+                icon={<RiCloseCircleLine size='1.2em' />}
+                onClick={() => this.setState({showRemoveAllMarkersDialog: true})}
+                text="Eliminar Notas"
+              />
+            }
             <MenuDivider />
             <MenuItem
               active={this.props.editMode === 'highlight'}
@@ -91,11 +99,13 @@ class Toolbar extends React.Component {
               onClick={() => this.changeEditMode('highlight')}
               text="Resaltar"
             />
-            <MenuItem
-              icon={<RiCloseCircleLine size='1.2em' />}
-              onClick={() => this.setState({showRemoveAllHighlightsDialog: true})}
-              text="Eliminar Resaltados"
-            />
+            {this.props.user.type === 'teacher' &&
+              <MenuItem
+                icon={<RiCloseCircleLine size='1.2em' />}
+                onClick={() => this.setState({showRemoveAllHighlightsDialog: true})}
+                text="Eliminar Resaltados"
+              />
+            }
           </Menu>
         </div>
         {this.state.showRemoveAllHighlightsDialog &&
