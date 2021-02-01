@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { Beforeunload } from 'react-beforeunload'
 import axios from 'axios'
 
+import './Document.css'
+
 import {
   Intent,
   Button,
@@ -1006,11 +1008,6 @@ class Document extends React.Component {
           />
           <div
             className='document'
-            style={{
-              position: 'relative',
-              marginTop: '50px',
-              padding: '20px',
-            }}
           >
             <Toolbar
               user={this.props.user}
@@ -1018,6 +1015,7 @@ class Document extends React.Component {
               handleClickWhenLocked={this.handleClickWhenLocked}
             />
             <div
+              className='document-container'
               style={{
                 maxWidth: 'var(--doc-width)',
                 margin: '0 auto',

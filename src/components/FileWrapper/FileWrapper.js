@@ -3,21 +3,21 @@ import Markers from '../Markers/Markers'
 import Highlights from '../Highlights/Highlights'
 
 class FileWrapper extends React.Component {
-  constructor() {
-    super()
+  // constructor() {
+  //   super()
 
-    this.state = {
-      hover: false,
-    }
-  }
+  //   this.state = {
+  //     hover: false,
+  //   }
+  // }
 
-  handleMouseEnter = () => {
-    this.setState({hover: true})
-  }
+  // handleMouseEnter = () => {
+  //   this.setState({hover: true})
+  // }
 
-  handleMouseLeave = () => {
-    this.setState({hover: false})
-  }
+  // handleMouseLeave = () => {
+  //   this.setState({hover: false})
+  // }
 
   render() {
     return (

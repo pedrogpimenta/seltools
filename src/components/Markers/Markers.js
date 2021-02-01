@@ -8,8 +8,8 @@ class Markers extends React.Component {
     super(props);
 
     this.state = {
-      x: 0,
-      y: 0,
+      // x: 0,
+      // y: 0,
       width: 0,
       height: 0,
     }
@@ -17,7 +17,7 @@ class Markers extends React.Component {
     this.markersRef = React.createRef();
   }
 
-  addNewMarker = e => {
+  addNewMarker = (e) => {
     const c = this.markersRef.current
     const markersInfo = c.getBoundingClientRect()
     const newId = Math.floor((Math.random() * 100000) + 1)

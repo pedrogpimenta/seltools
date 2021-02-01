@@ -64,6 +64,7 @@ class Toolbar extends React.Component {
             position: 'fixed',
             top: '70px',
             left: '10px',
+            zIndex: '2',
           }}
         >
           {this.props.isLocked &&

@@ -193,7 +193,7 @@ class Marker extends React.Component {
                   zIndex: '-1',
                 }}
               >
-            </div>
+              </div>
             }
             <div
               className='handle'
