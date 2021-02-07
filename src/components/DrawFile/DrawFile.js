@@ -17,13 +17,15 @@ import {
 
 import CanvasDraw from 'react-canvas-draw'
 
+import { DRAW_COLORS } from '../../CONSTANTS'
+
 class DrawFile extends React.Component {
   constructor() {
     super();
 
     this.state = {
       editMode: 'markers',
-      brushColor: '#ff0000',
+      brushColor: '#000000',
       brushSize: 3,
       brushX: 0,
       brushY: 0,
@@ -147,6 +149,7 @@ class DrawFile extends React.Component {
             height: this.state.editMode === 'markers' ? '0' : 'auto',
           }}
         >
+          {}
           <ButtonGroup
             minimal={true}
           >
@@ -165,57 +168,25 @@ class DrawFile extends React.Component {
           <ButtonGroup
             minimal={true}
           >
-            <Button
-              style={{
-                padding: '5px',
-              }}
-              active={this.state.brushColor === '#ff0000'}
-              onClick={() => this.handleChangeColor('#ff0000')}
-            >
-              <div
+            {DRAW_COLORS.map((color) => 
+              <Button
                 style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  backgroundColor: '#ff0000',
+                  padding: '5px',
                 }}
-              ></div>
-            </Button>
-            <Button
-              style={{
-                padding: '5px',
-              }}
-              active={this.state.brushColor === '#ffff00'}
-              onClick={() => this.handleChangeColor('#ffff00')}
-            >
-              <div
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  backgroundColor: '#ffff00',
-                }}
-              ></div>
-            </Button>
-            <Button
-              style={{
-                padding: '5px',
-              }}
-              active={this.state.brushColor === '#444400'}
-              onClick={() => this.handleChangeColor('#444400')}
-            >
-              <div
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  backgroundColor: '#444400',
-                }}
-              ></div>
-            </Button>
+                active={this.state.brushColor === color}
+                onClick={() => this.handleChangeColor(color)}
+              >
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    backgroundColor: color,
+                  }}
+                ></div>
+              </Button>
+            )}
           </ButtonGroup>
           <Divider />
           <ButtonGroup
