@@ -414,9 +414,6 @@ class Documents extends React.Component {
         >
           <Card
             className='document-item-card bp3-elevation-1'
-            style={{
-              padding: '0',
-            }}
           >
             <div
               style={{
@@ -426,7 +423,6 @@ class Documents extends React.Component {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                padding: '8px',
                 overflow: 'hidden',
               }}
               onClick={() => {

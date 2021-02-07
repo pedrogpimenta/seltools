@@ -85,28 +85,20 @@ class Toolbar extends React.Component {
               icon={<RiTBoxLine size='1.2em' />}
               onClick={() => this.changeEditMode('marker')}
               text="Notas"
+              labelElement={this.props.user.type === 'teacher' &&
+                <RiCloseCircleLine onClick={() => this.setState({showRemoveAllMarkersDialog: true})} size='1.2em' />
+              }
             />
-            {this.props.user.type === 'teacher' &&
-              <MenuItem
-                icon={<RiCloseCircleLine size='1.2em' />}
-                onClick={() => this.setState({showRemoveAllMarkersDialog: true})}
-                text="Eliminar Notas"
-              />
-            }
             <MenuDivider />
             <MenuItem
               active={this.props.editMode === 'highlight'}
               icon={<RiMarkPenFill size='1.2em' />}
               onClick={() => this.changeEditMode('highlight')}
               text="Resaltar"
+              labelElement={this.props.user.type === 'teacher' &&
+                <RiCloseCircleLine onClick={() => this.setState({showRemoveAllHighlightsDialog: true})} size='1.2em' />
+              }
             />
-            {this.props.user.type === 'teacher' &&
-              <MenuItem
-                icon={<RiCloseCircleLine size='1.2em' />}
-                onClick={() => this.setState({showRemoveAllHighlightsDialog: true})}
-                text="Eliminar Resaltados"
-              />
-            }
           </Menu>
         </div>
         {this.state.showRemoveAllHighlightsDialog &&
