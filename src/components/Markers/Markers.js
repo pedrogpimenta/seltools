@@ -1,15 +1,12 @@
 import React from 'react';
 import Marker from '../Marker/Marker'
 import { store } from '../../store/store'
-import { findDOMNode } from 'react-dom'
 
 class Markers extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      // x: 0,
-      // y: 0,
       width: 0,
       height: 0,
     }
@@ -38,15 +35,17 @@ class Markers extends React.Component {
     }) 
   }
 
-  editMarkerPosition = (e, markerId) => {
+  editMarkerPosition = (e, markerId, dragEl) => {
     const c = this.markersRef.current
     const markersInfo = c.getBoundingClientRect()
-    const targetEl = findDOMNode(e.target)
-    const parent = targetEl.closest('.react-draggable').getBoundingClientRect()
-    const thisX = parent.x
-    const thisY = parent.y + (parent.height / 2)
-    const xPercent = ((thisX - markersInfo.x) * 100) / markersInfo.width
-    const yPercent = ((thisY - markersInfo.y) * 100) / markersInfo.height
+
+    const positioner = dragEl.current.getBoundingClientRect()
+
+    const thisX = positioner.x - markersInfo.x 
+    const thisY = positioner.y - markersInfo.y
+
+    const xPercent = thisX <= 0 ? 0 : ((thisX) * 100) / markersInfo.width
+    const yPercent = ((thisY) * 100) / markersInfo.height
 
     store.dispatch({
       type: "EDIT_MARKER",
@@ -89,8 +88,6 @@ class Markers extends React.Component {
           left: 0,
           width: '100%',
           height: '100%',
-          // minHeight: '1000px',
-          // marginTop: '34px',
           cursor: this.props.dragging ? 'grabbing' : 'default',
           zIndex: this.props.isActive ? '5' : '3',
         }}
@@ -103,7 +100,6 @@ class Markers extends React.Component {
               width: '100%',
               height: '100%',
               zIndex: '100',
-              // background: 'red',
             }}
             onClick={this.props.handleClickWhenLocked}
           >
@@ -120,7 +116,7 @@ class Markers extends React.Component {
               y={marker.y}
               content={marker.content}
               background={marker.background}
-              editMarkerPosition={(e, markerId) => this.editMarkerPosition(e, markerId)}
+              editMarkerPosition={(e, markerId, dragEl) => this.editMarkerPosition(e, markerId, dragEl)}
               isStudent={this.props.isStudent}
               hasFocus={marker.hasFocus}
             />

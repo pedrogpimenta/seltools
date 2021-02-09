@@ -260,6 +260,7 @@ function reducer(state = initialState, action) {
 
     case 'EDIT_MARKER':
       const actionId = parseInt(action.id)
+      // TODO: melhorar esta merda que aí vem
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
           for (let marker in updatedFiles[file].markers) {
@@ -267,10 +268,10 @@ function reducer(state = initialState, action) {
               if (action.content !== undefined) {
                 updatedFiles[file].markers[marker].content = action.content
               }
-              if (!!action.x) {
+              if (!!action.x || action.x === 0) {
                 updatedFiles[file].markers[marker].x = action.x
               }
-              if (!!action.y) {
+              if (!!action.y || action.y === 0) {
                 updatedFiles[file].markers[marker].y = action.y
               }
             }

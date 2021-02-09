@@ -54,11 +54,12 @@ class Marker extends React.Component {
     this.state = {
       hover: false,
       parentInfo: null,
-      thisInfo: null,
+      // thisInfo: null,
       hasFocus: false,
     }
 
     this.draggable = React.createRef()
+    this.positioner = React.createRef()
     this.editableInput = React.createRef()
     // this.contentEditable = React.createRef()
   }
@@ -133,10 +134,10 @@ class Marker extends React.Component {
 
   componentDidMount = () => {
     const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
-    const thisInfo = findDOMNode(this.draggable.current)
+    // const thisInfo = findDOMNode(this.draggable.current)
     this.setState({
       parentInfo: parentInfo,
-      thisInfo: thisInfo,
+      // thisInfo: thisInfo,
     })
     
     if (this.props.hasFocus) {
@@ -163,12 +164,14 @@ class Marker extends React.Component {
       <Draggable
         ref={this.draggable}
         handle='.handle'
-        position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
+        position={{x: x, y: y}}
+        bounds={'parent'}
         onDrag={(e) => this.reportDragging(e)}
-        onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
+        onStop={(e) => this.props.editMarkerPosition(e, this.props.id, this.positioner)}
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <div
+          ref={this.positioner}
           style={{
             position: 'absolute',
             lineHeight: '0',
@@ -199,7 +202,7 @@ class Marker extends React.Component {
               className='handle'
               style={{
                 position: 'absolute',
-                top: '0',
+                top: '-1px',
                 left: '-30px',
                 paddingRight: '4px',
                 cursor: this.props.dragging ? 'grabbing' : 'grab',
@@ -225,7 +228,7 @@ class Marker extends React.Component {
               className={`marker ${this.props.id}`}
               style={{
                 position: 'relative',
-                padding: '3px 6px 4px 6px',
+                padding: '2px 5px 3px 5px',
                 lineHeight: '18px',
                 borderRadius: '14px',
                 boxShadow: this.state.hasFocus
@@ -261,8 +264,8 @@ class Marker extends React.Component {
               style={{
                 position: 'absolute',
                 display: 'flex',
-                left: '100%',
-                top: '0',
+                left: 'calc(100% + 2px)',
+                top: '-3px',
                 fontSize: 0,
                 paddingLeft: '4px',
                 opacity: this.state.hover && this.state.hasFocus ? '1' : '0',
