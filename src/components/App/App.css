@@ -102,6 +102,17 @@ a:hover {
   color: var(--c-primary-light);
 }
 
+.bp3-menu,
+.bp3-popover,
+.bp3-popover .bp3-popover-content {
+  border-radius: 6px;
+}
+
+.bp3-menu-item {
+  border-radius: 6px;
+  padding: 6px 12px;
+  line-height: 20px;
+}
 /* Buttons */
 /* .bp3-button :-moz-focusring {
   outline: 0 !important;
@@ -111,9 +122,11 @@ button:focus {
   outline: 0 !important;
 }
 
-.bp3-button {
+.bp3-button,
+.bp3-tag.bp3-large {
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 6px 12px;
+  line-height: 20px;
 }
 
 .bp3-button.bp3-intent-primary:not(.bp3-minimal) {
