@@ -4,12 +4,8 @@ import {
   Button,
   Classes,
   Dialog,
-  FormGroup,
-  InputGroup,
   Intent,
 } from "@blueprintjs/core"
-
-import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 class DialogSimple extends React.Component {
   render() {
