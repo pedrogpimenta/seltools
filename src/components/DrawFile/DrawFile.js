@@ -120,8 +120,9 @@ class DrawFile extends React.Component {
           style={{
             display: this.props.isLocked ? 'none' : 'block',
             position: 'absolute',
-            top: '5px',
-            right: '100%',
+            bottom: '100%',
+            left: 0,
+            marginBottom: '4px',
             cursor: 'pointer',
             transition: 'all 100ms ease-out',
             opacity: this.state.editMode === 'text' ? '.9' : '0',
@@ -130,7 +131,6 @@ class DrawFile extends React.Component {
           <Button
             style={{
               margin: '0 4px',
-              height: '38px',
             }}
             intent={this.state.editMode === 'markers' ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.state.editMode === 'markers' && Classes.MINIMAL}
@@ -170,6 +170,7 @@ class DrawFile extends React.Component {
           >
             {DRAW_COLORS.map((color) => 
               <Button
+                key={`color-${color}`}
                 style={{
                   padding: '5px',
                 }}
@@ -248,6 +249,8 @@ class DrawFile extends React.Component {
         <div
           style={{
             position: 'relative',
+            borderRadius: '6px',
+            overflow: 'hidden',
           }}
           ref={this.pointerContainer}
           onMouseMove={(e) => this.handleMouseMove(e)}

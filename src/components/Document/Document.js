@@ -1017,11 +1017,9 @@ class Document extends React.Component {
             <div
               className='document-container'
               style={{
+                position: 'relative',
                 maxWidth: 'var(--doc-width)',
                 margin: '0 auto',
-                // paddingTop: '70px',
-                // paddingRight: '10px',
-                // paddingLeft: '43px',
               }}
             >
               {this.props.files.map((file, i) => {

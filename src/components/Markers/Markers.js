@@ -44,7 +44,7 @@ class Markers extends React.Component {
     const thisX = positioner.x - markersInfo.x 
     const thisY = positioner.y - markersInfo.y
 
-    const xPercent = thisX <= 0 ? 0 : ((thisX) * 100) / markersInfo.width
+    const xPercent = ((thisX) * 100) / markersInfo.width
     const yPercent = ((thisY) * 100) / markersInfo.height
 
     store.dispatch({
@@ -84,9 +84,9 @@ class Markers extends React.Component {
         style={{
           position: 'absolute',
           display: 'flex',
-          top: 0,
-          left: 0,
-          width: '100%',
+          top: '0',
+          left: '-150px',
+          width: 'calc(100% + 300px)',
           height: '100%',
           cursor: this.props.dragging ? 'grabbing' : 'default',
           zIndex: this.props.isActive ? '5' : '3',
