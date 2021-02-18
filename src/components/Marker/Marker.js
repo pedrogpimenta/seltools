@@ -206,7 +206,7 @@ class Marker extends React.Component {
                 left: '-30px',
                 paddingRight: '4px',
                 cursor: this.props.dragging ? 'grabbing' : 'grab',
-                opacity: this.state.hover ? '1' : '0',
+                opacity: this.state.hover || this.state.hasFocus ? '1' : '0',
                 transition: 'all 100ms ease-out',
               }}
             >
@@ -268,8 +268,8 @@ class Marker extends React.Component {
                 top: '-3px',
                 fontSize: 0,
                 paddingLeft: '4px',
-                opacity: this.state.hover && this.state.hasFocus ? '1' : '0',
-                pointerEvents: this.state.hover && this.state.hasFocus ? 'all' : 'none',
+                opacity: this.state.hasFocus ? '1' : '0',
+                pointerEvents: this.state.hasFocus ? 'all' : 'none',
                 transition: 'all 100ms ease-out',
               }}
             >
