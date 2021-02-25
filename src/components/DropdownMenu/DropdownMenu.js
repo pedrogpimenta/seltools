@@ -81,7 +81,7 @@ class DropdownMenu extends React.Component {
             onClick={(e) => this.props.handleCloneDocument(this.props.documentId)}
           />
         }
-        {this.props.documentType === 'document' &&
+        {(this.props.documentType === 'document' || this.props.documentType === 'folder') &&
           <MenuItem
             icon={<RiFolderTransferFill size='1.2em' />}
             text="Mover a..."
