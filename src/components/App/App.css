@@ -90,6 +90,10 @@ body, input, button, textarea {
   font-size: 16px;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 body p:last-child {
   margin-bottom: 0;
 }
@@ -102,6 +106,17 @@ a:hover {
   color: var(--c-primary-light);
 }
 
+.bp3-menu,
+.bp3-popover,
+.bp3-popover .bp3-popover-content {
+  border-radius: 6px;
+}
+
+.bp3-menu-item {
+  border-radius: 6px;
+  padding: 6px 12px;
+  line-height: 20px;
+}
 /* Buttons */
 /* .bp3-button :-moz-focusring {
   outline: 0 !important;
@@ -109,6 +124,13 @@ a:hover {
 
 button:focus {
   outline: 0 !important;
+}
+
+.bp3-button,
+.bp3-tag.bp3-large {
+  border-radius: 6px;
+  padding: 6px 12px;
+  line-height: 20px;
 }
 
 .bp3-button.bp3-intent-primary:not(.bp3-minimal) {
@@ -192,6 +214,8 @@ button:focus {
 .folder-item .bp3-card {
   height: 100%;
   cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 6px;
 }
 
 .document-item:hover .bp3-card,
@@ -234,6 +258,7 @@ button:focus {
 .document-item:hover .button__delete-document {
   opacity: 1;
 }
+
 
 /* Text editor */
 
@@ -480,28 +505,52 @@ body .medium-toolbar-arrow-under::after {
 
 .tools-menu {
   min-width: 0;
+  border-radius: 6px;
 }
 
 .tools-menu li + li {
   margin-top: 6px;
 }
 
-.tools-menu .bp3-menu-item > svg {
-  margin-right: 0;
-  margin-bottom: 2px;
+.tools-menu .bp3-menu-item {
+  padding: 8px;
+  line-height: 19px;
+  border-radius: 4px;
 }
 
-.tools-menu svg + div {
+.tools-menu .bp3-menu-item-label {
+  display: flex;
+  align-items: center;
+}
+
+.tools-menu .bp3-menu-item > svg {
+  margin-right: 0;
+  /* margin-bottom: 2px; */
+}
+
+/* .tools-menu svg + div {
+  position: relative;
+  top: -1px;
+} */
+
+.tools-menu svg ~ * {
   opacity: 0;
   width: 0;
   padding-left: 0;
+  margin-right: 0;
   overflow: hidden;
   transition: all 100ms ease-out;
 }
 
-.tools-menu:hover svg + div {
+.tools-menu:hover svg ~ * {
   opacity: 1;
-  width: 100%;
+  width: auto;
+  padding-left: 8px;
+}
+
+.tools-menu:hover .bp3-menu-item svg ~ * {
+  opacity: 1;
+  /* width: 100%; */
   padding-left: 8px;
 }
 

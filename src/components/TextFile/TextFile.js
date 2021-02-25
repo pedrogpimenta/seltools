@@ -105,8 +105,9 @@ class TextFile extends React.Component {
           style={{
             display: this.props.isLocked ? 'none' : 'block',
             position: 'absolute',
-            top: '5px',
-            right: '100%',
+            bottom: '100%',
+            left: 0,
+            marginBottom: '4px',
             cursor: 'pointer',
             transition: 'all 100ms ease-out',
             opacity: this.state.editMode === 'text' ? '.9' : '0',
@@ -115,7 +116,6 @@ class TextFile extends React.Component {
           <Button
             style={{
               margin: '0 4px',
-              height: '38px',
             }}
             intent={this.state.editMode === 'markers' ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.state.editMode === 'markers' && Classes.MINIMAL}
