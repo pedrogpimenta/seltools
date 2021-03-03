@@ -1,10 +1,7 @@
 import React from 'react'
 import { store } from '../../store/store'
-import {
-  Icon,
-} from "@blueprintjs/core"
+import { Stage, Layer } from 'react-konva';
 
-import { Stage, Layer, Arrow, Rect, Text, Circle, Transformer } from 'react-konva';
 import Line from '../Line/Line'
 
 class Lines extends React.Component {
@@ -17,9 +14,7 @@ class Lines extends React.Component {
       startCoords: null,
       endCoords: null,
       isDrawing: false,
-      // fakeLines: [],
       canvasCursor: 'default',
-      // lineColor: 'black',
     }
 
     this.linesRef = React.createRef();
@@ -43,8 +38,6 @@ class Lines extends React.Component {
   }
 
   handleStageMouseUp = () => {
-    // if (!this.state.isDrawing) return
-    
     this.setState({
       isDrawing: false,
     })
@@ -60,7 +53,6 @@ class Lines extends React.Component {
       return 
     }
 
-    // const newLines = this.state.fakeLines
     const newPoints = [
       0,
       0,
@@ -86,7 +78,6 @@ class Lines extends React.Component {
     this.setState({
       startCoords: null,
       endCoords: null,
-      // fakeLines: newLines,
     })
   }
 
@@ -161,25 +152,9 @@ class Lines extends React.Component {
             }
           </Layer>
         </Stage>
-        {/* <canvas 
-          ref={this.linesRef}
-          style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            // marginTop: '34px',
-            zIndex: this.props.isActive ? '5' : '2',
-          }}
-          onMouseDown={this.handleMouseDown}
-          onMouseMove={this.onMouseMove}
-        >
-        </canvas> */}
       </div>
     )
   }
 }
-
 
 export default Lines

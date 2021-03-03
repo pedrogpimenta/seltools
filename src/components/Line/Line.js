@@ -1,12 +1,7 @@
 import React from 'react'
 import { store } from '../../store/store'
-import {
-  Icon,
-} from "@blueprintjs/core"
-
 
 import { Line } from 'react-konva';
-
 
 class Lines extends React.Component {
   constructor() {
@@ -36,8 +31,6 @@ class Lines extends React.Component {
   }
   
   handleLineMouseUp = () => {
-    console.log('ola')
-
     if (this.props.isDrawing) return
 
     store.dispatch(
