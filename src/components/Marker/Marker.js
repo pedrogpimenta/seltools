@@ -3,16 +3,22 @@ import Draggable from 'react-draggable'
 import { connect } from 'react-redux'
 import { store } from '../../store/store'
 import { findDOMNode } from 'react-dom'
+import ReactQuill, {Quill} from 'react-quill'
+import 'react-quill/dist/quill.bubble.css'
+
 import {
   Icon,
 } from "@blueprintjs/core"
-import ReactQuill, {Quill} from 'react-quill'
-import 'react-quill/dist/quill.bubble.css'
+
+import {
+  RiCloseCircleLine,
+  RiDragMove2Fill,
+} from 'react-icons/ri'
 
 var FontAttributor = Quill.import('attributors/class/font');
 
 FontAttributor.whitelist = [
-  'roboto', 'comfortaa', 'lobster', 'amatic',
+  'opensans', 'comfortaa', 'lobster', 'amatic',
 ];
 Quill.register(FontAttributor, true);
 
@@ -48,11 +54,12 @@ class Marker extends React.Component {
     this.state = {
       hover: false,
       parentInfo: null,
-      thisInfo: null,
+      // thisInfo: null,
       hasFocus: false,
     }
 
     this.draggable = React.createRef()
+    this.positioner = React.createRef()
     this.editableInput = React.createRef()
     // this.contentEditable = React.createRef()
   }
@@ -127,10 +134,10 @@ class Marker extends React.Component {
 
   componentDidMount = () => {
     const parentInfo = findDOMNode(this.draggable.current).closest('.markers')
-    const thisInfo = findDOMNode(this.draggable.current)
+    // const thisInfo = findDOMNode(this.draggable.current)
     this.setState({
       parentInfo: parentInfo,
-      thisInfo: thisInfo,
+      // thisInfo: thisInfo,
     })
     
     if (this.props.hasFocus) {
@@ -157,15 +164,18 @@ class Marker extends React.Component {
       <Draggable
         ref={this.draggable}
         handle='.handle'
-        position={{x: x, y: y - (this.state.thisInfo?.getBoundingClientRect().height / 2)}}
+        position={{x: x, y: y}}
+        bounds={'parent'}
         onDrag={(e) => this.reportDragging(e)}
-        onStop={(e) => this.props.editMarkerPosition(e, this.props.id)}
+        onStop={(e) => this.props.editMarkerPosition(e, this.props.id, this.positioner)}
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <div
+          ref={this.positioner}
           style={{
             position: 'absolute',
             lineHeight: '0',
+            zIndex: this.state.hasFocus ? '30' : '1',
           }}
         >
           <div
@@ -186,17 +196,17 @@ class Marker extends React.Component {
                   zIndex: '-1',
                 }}
               >
-            </div>
+              </div>
             }
             <div
               className='handle'
               style={{
                 position: 'absolute',
-                top: '0',
+                top: '-1px',
                 left: '-30px',
                 paddingRight: '4px',
                 cursor: this.props.dragging ? 'grabbing' : 'grab',
-                opacity: this.state.hover ? '1' : '0',
+                opacity: this.state.hover || this.state.hasFocus ? '1' : '0',
                 transition: 'all 100ms ease-out',
               }}
             >
@@ -204,21 +214,21 @@ class Marker extends React.Component {
                 style={{
                   background: 'white',
                   borderRadius: '40px',
-                  fontSize: '0',
-                  padding: '5px',
+                  // fontSize: '0',
+                  padding: '4px',
                   width: '26px',
                   height: '26px',
                   boxShadow: markerShadow,
                 }}
               >
-                <Icon icon='move' />
+                <RiDragMove2Fill size='1.1em' />
               </div>
             </div>
             <div
               className={`marker ${this.props.id}`}
               style={{
                 position: 'relative',
-                padding: '3px 6px 4px 6px',
+                padding: '2px 5px 3px 5px',
                 lineHeight: '18px',
                 borderRadius: '14px',
                 boxShadow: this.state.hasFocus
@@ -249,36 +259,27 @@ class Marker extends React.Component {
                   },
                 }}
               />
-              {/* <Editor
-                content={this.props.content}
-                parentId={this.props.id}
-                fileId={this.props.fileId}
-                hasFocus={this.props.hasFocus}
-                onEditorChange={(e) => {this.handleChange(e)}}
-                onInputFocus={(e) => {this.onInputFocus(e)}}
-                onInputBlur={(e) => {this.onInputBlur(e)}}
-              /> */}
             </div>
             <div
               style={{
                 position: 'absolute',
                 display: 'flex',
-                left: '100%',
-                top: '0',
+                left: 'calc(100% + 2px)',
+                top: '-3px',
                 fontSize: 0,
                 paddingLeft: '4px',
-                opacity: this.state.hover && this.state.hasFocus ? '1' : '0',
-                pointerEvents: this.state.hover && this.state.hasFocus ? 'all' : 'none',
+                opacity: this.state.hasFocus ? '1' : '0',
+                pointerEvents: this.state.hasFocus ? 'all' : 'none',
                 transition: 'all 100ms ease-out',
               }}
             >
               <div
                 className='delete'
                 style={{
-                  fontSize: 0,
+                  fontSize: '1rem',
                   background: 'white',
                   borderRadius: '40px',
-                  padding: '5px',
+                  padding: '3px',
                   width: '26px',
                   height: '26px',
                   marginRight: '4px',
@@ -286,7 +287,7 @@ class Marker extends React.Component {
                 }}
                 onClick={this.handleDelete}
               >
-                <Icon icon='delete' />
+                <RiCloseCircleLine size='1.25em' />
               </div>
               {!this.props.isStudent &&
                 <>

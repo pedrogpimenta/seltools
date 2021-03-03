@@ -1,0 +1,18 @@
+/* Document page */
+.document {
+  position: relative;
+  margin-top: 50px;
+  padding: 20px;
+}
+
+@media screen and (min-width: 960px) {
+  .document {
+    padding: 20px 50px 20px 100px;
+  }
+}
+
+@media screen and (min-width: 1030px) {
+  .document {
+    padding: 20px 20px 20px 70px;
+  }
+}

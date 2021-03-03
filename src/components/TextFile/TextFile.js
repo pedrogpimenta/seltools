@@ -6,6 +6,11 @@ import {
   Intent,
 } from "@blueprintjs/core"
 
+import {
+  RiLock2Fill,
+  RiPencilFill,
+} from 'react-icons/ri'
+
 import ReactQuill, {Quill} from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 
@@ -40,26 +45,6 @@ export class TagBlot extends Inline {
   }
 }
 Quill.register(TagBlot)
-
-
-// class MyCustomInline extends Inline {
-//   static blotName = 'redtext'
-//   static tagName = 'span'
-//   static className = 'redtext'
-
-//   formats() {
-//     return MyCustomInline.tagName
-//   }
-// }
-
-// Quill.register(MyCustomInline)
-
-
-// class RedTextBlot extends Inline { } 
-// RedTextBlot.blotName = 'redtext';
-// RedTextBlot.tagName = 'SPAN';
-// RedTextBlot.className = 'redtext';
-// Quill.register(RedTextBlot)
 
 
 class TextFile extends React.Component {
@@ -120,18 +105,21 @@ class TextFile extends React.Component {
           style={{
             display: this.props.isLocked ? 'none' : 'block',
             position: 'absolute',
-            top: '5px',
-            right: '100%',
+            bottom: '100%',
+            left: 0,
+            marginBottom: '4px',
             cursor: 'pointer',
             transition: 'all 100ms ease-out',
             opacity: this.state.editMode === 'text' ? '.9' : '0',
           }}
         >
           <Button
-            style={{margin: '0 4px'}}
+            style={{
+              margin: '0 4px',
+            }}
             intent={this.state.editMode === 'markers' ? Intent.DEFAULT : Intent.PRIMARY}
             className={this.state.editMode === 'markers' && Classes.MINIMAL}
-            icon={this.state.editMode === 'markers' ? 'edit' : 'lock'}
+            icon={this.state.editMode === 'markers' ? <RiPencilFill /> : <RiLock2Fill />}
             onClick={this.handleChangeMode}
           />
         </div>

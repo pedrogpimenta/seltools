@@ -4,10 +4,16 @@ import {
   Button,
   Classes,
   Dialog,
-  Icon,
   Intent,
   Spinner,
 } from "@blueprintjs/core"
+
+import {
+  RiFile3Line,
+  RiFolderFill,
+  RiFolder5Fill,
+  RiUserSmileFill,
+} from 'react-icons/ri'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import IconSel from '../IconSel/IconSel'
@@ -18,9 +24,10 @@ class MoveDialog extends React.Component {
 
     this.state = {
       isLoading: true,
+      students: [],
+      folders: [],
       documents: [],
       breadcrumbs: [],
-      students: [],
       folder: [],
     }
   }
@@ -30,40 +37,38 @@ class MoveDialog extends React.Component {
       isLoading: true,
     })
 
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/${'5f3633a4e93634d14b1df842'}/documents/${folderId}`)
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
+    }
+
+    let fetchUrl = localStorage.getItem('seltoolsuserfolder') === folderId ?
+      `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?isTeacherFolder=true` :
+      `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`
+
+    fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        let dialogBreadcrumbs = [{
-          icon: <IconSel />,
-          text: this.props.user.name,
-          id: this.props.user._id,
-          type: 'folder',
-        }]
-
-        if (dialogBreadcrumbs.length > 0) {
-          dialogBreadcrumbs = data.breadcrumbs.map(crumb => {
-            return({
-              icon: 'folder-open',
-              id: crumb._id,
-              text: crumb.name,
-              type: crumb.type,
-              color: crumb.color
-            })
-          })
+        const newBreadcrumbs = data.breadcrumbs
+        newBreadcrumbs.push({icon: 'folder-open', name: data.folder.name, _id: data.folder._id, type: data.folder.type, color: data.folder.color})
+        if (this.props.user.type === 'student') {
+          newBreadcrumbs.shift()
         }
 
-        dialogBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type,  color: data.folder.color})
-      
-        if (dialogBreadcrumbs[0].type === 'student') {
-          dialogBreadcrumbs.unshift({icon: 'folder-open', text: this.props.user.name, id: this.state.user.userfolder, type: 'folder'})
-        }
+        const folders = data.documents.filter(doc => doc.type === 'folder').sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
+        const documents = data.documents.filter(doc => doc.type === 'document')
+        const folder = newBreadcrumbs[newBreadcrumbs.length - 1]
 
         this.setState({
           isLoading: false,
-          students: data.students || [],
-          folder: data.folder || [],
-          documents: data.documents || [],
-          breadcrumbs: dialogBreadcrumbs || [],
+          students: data.students,
+          folders: folders,
+          documents: documents,
+          breadcrumbs: newBreadcrumbs,
+          folder: folder,
         })
       })
   }
@@ -85,9 +90,10 @@ class MoveDialog extends React.Component {
           isOpen={true}
           onClose={() => this.props.handleCloseButton()}
           style={{
+            alignSelf: 'flex-start',
             width: '1000px',
             maxWidth: '100%',
-            maxHeight: '80vh',
+            // maxHeight: '80vh',
           }}
         >
           {this.state.isLoading &&
@@ -97,19 +103,32 @@ class MoveDialog extends React.Component {
               }}
             />
           }
-          <div className={Classes.DIALOG_BODY}>
+          <div
+            className={Classes.DIALOG_BODY}
+            style={{
+              // maxHeight: '70vh',
+            }}
+          >
             <div
               style={{marginLeft: '8px', marginBottom: '8px'}}
             >
               <ul className='bp3-overflow-list bp3-breadcrumbs'>
                 {this.state.breadcrumbs.map((crumb, i) => {
-                    const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
+                    const icon =
+                      crumb.name === 'Sel' ?
+                      <IconSel /> :
+                      crumb.type === 'folder' ?
+                        <RiFolder5Fill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                        crumb.type === 'teacher' ?
+                          <RiUserSmileFill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                          <RiFile3Line size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} />
+
                     return (
                       <li key={`menuitem-${crumb}`}>
                         <span
                           className={`bp3-breadcrumb ${this.state.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
                           onClick={() => {
-                            this.getCurrentDialogContent(crumb.id)
+                            this.getCurrentDialogContent(crumb._id)
                           }}
                         >
                           {crumb.type === 'student' && 
@@ -128,17 +147,11 @@ class MoveDialog extends React.Component {
                                 fontWeight: '700',
                               }}
                             >
-                              {crumb.text.substr(0, 1).toUpperCase()}
+                              {crumb.name.substr(0, 1).toUpperCase()}
                             </div>
                           }
-                          {crumb.type !== 'student' && 
-                            <Icon
-                              icon={icon}
-                              color={crumb.color || '#666'}
-                              className='bp3-icon'
-                            />
-                          }
-                          {crumb.text}
+                          {crumb.type !== 'student' && icon}
+                          {crumb.name}
                         </span>
                       </li>
                     )}
@@ -148,109 +161,169 @@ class MoveDialog extends React.Component {
             <div
               style={{
                 display: 'flex',
-                flexWrap: 'wrap',
+                flexDirection: 'column',
                 width: '100%',
+                minHeight: '100px',
                 background: 'white',
                 borderRadius: '4px',
-                padding: '8px',
-                minHeight: '100px',
-                maxHeight: 'calc(100vh - 340px)',
-                overflow: 'auto',
               }}
-              interactive={true}
-              striped={true}
+              interactive={false}
+              striped={false}
             >
-                {this.state.students.map((student) => {
-                  return (
-                    <div
-                      key={`movedialog-${student._id}`}
-                      style={{
-                        width: '20%',
-                        padding: '6px',
-                      }}
-                      onClick={() => {
-                        this.getCurrentDialogContent(student._id)
-                      }}
-                    >
+              {!!this.state.students.length && 
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    width: '100%',
+                    padding: '8px',
+                  }}
+                  interactive={true}
+                  striped={true}
+                >
+                    {this.state.students.map((student) => {
+                      return (
+                        <div
+                          key={`movedialog-${student._id}`}
+                          style={{
+                            width: '20%',
+                            padding: '6px',
+                          }}
+                          onClick={() => {
+                            this.getCurrentDialogContent(student._id)
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '10px 8px',
+                              boxShadow: '0 0 2px 0 gray',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center', 
+                                width: '18px',
+                                height: '18px',
+                                backgroundColor: student.color || 'black',
+                                color: 'white',
+                                borderRadius: '50%',
+                                marginRight: '2px',
+                                fontSize: '12px',
+                                fontWeight: '700',
+                              }}
+                            >
+                              {student.name.substr(0, 1).toUpperCase()}
+                            </div>
+                            <span
+                              style={{
+                                marginLeft: '6px',
+                                userSelect: 'none',
+                              }}
+                            >{student.name}</span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                </div>
+              }
+              {!!this.state.folders.length &&
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    width: '100%',
+                    padding: '8px',
+                  }}
+                  interactive={true}
+                  striped={true}
+                >
+                    {this.state.folders.map((doc) => {
+                      return (
+                        <div
+                          key={`movedialog-${doc._id}`}
+                          style={{
+                            width: '20%',
+                            padding: '6px',
+                          }}
+                          onClick={() => {
+                            this.getCurrentDialogContent(doc._id)
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '10px 8px',
+                              boxShadow: '0 0 2px 0 gray',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <RiFolderFill size='1.2em' color={doc.color || '#888'} />
+                            <span
+                              style={{
+                                marginLeft: '8px',
+                                userSelect: 'none',
+                              }}
+                            >
+                              {doc.name}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                </div>
+              }
+              {!!this.state.documents.length &&
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    width: '100%',
+                    padding: '8px',
+                  }}
+                  interactive={true}
+                  striped={true}
+                >
+                  {this.state.documents.map((doc) => {
+                    return (
                       <div
+                        key={`movedialog-${doc._id}`}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '10px 8px',
-                          boxShadow: '0 0 2px 0 gray',
-                          cursor: 'pointer',
+                          width: '20%',
+                          padding: '6px',
                         }}
                       >
                         <div
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center', 
-                            width: '18px',
-                            height: '18px',
-                            backgroundColor: student.color || 'black',
-                            color: 'white',
-                            borderRadius: '50%',
-                            marginRight: '6px',
-                            fontSize: '12px',
-                            fontWeight: '700',
+                            padding: '10px 8px',
+                            boxShadow: '0 0 2px 0 gray',
                           }}
                         >
-                          {student.name.substr(0, 1).toUpperCase()}
+                          <RiFile3Line size='1.2em' color={doc.color || '#666'} style={{opacity: '.4'}} />
+                          <span
+                            style={{
+                              marginLeft: '8px',
+                              userSelect: 'none',
+                              opacity: '.4',
+                            }}
+                          >
+                            {doc.name}
+                          </span>
                         </div>
-                        <span
-                          style={{
-                            marginLeft: '6px',
-                            userSelect: 'none',
-                          }}
-                        >{student.name}</span>
                       </div>
-                    </div>
-                  )
-                })}
-                {this.state.documents.map((doc) => {
-                  return (
-                    <div
-                      key={`movedialog-${doc._id}`}
-                      style={{
-                        width: '20%',
-                        padding: '6px',
-                        pointerEvents: doc.type === 'document' ? 'none' : 'all',
-                      }}
-                      onClick={() => {
-                        if (doc.type === 'document') return false
-                        this.getCurrentDialogContent(doc._id)
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '10px 8px',
-                          boxShadow: '0 0 2px 0 gray',
-                          cursor: doc.type === 'folder' ? 'pointer' : 'default',
-                        }}
-                      >
-                        <Icon
-                          icon={doc.type === 'document' ? 'document' : 'folder-close'}
-                          color={doc.color || '#666'}
-                        />
-                        <span
-                          style={{
-                            marginLeft: '8px',
-                            userSelect: 'none',
-                            opacity: doc.type === 'document' ? '.4' : '1',
-                          }}
-                        >
-                          {doc.name}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
+              }
             </div>
           </div>
-
           <div className={Classes.DIALOG_FOOTER}>
             <div className={Classes.DIALOG_FOOTER_ACTIONS}>
               <Button

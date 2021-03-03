@@ -37,6 +37,11 @@ function reducer(state = initialState, action) {
         students: action.students,
       }
 
+    case 'RESET_FILES':
+      return {
+        ...initialState,
+      }
+
     case 'LOAD_FILES':
       const filesOnLoad = cloneDeep(action.files)
       
@@ -197,11 +202,18 @@ function reducer(state = initialState, action) {
       }
 
       filesForLS = updatedFiles.slice()
-      for (let file in filesForLS) {
-        filesForLS[file].hasRendered = false
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+      
+    case 'DELETE_ALL_HIGHLIGHTS':
+      for (let file in updatedFiles) {
+        updatedFiles[file].highlights = []
       }
 
-      // localStorage.setItem('files', JSON.stringify(filesForLS))
+      filesForLS = updatedFiles.slice()
 
       return {
         ...state,
@@ -248,6 +260,7 @@ function reducer(state = initialState, action) {
 
     case 'EDIT_MARKER':
       const actionId = parseInt(action.id)
+      // TODO: melhorar esta merda que aí vem
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
           for (let marker in updatedFiles[file].markers) {
@@ -255,10 +268,10 @@ function reducer(state = initialState, action) {
               if (action.content !== undefined) {
                 updatedFiles[file].markers[marker].content = action.content
               }
-              if (!!action.x) {
+              if (!!action.x || action.x === 0) {
                 updatedFiles[file].markers[marker].x = action.x
               }
-              if (!!action.y) {
+              if (!!action.y || action.y === 0) {
                 updatedFiles[file].markers[marker].y = action.y
               }
             }
@@ -326,6 +339,7 @@ function reducer(state = initialState, action) {
         type: 'txt',
         name: null,
         markers: [],
+        highlights: [],
         content: '',
         creator: action.creator,
       }
@@ -353,6 +367,26 @@ function reducer(state = initialState, action) {
         ...state,
         files: filesForLS,
       }
+
+    case 'ADD_DRAW_FILE':
+      filesForLS = updatedFiles.slice()
+      const drawFileToAdd = {
+        id: `draw-file-${Math.floor((Math.random() * 100000) + 1)}`,
+        type: 'draw',
+        name: null,
+        markers: [],
+        highlights: [],
+        content: '',
+        creator: action.creator,
+      }
+
+      filesForLS.splice(action.position + 1, 0, drawFileToAdd)
+
+      return {
+        ...state,
+        files: filesForLS,
+      }
+
       
     case 'ADD_VIDEO_EMBED':
       filesForLS = updatedFiles.slice()
@@ -361,6 +395,7 @@ function reducer(state = initialState, action) {
         type: 'videoembed',
         name: null,
         markers: [],
+        highlights: [],
         content: action.url,
         creator: action.creator,
       }
@@ -446,7 +481,7 @@ function reducer(state = initialState, action) {
     case 'DOCUMENT_UNSAVED':
       return {
         ...state,
-        isSaved: false,
+        isSaved: state.isLocked ? true : false,
       }
     
     case 'DOCUMENT_SAVED':

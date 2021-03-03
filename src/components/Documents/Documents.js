@@ -1,29 +1,36 @@
 import React from 'react'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { store } from '../../store/store'
 import { cloneDeep } from 'lodash'
 
 import {
-  Alignment,
-  AnchorButton,
   Button,
   Classes,
   Card,
   Icon,
   Intent,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
   Popover,
   Spinner,
 } from "@blueprintjs/core"
 
+import {
+  RiFile3Line,
+  RiFileAddFill,
+  RiFileUserLine,
+  RiFolderAddFill,
+  RiFolderFill,
+  RiFolderUserFill,
+  RiMoreFill,
+  RiUserAddFill,
+  RiUserFill,
+} from 'react-icons/ri'
+
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
 import MoveDialog from '../MoveDialog/MoveDialog'
+import AddStudentDialog from '../AddStudentDialog/AddStudentDialog'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
-import IconSel from '../IconSel/IconSel'
+import TopBar from '../TopBar/TopBar'
 
 class Documents extends React.Component {
   constructor() {
@@ -31,104 +38,58 @@ class Documents extends React.Component {
 
     this.state = {
       isLoadingDocuments: true,
-      user: {},
       userFolders: [],
       userDocuments: [],
       students: [],
-      isUserAllowed: false,
       selectedDocumentId: null,
       selectedDocumentName: null,
       isMoveDialogOpen: false,
-      breadcrumbs: [
-        { icon: 'folder-open',
-          text: 'Sel',
-        },
-      ],
     }
   }
 
-  auth = () => {
-    if (this.state.isUserAllowed) return null
-
-    const pass = window.prompt('¿Cuál es tu contraseña?')
-
-    if (pass === 'amor') {
-      this.setState({isUserAllowed: true})
-      localStorage.setItem('isUserAllowed', true)
-    }
-  }
-
-  getUser = () => {
-    fetch(`${REACT_APP_SERVER_BASE_URL}/user/Sel`)
-      .then(response => response.json())
-      .then(data => {
-        const newBreadcrumbs = cloneDeep(this.state.breadcrumbs)
-
-        // console.log('data.user.userFolder:', data.user.userfolder)
-        newBreadcrumbs[newBreadcrumbs.length - 1].id = data.user.userfolder        
-
-        this.setState({
-          user: data.user,
-          breadcrumbs: newBreadcrumbs,
-        })
-
-        // this.getDocuments(this.props.match.params.folder || data.user.userfolder)
-        this.props.history.push(`/documentos/${this.props.match.params.folder || data.user.userfolder}`)
-        // getDocuments(data.user.userfolder, true)
-      })
-
-  }
-  
   getDocuments = (folderId) => {
     this.setState({
       isLoadingDocuments: true,
     })
 
-    fetch(
-      this.state.breadcrumbs[0].id === folderId ?
-      `${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}?isTeacherFolder=true` :
-      `${REACT_APP_SERVER_BASE_URL}/user/${this.state.user._id}/documents/${folderId}`,
-    )
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
+    }
+
+
+
+    let fetchUrl =
+      this.props.user.type === 'student' ? // is user a student?
+        `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?userIsStudent=true` :
+        localStorage.getItem('seltoolsuserfolder') === folderId ? // is current folder the root teacher folder?
+          `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?isTeacherFolder=true` :
+          `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`
+
+    fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        let newBreadcrumbs = [{
-          icon: <IconSel />,
-          text: this.state.user.name,
-          id: this.state.user._id,
-          type: 'folder'
-        }]
-
-        if (newBreadcrumbs.length > 0) {
-          newBreadcrumbs = data.breadcrumbs.map(crumb => {
-            return({
-              icon: 'folder-open',
-              id: crumb._id,
-              text: crumb.name,
-              type: crumb.type,
-              color: crumb.color,
-            })
-          })
+        const newBreadcrumbs = data.breadcrumbs
+        newBreadcrumbs.push({icon: 'folder-open', name: data.folder.name, _id: data.folder._id, type: data.folder.type, color: data.folder.color})
+        if (this.props.user.type === 'student') {
+          newBreadcrumbs.shift()
         }
-        
-        newBreadcrumbs.push({icon: 'folder-open', text: data.folder.name, id: data.folder._id, type: data.folder.type, color: data.folder.color})
-      
-        if (newBreadcrumbs[0].type === 'student') {
-          newBreadcrumbs.unshift({icon: 'folder-open', text: this.state.user.username, id: this.state.user.userfolder, type: 'folder'})
-        }
+        this.props.setLocation(newBreadcrumbs)
 
         const folders = data.documents.filter(doc => doc.type === 'folder')
         const documents = data.documents.filter(doc => doc.type === 'document')
 
         this.setState({
           isLoadingDocuments: false,
-          students: data.students || [],
-          userFolders: folders || [],
-          userDocuments: documents || [],
-          breadcrumbs: newBreadcrumbs,
+          students: data.students,
+          userFolders: folders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0),
+          userDocuments: documents,
         })
 
-        document.title = `${data.folder.name} -- Seltools`;
-        // this.props.history.push(`/documentos/${folderId}`)
+        document.title = `${data.folder.name} - Seldocs`;
       })
   }
 
@@ -138,6 +99,10 @@ class Documents extends React.Component {
     if (confirmDelete) {
       const requestOptions = {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        },
       }
 
       const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -159,7 +124,7 @@ class Documents extends React.Component {
             })
           } else if (documentType === 'folder') {
             this.setState({
-              userFolders: updatedDocs
+              userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
             })
           } else {
             this.setState({
@@ -177,8 +142,11 @@ class Documents extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -199,7 +167,7 @@ class Documents extends React.Component {
           })
         } else if (documentType === 'folder') {
           this.setState({
-            userFolders: updatedDocs
+            userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
           })
         } else {
           this.setState({
@@ -216,8 +184,11 @@ class Documents extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentmove/${this.state.selectedDocumentId}`
@@ -238,16 +209,19 @@ class Documents extends React.Component {
     const folderName = window.prompt('¿Qué nombre tiene la nueva carpeta?')
 
     if (!!folderName && folderName.length > 0) {
-      const parent = this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id
+      const parent = this.props.breadcrumbs[this.props.breadcrumbs.length - 1]._id
 
       const requestOptions = {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           name: folderName,
           parent: parent,
           type: 'folder',
-        })
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        },
       }
 
       const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`
@@ -255,37 +229,16 @@ class Documents extends React.Component {
       fetch(fetchUrl, requestOptions)
         .then(response => response.json())
         .then((data) => {
+          const folders = this.state.userFolders
 
-          this.getDocuments(parent)
-          // this.props.history.push(`/documentos/${parent}`)
-        })
-    }
-  }
-
-  handleAddStudent = () => {
-    const studentName = window.prompt('¿Cómo se llama tu nuevo alumno?')
-
-    if (!!studentName && studentName.length > 0) {
-      const parent = this.state.breadcrumbs[0].id
-
-      const requestOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          name: studentName,
-          parent: parent,
-          type: 'student',
-        })
-      }
-
-      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`
-
-      fetch(fetchUrl, requestOptions)
-        .then(response => response.json())
-        .then((data) => {
+          folders.unshift({
+            _id: data.insertedId,
+            name: folderName,
+            type: 'folder',
+          })
 
           this.setState({
-            students: data,
+            userFolders: folders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0),
           })
         })
     }
@@ -296,14 +249,17 @@ class Documents extends React.Component {
 
     if (!!newName) {
       const documentObject = {
-        parentId: this.state.breadcrumbs[this.state.breadcrumbs.length - 1].id,
+        parentId: this.props.breadcrumbs[this.props.breadcrumbs.length - 1].id,
         name: newName,
       }
   
       const requestOptions = {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(documentObject)
+        body: JSON.stringify(documentObject),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        },
       }
   
       let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -343,8 +299,11 @@ class Documents extends React.Component {
 
     const requestOptions = {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(documentObject)
+      body: JSON.stringify(documentObject),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
@@ -379,6 +338,10 @@ class Documents extends React.Component {
   handleCloneDocument = (documentId) => {
     const requestOptions = {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
     }
 
     let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentclone/${documentId}`
@@ -413,15 +376,29 @@ class Documents extends React.Component {
 
     return(
       <MoveDialog
-        initialFolder={this.state.breadcrumbs[0].id}
-        user={this.state.user}
+        initialFolder={this.props.user.userfolder}
+        user={this.props.user}
         selectedDocumentId={this.state.selectedDocumentId}
         selectedDocumentName={this.state.selectedDocumentName}
         handleCloseButton={() => this.setState({isMoveDialogOpen: false})}
         handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+        setLocation={this.props.setLocation}
       >
       </MoveDialog>
     )
+  }
+
+  renderAddStudentDialog = () => {
+    if (!this.state.isAddStudentDialogOpen) return false
+
+    return(
+      <AddStudentDialog
+        getDocuments={this.getDocuments}
+        handleCloseButton={() => this.setState({isAddStudentDialogOpen: false})}
+      >
+      </AddStudentDialog>
+    )
+
   }
 
   renderDocuments = () => {
@@ -437,11 +414,8 @@ class Documents extends React.Component {
         >
           <Card
             className='document-item-card bp3-elevation-1'
-            style={{
-              padding: '0',
-            }}
           >
-            <Link
+            <div
               style={{
                 position: 'relative',
                 display: 'flex',
@@ -449,10 +423,13 @@ class Documents extends React.Component {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                padding: '8px',
                 overflow: 'hidden',
               }}
-              to={`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`}
+              onClick={() => {
+                this.props.history.push(`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`)
+                if (document.type !== 'document') this.getDocuments(document._id)
+              }}
+              // to={`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`}
             >
               {document.type === 'student' &&
                 <div
@@ -465,7 +442,7 @@ class Documents extends React.Component {
                     backgroundColor: document.color || 'black',
                     color: 'white',
                     borderRadius: '50%',
-                    marginRight: '6px',
+                    marginRight: '2px',
                     fontSize: '12px',
                     fontWeight: '700',
                     userSelect: 'none',
@@ -475,19 +452,15 @@ class Documents extends React.Component {
                 </div>
               }
               {document.type !== 'student' &&
-                <Icon
-                  icon={document.type === 'document' && document.shared === true ? 'document-share' :
-                        document.type === 'document' ? 'document' :
-                        document.type === 'folder' && document.shared === true ? 'folder-shared' :
-                        document.type === 'folder' ? 'folder-close' :
-                        'user'}
-                  color={document.color || '#888'}
-                  style={{
-                    marginRight: '6px',
-                    // pointerEvents: 'none',
-                    userSelect: 'none',
-                  }}
-                />
+                <>
+                  {this.props.user.type === 'student' && document.type === 'document' ? <RiFile3Line color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
+                  this.props.user.type === 'student' && document.type === 'folder' ? <RiFolderFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
+                  document.type === 'document' && document.shared === true ? <RiFileUserLine color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  document.type === 'document' ? <RiFile3Line color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  document.type === 'folder' && document.shared === true ? <RiFolderUserFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  document.type === 'folder' ? <RiFolderFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+                  <RiUserFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} />}
+                </>
               }
               <h4
                 style={{
@@ -500,8 +473,9 @@ class Documents extends React.Component {
               >
                 {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
               </h4>
-            </Link>
+            </div>
           </Card>
+          {this.props.user.type === 'teacher' &&
             <Popover
               autoFocus={false}
               content={<DropdownMenu
@@ -509,7 +483,7 @@ class Documents extends React.Component {
                 documentName={document.name}
                 documentType={document.type}
                 documentShared={document.shared}
-                breadcrumbs={this.state.breadcrumbs}
+                breadcrumbs={this.props.breadcrumbs}
                 handleShareDocument={this.handleShareDocument}
                 handleRename={this.handleRename}
                 handleColorChange={this.handleColorChange}
@@ -528,11 +502,12 @@ class Documents extends React.Component {
                 }}
               >
                 <Icon
-                  icon='more'
+                  icon={<RiMoreFill size='1.2em' color='white' />}
                   color='white'
                 />
               </div>
             </Popover>
+          }
         </li>
       )
     }
@@ -556,11 +531,11 @@ class Documents extends React.Component {
             <div>
               <Button
                 type='button'
-                icon='new-person'
+                icon={<RiUserAddFill />}
                 className={Classes.MINIMAL}
                 intent={Intent.PRIMARY}
                 text='Nuevo alumno'
-                onClick={this.handleAddStudent}
+                onClick={() => this.setState({isAddStudentDialogOpen: true})}
               />
             </div>
           </div>
@@ -598,16 +573,18 @@ class Documents extends React.Component {
             >
               Carpetas
             </div>
-            <div>
-              <Button
-                type='button'
-                icon='folder-new'
-                className={Classes.MINIMAL}
-                intent={Intent.PRIMARY}
-                text='Nueva carpeta'
-                onClick={this.handleAddFolder}
-              />
-            </div>
+            {this.props.user.type === 'teacher' &&
+              <div>
+                <Button
+                  type='button'
+                  icon={<RiFolderAddFill />}
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nueva carpeta'
+                  onClick={this.handleAddFolder}
+                />
+              </div>
+            }
           </div>
           <ul
             className='documents__documents'
@@ -644,17 +621,20 @@ class Documents extends React.Component {
             >
               Documentos
             </div>
-            <div>
-              <AnchorButton
-                type='button'
-                icon='add'
-                className={Classes.MINIMAL}
-                intent={Intent.PRIMARY}
-                text='Nuevo documento'
-                href={`/documento?parent=${this.props.match.params.folder}`}
-                style={{marginRight: '8px'}}
-              />
-            </div>
+            {this.props.user.type === 'teacher' &&
+              <div>
+                <Button
+                  type='button'
+                  icon={<RiFileAddFill />}
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nuevo documento'
+                  // href={`/documento?parent=${this.props.match.params.folder}`}
+                  style={{marginRight: '8px'}}
+                  onClick={() => this.props.history.push(`/documento?parent=${this.props.match.params.folder}`)}
+                />
+              </div>
+            }
           </div>
           <ul
             className='documents__documents'
@@ -675,7 +655,7 @@ class Documents extends React.Component {
 
     return (
       <div>
-        {this.state.breadcrumbs.length === 1 && students()}
+        {this.props.breadcrumbs.length === 1 && this.props.user.type === 'teacher' && students()}
         {folders()}
         {documents()}
       </div>
@@ -683,28 +663,22 @@ class Documents extends React.Component {
   }
 
   componentDidMount = () => {
-    
+    // TODO: needed?
     store.dispatch({
-      type: 'CHANGE_DOCUMENT_BREADCRUMBS',
-      breadcrumbs: [],
-    })
-
-    store.dispatch({
-      type: 'LOAD_FILES',
+      type: 'RESET_FILES',
       files: [],
       filesOnLoad: [],
     })
-
-    if (!localStorage.getItem('isUserAllowed')) {
-      this.auth()
-    }
-
-    if (localStorage.getItem('isUserAllowed')) {
-      this.getUser()
-    }
     
+    if (!this.props.match.params.folder) {
+      this.getDocuments(this.props.user.userfolder)
+    } else {
+      this.getDocuments(this.props.match.params.folder)
+    }
+
     this.props.history.listen((location, action) => {
-      if (action !== 'PUSH') return false
+      if (action !== 'POP') return
+
       const locationArray = location.pathname.split('/')
       const docId = locationArray[locationArray.length - 1]
       this.getDocuments(docId)
@@ -712,8 +686,6 @@ class Documents extends React.Component {
   }
 
   render() {
-    if (!localStorage.getItem('isUserAllowed')) return <div>No eres Sel!</div>
-
     return (
       <div
         className='App'
@@ -722,132 +694,42 @@ class Documents extends React.Component {
           minHeight: '100vh',
           overflow: 'hidden',
           backgroundColor: '#f8f8f8',
-          // cursor: this.props.dragging ? 'grabbing' : 'default',
         }}
       >
+        <TopBar
+          isDocument={false}
+          isLoading={this.state.isLoadingDocuments}
+          user={this.props.user}
+          breadcrumbs={this.props.breadcrumbs}
+          connectedStudents={this.props.connectedStudents}
+          getDocuments={this.getDocuments}
+          isStudent={this.props.user.type === 'student'}
+        />
         <div
           style={{
-            width: '100%',
-            // cursor: this.props.dragging ? 'grabbing' : 'default',
+            width: '1100px',
+            maxWidth: '100%',
+            margin: '0 auto',
+            paddingTop: '70px',
+            paddingLeft: '16px',
+            paddingRight: '16px',
           }}
         >
-          <Navbar
-            fixedToTop={true}
-            style={{
-              background: 'var(--c-primary-lightest)',
-            }}
-          >
-            <NavbarGroup align={Alignment.LEFT}>
-              <NavbarHeading
+          <div style={{
+            margin: '0 0 32px',
+          }}>
+            {!this.state.isLoadingDocuments ?
+              this.renderDocuments() :
+              <Spinner 
                 style={{
-                  marginRight: '8px'
+                  background: 'red',
                 }}
-              >
-                <div style={{
-                  maxHeight: '44px',
-                  overflow: 'hidden',
-                }}>
-                  <img 
-                    style={{
-                      maxHeight: '44px'
-                    }}
-                    src="/assets/images/logo-seltools.png"
-                    alt= "Seltools"
-                  />
-                </div>
-              </NavbarHeading>
-              <NavbarDivider />
-              <div
-                style={{marginLeft: '8px'}}
-              >
-                <ul className='bp3-overflow-list bp3-breadcrumbs'>
-                  {this.state.breadcrumbs.map((crumb, i) => {
-                    const icon = crumb.type === 'folder' ? 'folder-open' : <IconSel />
-                    return (
-                      <li key={`crumb-${crumb.id}`}>
-                        <span
-                          className={`bp3-breadcrumb ${this.state.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
-                          onClick={() => {
-                            this.state.breadcrumbs.length - 1 !== i && this.props.history.push(`/documentos/${crumb.id}`)
-                          }}
-                        >
-                          {crumb.type === 'student' && 
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center', 
-                                width: '18px',
-                                height: '18px',
-                                backgroundColor: crumb.color || 'black',
-                                color: 'white',
-                                borderRadius: '50%',
-                                marginRight: '6px',
-                                fontSize: '12px',
-                                fontWeight: '700',
-                              }}
-                            >
-                              {crumb.text.substr(0, 1).toUpperCase()}
-                            </div>
-                          }
-                          {crumb.type !== 'student' && 
-                            <Icon
-                              icon={icon}
-                              color={crumb.color || '#666'}
-                              className='bp3-icon'
-                            />
-                          }
-                          {crumb.text}
-                        </span>
-                      </li>
-                    )}
-                  )}
-                </ul>
-              </div>
-            </NavbarGroup>
-            <NavbarGroup align={Alignment.RIGHT}>
-            </NavbarGroup>
-          </Navbar>
-          <div
-            style={{
-              maxWidth: '1100px',
-              margin: '0 auto',
-              paddingTop: '70px',
-              paddingLeft: '16px',
-              paddingRight: '16px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'space-between',
-              }}
-              >
-              <div
-                style={{
-                  width: '100%',
-                }}
-              >
-                <div style={{
-                  margin: '0 0 32px',
-                }}>
-                  {!this.state.isLoadingDocuments &&
-                    this.renderDocuments()
-                  }
-                </div>
-              </div>
-            </div>
+              />
+            }
           </div>
-          {this.state.isLoadingDocuments &&
-            <Spinner 
-              style={{
-                background: 'red',
-              }}
-            />
-          }
-          {this.renderMoveDialog()}
         </div>
+        {this.renderMoveDialog()}
+        {this.renderAddStudentDialog()}
       </div>
     )
   }

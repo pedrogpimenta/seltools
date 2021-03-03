@@ -2,6 +2,67 @@
 @import "~@blueprintjs/core/lib/css/blueprint.css";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
 
+@font-face {
+  font-family: 'Open Sans';
+  src: url('../../fonts/opensans-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Open Sans';
+  src: url('../../fonts/opensans-italic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Open Sans';
+  src: url('../../fonts/opensans-semibold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Open Sans';
+  src: url('../../fonts/opensans-semibolditalic.woff') format('woff');
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Lobster';
+  src: url('../../fonts/lobster.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Amatic SC';
+  src: url('../../fonts/amatic-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Amatic SC';
+  src: url('../../fonts/amatic-bold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Comfortaa';
+  src: url('../../fonts/comfortaa-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Comfortaa';
+  src: url('../../fonts/comfortaa-bold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+
+
 :root {
   --c-primary-dark: #e06150;
   --c-primary: #F87361;
@@ -29,6 +90,14 @@ body, input, button, textarea {
   font-size: 16px;
 }
 
+body {
+  overflow-x: hidden;
+}
+
+body p:last-child {
+  margin-bottom: 0;
+}
+
 a {
   color: var(--c-primary);
 }
@@ -37,6 +106,17 @@ a:hover {
   color: var(--c-primary-light);
 }
 
+.bp3-menu,
+.bp3-popover,
+.bp3-popover .bp3-popover-content {
+  border-radius: 6px;
+}
+
+.bp3-menu-item {
+  border-radius: 6px;
+  padding: 6px 12px;
+  line-height: 20px;
+}
 /* Buttons */
 /* .bp3-button :-moz-focusring {
   outline: 0 !important;
@@ -44,6 +124,13 @@ a:hover {
 
 button:focus {
   outline: 0 !important;
+}
+
+.bp3-button,
+.bp3-tag.bp3-large {
+  border-radius: 6px;
+  padding: 6px 12px;
+  line-height: 20px;
 }
 
 .bp3-button.bp3-intent-primary:not(.bp3-minimal) {
@@ -82,14 +169,23 @@ button:focus {
   background-color: var(--c-primary-light);
 }
 
+.bp3-button svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* Navbar */
 .bp3-navbar {
   display: flex;
-  overflow: auto;
+  overflow: hidden;
   justify-content: space-between;
   /* background-color: var(--c-primary-lightest); */
   box-shadow: none;
   z-index: 20;
+}
+
+.bp3-navbar .bp3-popover-wrapper {
+  line-height: 0;
 }
 
 .bp3-breadcrumb:not(.bp3-breadcrumb-current) {
@@ -118,6 +214,8 @@ button:focus {
 .folder-item .bp3-card {
   height: 100%;
   cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 6px;
 }
 
 .document-item:hover .bp3-card,
@@ -130,7 +228,7 @@ button:focus {
 .folder-item .bp3-popover-wrapper {
   position: absolute;
   right: 6px;
-  top: calc(50% - 1px);
+  top: calc(50%);
   transform: translateY(-50%);
   opacity: 0;
   cursor: pointer;
@@ -160,6 +258,7 @@ button:focus {
 .document-item:hover .button__delete-document {
   opacity: 1;
 }
+
 
 /* Text editor */
 
@@ -300,10 +399,7 @@ body .medium-toolbar-arrow-under::after {
 }
 
 .text-editor .ql-container {
-  /* font-family: 'Roboto', sans-serif; */
   font-family: 'Open Sans', sans-serif;
-  /* font-size: 16px;
-  line-height: 1.5; */
 }
 
 .text-editor .ql-editor {
@@ -391,7 +487,7 @@ body .medium-toolbar-arrow-under::after {
   }
 }
 
-.file-wrapper:hover .text-editor__edit-button {
+.file-wrapper:hover .text-editor.locked .text-editor__edit-button {
   opacity: .6 !important;
 }
 
@@ -409,24 +505,52 @@ body .medium-toolbar-arrow-under::after {
 
 .tools-menu {
   min-width: 0;
+  border-radius: 6px;
 }
 
-.tools-menu .bp3-menu-item > .bp3-icon {
+.tools-menu li + li {
+  margin-top: 6px;
+}
+
+.tools-menu .bp3-menu-item {
+  padding: 8px;
+  line-height: 19px;
+  border-radius: 4px;
+}
+
+.tools-menu .bp3-menu-item-label {
+  display: flex;
+  align-items: center;
+}
+
+.tools-menu .bp3-menu-item > svg {
   margin-right: 0;
-  margin-bottom: 2px;
+  /* margin-bottom: 2px; */
 }
 
-.tools-menu .bp3-icon + div {
+/* .tools-menu svg + div {
+  position: relative;
+  top: -1px;
+} */
+
+.tools-menu svg ~ * {
   opacity: 0;
   width: 0;
   padding-left: 0;
+  margin-right: 0;
   overflow: hidden;
   transition: all 100ms ease-out;
 }
 
-.tools-menu:hover .bp3-icon + div {
+.tools-menu:hover svg ~ * {
   opacity: 1;
-  width: 100%;
+  width: auto;
+  padding-left: 8px;
+}
+
+.tools-menu:hover .bp3-menu-item svg ~ * {
+  opacity: 1;
+  /* width: 100%; */
   padding-left: 8px;
 }
 
@@ -445,7 +569,7 @@ body .medium-toolbar-arrow-under::after {
 
 /* Draggable stuff */
 .react-draggable:hover {
-  z-index: 20;
+  z-index: 20 !important;
 }
 
 .react-draggable-dragging {
