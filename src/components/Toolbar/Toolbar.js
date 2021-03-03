@@ -14,7 +14,6 @@ import {
 import {
   RiCloseCircleLine,
   RiMarkPenFill,
-  RiArrowRightLine,
   RiSubtractLine,
   RiTBoxLine,
 } from 'react-icons/ri'
@@ -85,7 +84,6 @@ class Toolbar extends React.Component {
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
-                // background: 'red',
               }}
               onClick={this.props.handleClickWhenLocked}
             >
