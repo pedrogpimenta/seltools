@@ -518,6 +518,10 @@ body .medium-toolbar-arrow-under::after {
   border-radius: 4px;
 }
 
+.tools-menu:hover .bp3-menu-item-label  {
+  padding-left: 2rem !important;
+}
+
 .tools-menu .bp3-menu-item-label {
   display: flex;
   align-items: center;

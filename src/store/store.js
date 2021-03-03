@@ -220,6 +220,18 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
+    case 'DELETE_ALL_LINES':
+      for (let file in updatedFiles) {
+        updatedFiles[file].lines = []
+      }
+
+      filesForLS = updatedFiles.slice()
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
     case 'ADD_MARKER':
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {
@@ -434,6 +446,44 @@ function reducer(state = initialState, action) {
           for (let highlight in updatedFiles[file].highlights) {
             if (updatedFiles[file].highlights[highlight].id === action.id) {
               updatedFiles[file].highlights.splice(highlight, 1)
+            }
+          }
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'ADD_NEW_LINE':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          if (!updatedFiles[file].lines) {
+            updatedFiles[file].lines = []
+          }
+          updatedFiles[file].lines.push({
+            id: action.id,
+            x: action.x,
+            y: action.y,
+            points: action.points,
+          })
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'DELETE_LINE':
+      console.log('2')
+      for (let file in updatedFiles) {
+        console.log(updatedFiles[file].id, action.fileId)
+        if (updatedFiles[file].id === action.fileId) {
+          for (let line in updatedFiles[file].lines) {
+            if (updatedFiles[file].lines[line].id === action.id) {
+              updatedFiles[file].lines.splice(line, 1)
             }
           }
         }

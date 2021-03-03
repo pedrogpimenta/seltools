@@ -14,6 +14,8 @@ import {
 import {
   RiCloseCircleLine,
   RiMarkPenFill,
+  RiArrowRightLine,
+  RiSubtractLine,
   RiTBoxLine,
 } from 'react-icons/ri'
 
@@ -24,6 +26,7 @@ class Toolbar extends React.Component {
     this.state = {
       showRemoveAllMarkersDialog: false,
       showRemoveAllHighlightsDialog: false,
+      showRemoveAllLinesDialog: false,
     }
   }
 
@@ -33,7 +36,6 @@ class Toolbar extends React.Component {
       editMode: newEditMode,
     }) 
   }
-
 
   handleRemoveAllHighlights = () => {
     this.props.dispatch({
@@ -53,6 +55,16 @@ class Toolbar extends React.Component {
       type: "DOCUMENT_UNSAVED",
     }) 
     this.setState({showRemoveAllMarkersDialog: false})
+  }
+  
+  handleRemoveAllLines = () => {
+    this.props.dispatch({
+      type: "DELETE_ALL_LINES",
+    }) 
+    this.props.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
+    this.setState({showRemoveAllLinesDialog: false})
   }
 
   render() {
@@ -99,6 +111,16 @@ class Toolbar extends React.Component {
                 <RiCloseCircleLine onClick={() => this.setState({showRemoveAllHighlightsDialog: true})} size='1.2em' />
               }
             />
+            <MenuDivider />
+            <MenuItem
+              active={this.props.editMode === 'lines'}
+              icon={<RiSubtractLine size='1.2em' />}
+              onClick={() => this.changeEditMode('lines')}
+              text="Líneas"
+              labelElement={this.props.user.type === 'teacher' &&
+                <RiCloseCircleLine onClick={() => this.setState({showRemoveAllLinesDialog: true})} size='1.2em' />
+              }
+            />
           </Menu>
         </div>
         {this.state.showRemoveAllHighlightsDialog &&
@@ -119,6 +141,16 @@ class Toolbar extends React.Component {
             yes={this.handleRemoveAllMarkers}
             noText='No, quiero cancelar'
             no={() => this.setState({showRemoveAllMarkersDialog: false})}
+          />
+        }
+        {this.state.showRemoveAllLinesDialog &&
+          <DialogSimple
+            title='Eliminar líneas'
+            content='Quieres eliminar todas las líneas de este documento?'
+            yesText='Si, quiero eliminar'
+            yes={this.handleRemoveAllLines}
+            noText='No, quiero cancelar'
+            no={() => this.setState({showRemoveAllLinesDialog: false})}
           />
         }
       </>
