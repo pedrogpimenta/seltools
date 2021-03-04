@@ -11,24 +11,30 @@ import {
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
-class MoveDialog extends React.Component {
+class EditDocumentDialog extends React.Component {
   constructor() {
     super()
 
     this.state = {
-      name: '',
-      email: '',
+      student: {
+        _id: null,
+        username: '',
+        email: '',
+      }
     }
   }
 
-  handleAddStudent = () => {
+  componentDidMount = () => {
+    this.getCurrentDialogContent(this.props.selectedDocumentId)
+  }
+
+  handleEditStudent = () => {
     const requestOptions = {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify({
-        name: this.state.name,
-        email: this.state.email,
-        teacherId: localStorage.getItem('seltoolsuserid'),
-        teacherFolder: localStorage.getItem('seltoolsuserfolder'),
+        username: this.state.student.username,
+        email: this.state.student.email,
+        userfolder: this.state.student.userfolder,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -36,11 +42,36 @@ class MoveDialog extends React.Component {
       },
     }
 
-    const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/newStudent`
+    const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/student/${this.state.student._id}`
 
     fetch(fetchUrl, requestOptions)
+      .then(response => response.json())
       .then(() => {
         this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
+      })
+  }
+
+  getCurrentDialogContent = (documentId) => {
+    this.setState({
+      isLoading: true,
+    })
+
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+      },
+    }
+
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/student/${documentId}`
+
+    fetch(fetchUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          student: data,
+        })
       })
   }
 
@@ -48,7 +79,7 @@ class MoveDialog extends React.Component {
     return (
       <>
         <Dialog
-          title={`Añadir estudiante`}
+          title={`Editar estudiante: ${this.state.student.username}`}
           isOpen={true}
           onClose={() => this.props.handleCloseButton()}
           style={{
@@ -60,9 +91,7 @@ class MoveDialog extends React.Component {
           <div
             className={Classes.DIALOG_BODY}
           >
-            <div
-
-            >
+            <div>
               <form
                 action="submit"
                 style={{
@@ -77,8 +106,13 @@ class MoveDialog extends React.Component {
                   <InputGroup
                     id="name-input"
                     type="text"
-                    placeholder="Sara"
-                    onChange={(e) => this.setState({name: e.target.value})}
+                    value={this.state.student.username}
+                    onChange={(e) => this.setState({
+                      student: {
+                        ...this.state.student,
+                        username: e.target.value,
+                      }
+                    })}
                   />
                 </FormGroup>
                 <FormGroup
@@ -91,8 +125,13 @@ class MoveDialog extends React.Component {
                   <InputGroup
                     id="email-input"
                     type="email"
-                    placeholder="email@ejemplo.com"
-                    onChange={(e) => this.setState({email: e.target.value})}
+                    value={this.state.student.email}
+                    onChange={(e) => this.setState({
+                      student: {
+                        ...this.state.student,
+                        email: e.target.value,
+                      }
+                    })}
                   />
                 </FormGroup>
               </form>
@@ -101,13 +140,20 @@ class MoveDialog extends React.Component {
           <div className={Classes.DIALOG_FOOTER}>
             <div className={Classes.DIALOG_FOOTER_ACTIONS}>
               <Button
-                intent={Intent.PRIMARY}
                 onClick={() => {
-                  this.handleAddStudent()
                   this.props.handleCloseButton()
                 }}
               >
-                Añadir {this.state.name}
+                Cancelar
+              </Button>
+              <Button
+                intent={Intent.PRIMARY}
+                onClick={() => {
+                  this.handleEditStudent()
+                  this.props.handleCloseButton()
+                }}
+              >
+                Guardar cambios
               </Button>
             </div>
           </div>
@@ -117,4 +163,4 @@ class MoveDialog extends React.Component {
   }
 }
 
-export default MoveDialog
+export default EditDocumentDialog

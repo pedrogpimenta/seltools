@@ -27,6 +27,8 @@ import {
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
+import DeleteDocumentDialog from '../DeleteDocumentDialog/DeleteDocumentDialog'
+import EditDocumentDialog from '../EditDocumentDialog/EditDocumentDialog'
 import MoveDialog from '../MoveDialog/MoveDialog'
 import AddStudentDialog from '../AddStudentDialog/AddStudentDialog'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
@@ -44,10 +46,12 @@ class Documents extends React.Component {
       selectedDocumentId: null,
       selectedDocumentName: null,
       isMoveDialogOpen: false,
+      isEditDocumentDialogOpen: false,
+      isDeleteDocumentDialogOpen: false,
     }
   }
 
-  getDocuments = (folderId) => {
+getDocuments = (folderId) => {
     this.setState({
       isLoadingDocuments: true,
     })
@@ -93,47 +97,47 @@ class Documents extends React.Component {
       })
   }
 
-  handleDeleteDocument = (documentId, documentName, documentType) => {
-    const confirmDelete = window.confirm(`¿Quieres eliminar "${documentName}"?`)
+  // handleDeleteDocument = (documentId, documentName, documentType) => {
+  //   const confirmDelete = window.confirm(`¿Quieres eliminar "${documentName}"?`)
 
-    if (confirmDelete) {
-      const requestOptions = {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
-        },
-      }
+  //   if (confirmDelete) {
+  //     const requestOptions = {
+  //       method: 'DELETE',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+  //       },
+  //     }
 
-      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
+  //     const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
 
-      fetch(fetchUrl, requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          if (data.ok !== 1) return false
+  //     fetch(fetchUrl, requestOptions)
+  //       .then(response => response.json())
+  //       .then(data => {
+  //         if (data.ok !== 1) return false
 
-          const updatedDocs = documentType === 'document' ?
-            this.state.userDocuments.filter((doc) => doc._id !== documentId) :
-            documentType === 'folder' ?
-              this.state.userFolders.filter((doc) => doc._id !== documentId) :
-              this.state.students.filter((doc) => doc._id !== documentId)
+  //         const updatedDocs = documentType === 'document' ?
+  //           this.state.userDocuments.filter((doc) => doc._id !== documentId) :
+  //           documentType === 'folder' ?
+  //             this.state.userFolders.filter((doc) => doc._id !== documentId) :
+  //             this.state.students.filter((doc) => doc._id !== documentId)
 
-          if (documentType === 'document') {
-            this.setState({
-              userDocuments: updatedDocs
-            })
-          } else if (documentType === 'folder') {
-            this.setState({
-              userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
-            })
-          } else {
-            this.setState({
-              students: updatedDocs
-            })
-          }
-        })
-    }
-  }
+  //         if (documentType === 'document') {
+  //           this.setState({
+  //             userDocuments: updatedDocs
+  //           })
+  //         } else if (documentType === 'folder') {
+  //           this.setState({
+  //             userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
+  //           })
+  //         } else {
+  //           this.setState({
+  //             students: updatedDocs
+  //           })
+  //         }
+  //       })
+  //   }
+  // }
 
   handleShareDocument = (documentId, documentShared, documentType) => {
     const documentObject = {
@@ -202,6 +206,14 @@ class Documents extends React.Component {
           this.setState({
             userDocuments: documents
           })
+
+          if (!this.props.match.params.folder) {
+            this.getDocuments(this.props.user.userfolder)
+          } else {
+            this.getDocuments(this.props.match.params.folder)
+          }
+
+          // this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
       })
   }
 
@@ -371,6 +383,53 @@ class Documents extends React.Component {
     })
   }
 
+  handleEditDocumentDialogOpen = (documentId, documentName) => {
+    this.setState({
+      isEditDocumentDialogOpen: true,
+      selectedDocumentId: documentId,
+      selectedDocumentName: documentName,
+    })
+  }
+
+  renderEditDocumentDialog = () => {
+    if (!this.state.isEditDocumentDialogOpen) return false
+
+    return(
+      <EditDocumentDialog
+        user={this.props.user}
+        selectedDocumentId={this.state.selectedDocumentId}
+        handleCloseButton={() => this.setState({isEditDocumentDialogOpen: false})}
+        getDocuments={this.getDocuments}
+      >
+      </EditDocumentDialog>
+    )
+  }
+
+  handleDeleteDocument = (documentId, documentName, documentType) => {
+    this.setState({
+      isDeleteDocumentDialogOpen: true,
+      selectedDocumentId: documentId,
+      selectedDocumentName: documentName,
+      selectedDocumentType: documentType,
+    })
+  }
+  
+  renderDeleteDocumentDialog = () => {
+    if (!this.state.isDeleteDocumentDialogOpen) return false
+
+    return(
+      <DeleteDocumentDialog
+        user={this.props.user}
+        selectedDocumentId={this.state.selectedDocumentId}
+        selectedDocumentName={this.state.selectedDocumentName}
+        selectedDocumentType={this.state.selectedDocumentType}
+        handleCloseButton={() => this.setState({isDeleteDocumentDialogOpen: false})}
+        getDocuments={this.getDocuments}
+      >
+      </DeleteDocumentDialog>
+    )
+  }
+
   renderMoveDialog = () => {
     if (!this.state.isMoveDialogOpen) return false
 
@@ -490,6 +549,7 @@ class Documents extends React.Component {
                 handleCloneDocument={this.handleCloneDocument}
                 handleDeleteDocument={this.handleDeleteDocument}
                 handleMoveDialogOpen={this.handleMoveDialogOpen}
+                handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
               />}
             >
               <div
@@ -728,6 +788,8 @@ class Documents extends React.Component {
             }
           </div>
         </div>
+        {this.renderDeleteDocumentDialog()}
+        {this.renderEditDocumentDialog()}
         {this.renderMoveDialog()}
         {this.renderAddStudentDialog()}
       </div>

@@ -131,6 +131,18 @@ button:focus {
   border-radius: 6px;
   padding: 6px 12px;
   line-height: 20px;
+  transition: all 100ms ease-out;
+}
+
+.bp3-button:not(.bp3-minimal):not([class*="bp3-intent-"]) {
+  background: white;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.bp3-button:not(.bp3-minimal):not([class*="bp3-intent-"]):hover {
+  /* opacity: .6; */
+  background: white;
+  box-shadow: 0 5px 8px 0 rgba(0, 0, 0, .08);
 }
 
 .bp3-button.bp3-intent-primary:not(.bp3-minimal) {
