@@ -5,8 +5,6 @@ import {
   Button,
   Classes,
   Dialog,
-  FormGroup,
-  InputGroup,
   Intent,
 } from "@blueprintjs/core"
 
@@ -26,10 +24,7 @@ class DeleteDocumentDialog extends React.Component {
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
-      .then((data) => {
-        // this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
-        // this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
-        // handleDeleteDocument
+      .then(() => {
         if (!this.props.match.params.folder) {
           this.props.getDocuments(this.props.user.userfolder)
         } else {
