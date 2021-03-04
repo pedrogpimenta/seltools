@@ -27,6 +27,7 @@ import {
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 
+import EditDocumentDialog from '../EditDocumentDialog/EditDocumentDialog'
 import MoveDialog from '../MoveDialog/MoveDialog'
 import AddStudentDialog from '../AddStudentDialog/AddStudentDialog'
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
@@ -44,6 +45,7 @@ class Documents extends React.Component {
       selectedDocumentId: null,
       selectedDocumentName: null,
       isMoveDialogOpen: false,
+      isEditDocumentDialogOpen: false,
     }
   }
 
@@ -371,6 +373,28 @@ class Documents extends React.Component {
     })
   }
 
+  handleEditDocumentDialogOpen = (documentId, documentName) => {
+    this.setState({
+      isEditDocumentDialogOpen: true,
+      selectedDocumentId: documentId,
+      selectedDocumentName: documentName,
+    })
+  }
+
+  renderEditDocumentDialog = () => {
+    if (!this.state.isEditDocumentDialogOpen) return false
+
+    return(
+      <EditDocumentDialog
+        user={this.props.user}
+        selectedDocumentId={this.state.selectedDocumentId}
+        handleCloseButton={() => this.setState({isEditDocumentDialogOpen: false})}
+        getDocuments={this.getDocuments}
+      >
+      </EditDocumentDialog>
+    )
+  }
+
   renderMoveDialog = () => {
     if (!this.state.isMoveDialogOpen) return false
 
@@ -490,6 +514,7 @@ class Documents extends React.Component {
                 handleCloneDocument={this.handleCloneDocument}
                 handleDeleteDocument={this.handleDeleteDocument}
                 handleMoveDialogOpen={this.handleMoveDialogOpen}
+                handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
               />}
             >
               <div
@@ -728,6 +753,7 @@ class Documents extends React.Component {
             }
           </div>
         </div>
+        {this.renderEditDocumentDialog()}
         {this.renderMoveDialog()}
         {this.renderAddStudentDialog()}
       </div>

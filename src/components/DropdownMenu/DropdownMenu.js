@@ -53,6 +53,13 @@ class DropdownMenu extends React.Component {
             onClick={(e) => this.props.handleShareDocument(this.props.documentId, this.props.documentShared, this.props.documentType)}
           />
         }
+        {this.props.documentType === 'student' &&
+          <MenuItem
+            icon={<RiPencilFill size='1.2em' />}
+            text="Editar"
+            onClick={(e) => this.props.handleEditDocumentDialogOpen(this.props.documentId, this.props.documentName)}
+          />
+        }
         {this.props.documentType !== 'student' &&
           <MenuItem
             icon={<RiPencilFill size='1.2em' />}
