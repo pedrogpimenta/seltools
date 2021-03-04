@@ -21,10 +21,6 @@ class MoveDialog extends React.Component {
     }
   }
 
-  // componentDidMount = () => {
-  //   this.getCurrentDialogContent(this.props.initialFolder)
-  // }
-
   handleAddStudent = () => {
     const requestOptions = {
       method: 'POST',
@@ -43,8 +39,7 @@ class MoveDialog extends React.Component {
     const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/newStudent`
 
     fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then((data) => {
+      .then(() => {
         this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
       })
   }
@@ -60,21 +55,13 @@ class MoveDialog extends React.Component {
             alignSelf: 'flex-start',
             width: '500px',
             maxWidth: '100%',
-            // maxHeight: '80vh',
           }}
         >
           <div
             className={Classes.DIALOG_BODY}
           >
             <div
-              style={{
-                // display: 'flex',
-                // flexDirection: 'column',
-                // width: '100%',
-                // minHeight: '100px',
-                // background: 'white',
-                // borderRadius: '4px',
-              }}
+
             >
               <form
                 action="submit"
@@ -130,5 +117,4 @@ class MoveDialog extends React.Component {
   }
 }
 
-// export default withRouter(Dialog)
 export default MoveDialog

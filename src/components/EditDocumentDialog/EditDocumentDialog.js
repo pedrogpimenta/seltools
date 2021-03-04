@@ -46,7 +46,7 @@ class EditDocumentDialog extends React.Component {
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
-      .then((data) => {
+      .then(() => {
         this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
       })
   }
@@ -69,7 +69,6 @@ class EditDocumentDialog extends React.Component {
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log('data:', data)
         this.setState({
           student: data,
         })
@@ -87,7 +86,6 @@ class EditDocumentDialog extends React.Component {
             alignSelf: 'flex-start',
             width: '500px',
             maxWidth: '100%',
-            // maxHeight: '80vh',
           }}
         >
           <div

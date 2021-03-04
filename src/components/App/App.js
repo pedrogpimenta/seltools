@@ -37,18 +37,7 @@ class App extends React.Component {
     })
 
     this.socket = io(REACT_APP_SERVER_WS_URL, {query: `userId=${user._id}`})
-    // this.socket = user.type === 'teacher' ?
-    // io(REACT_APP_SERVER_WS_URL, {query: `userId=${user._id}`}) :
-    // io(REACT_APP_SERVER_WS_URL, {query: `userId=${user._id}&teacherId=${user.teacherId}`})
 
-    // this.socket.on('offline', () => {
-    //   console.log('off')
-    // })
-
-    // this.socket.on('connect', () => {
-    //   console.log('conn')
-    // })
-    
     if (this.state.user.type === 'teacher') {
       this.socket.on('connected students', (students) => {
         this.setState({
