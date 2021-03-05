@@ -71,6 +71,7 @@ class Lines extends React.Component {
         onMouseOver={this.handleLineMouseOver}
         onMouseOut={this.handleLineMouseOut}
         onMouseUp={this.handleLineMouseUp}
+        listening={this.props.listening}
         style={{
           opacity: '.1',
         }}

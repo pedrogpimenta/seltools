@@ -126,7 +126,8 @@ class Lines extends React.Component {
             cursor: this.state.canvasCursor,
           }}
         >
-          <Layer>
+          <Layer
+          >
             {this.props.lines.map((line) => {
               return (
                 <>
@@ -136,6 +137,7 @@ class Lines extends React.Component {
                     handleLineCursorOver={this.handleLineCursorOver}
                     handleLineCursorOut={this.handleLineCursorOut}
                     isDrawing={this.state.isDrawing}
+                    listening={!this.state.isDrawing}
                   />
                 </>
               )
