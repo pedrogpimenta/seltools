@@ -477,9 +477,7 @@ function reducer(state = initialState, action) {
       }
 
     case 'DELETE_LINE':
-      console.log('2')
       for (let file in updatedFiles) {
-        console.log(updatedFiles[file].id, action.fileId)
         if (updatedFiles[file].id === action.fileId) {
           for (let line in updatedFiles[file].lines) {
             if (updatedFiles[file].lines[line].id === action.id) {
