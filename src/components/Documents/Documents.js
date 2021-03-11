@@ -153,16 +153,20 @@ getDocuments = (folderId) => {
       .then(data => {
           if (data.ok !== 1) return false
           const documents = this.state.userDocuments.filter((doc) => doc._id !== documentId)
+          const folders = this.state.userFolders.filter((doc) => doc._id !== documentId)
+          const students = this.state.students.filter((doc) => doc._id !== documentId)
 
           this.setState({
-            userDocuments: documents
+            students: students,
+            userFolders: folders,
+            userDocuments: documents,
           })
 
-          if (!this.props.match.params.folder) {
-            this.getDocuments(this.props.user.userfolder)
-          } else {
-            this.getDocuments(this.props.match.params.folder)
-          }
+          // if (!this.props.match.params.folder) {
+          //   this.getDocuments(this.props.user.userfolder)
+          // } else {
+          //   this.getDocuments(this.props.match.params.folder)
+          // }
 
           // this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
       })
@@ -451,6 +455,7 @@ getDocuments = (folderId) => {
           >
             {this.state.students.map((student) => 
               <DocumentsItem
+                key={student._id}
                 user={this.props.user}
                 document={student}
                 breadcrumbs={this.props.breadcrumbs}
@@ -514,6 +519,7 @@ getDocuments = (folderId) => {
           >
             {this.state.userFolders.map((folder) => 
               <DocumentsItem
+                key={folder._id}
                 user={this.props.user}
                 document={folder}
                 breadcrumbs={this.props.breadcrumbs}
@@ -579,6 +585,7 @@ getDocuments = (folderId) => {
           >
             {this.state.userDocuments.map((document) => 
               <DocumentsItem
+                key={document._id}
                 user={this.props.user}
                 document={document}
                 breadcrumbs={this.props.breadcrumbs}

@@ -1,6 +1,7 @@
-import React, {useRef} from 'react'
+import React, { useRef, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { useDrag, useDrop } from "react-dnd"
+import { getEmptyImage } from 'react-dnd-html5-backend';
 
 import {
   Card,
@@ -18,18 +19,24 @@ import {
 } from 'react-icons/ri'
 
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
+import { CustomDragLayer } from './DragLayer'
 
 const DocumentsItem = (props) => {
 
   const ref = useRef(null)
 
-  const [{ isDragging }, dragRef] = useDrag({
+  const [{ isDragging }, dragRef, preview] = useDrag({
     type: props.document.type,
     item: {_id: props.document._id, name: props.document.name},
+    canDrag: () => props.document.type !== 'student',
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   })
+  
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  });
 
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: props.document.type === 'document' ? 'none' : ['document', 'folder'],
@@ -51,13 +58,16 @@ const DocumentsItem = (props) => {
       style={{
         position: 'relative',
         listStyle: 'none',
-        opacity: isDragging ? '.5' : '1',
         borderRadius: '6px',
         boxShadow: (isOver && canDrop) ? '0 0 0 3px var(--c-primary)' : 'none',
       }}
     >
+      {isDragging && <CustomDragLayer document={props.document} user={props.user} />}
       <Card
         className='document-item-card bp3-elevation-1'
+        style={{
+          opacity: isDragging ? '.5' : '1',
+        }}
       >
         <div
           style={{
@@ -118,7 +128,7 @@ const DocumentsItem = (props) => {
           </h4>
         </div>
       </Card>
-      {props.user.type === 'teacher' &&
+      {props.user.type === 'teacher' && !isDragging &&
         <Popover
           autoFocus={false}
           content={<DropdownMenu
