@@ -53,7 +53,7 @@ const DocumentsItem = (props) => {
   return (
     <li
       key={props.document._id}
-      ref={ref}
+      ref={props.user.type !== 'student' ? ref : null}
       className='document-item'
       style={{
         position: 'relative',
