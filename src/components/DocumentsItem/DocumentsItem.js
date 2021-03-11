@@ -1,89 +1,169 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Link } from 'react-router-dom'
-import { store } from '../../store/store'
+import { useDrag, useDrop } from "react-dnd"
+import { getEmptyImage } from 'react-dnd-html5-backend';
 
 import {
-  Alignment,
-  AnchorButton,
-  Breadcrumbs,
-  Button,
-  Classes,
   Card,
   Icon,
-  Intent,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
+  Popover,
 } from "@blueprintjs/core"
 
-import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
+import {
+  RiFile3Line,
+  RiFileUserLine,
+  RiFolderFill,
+  RiFolderUserFill,
+  RiMoreFill,
+  RiUserFill,
+} from 'react-icons/ri'
 
-class DocumentsItem extends React.Component {
-  // constructor() {
-  //   super()
+import DropdownMenu from '../DropdownMenu/DropdownMenu'
+import { CustomDragLayer } from './DragLayer'
 
-  //   this.state = {
-  //   }
-  // }
+const DocumentsItem = (props) => {
 
+  const ref = useRef(null)
 
-  // componentDidMount = () => {
+  const [{ isDragging }, dragRef, preview] = useDrag({
+    type: props.document.type,
+    item: {_id: props.document._id, name: props.document.name},
+    canDrag: () => props.document.type !== 'student',
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+  
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  });
 
-  // }
+  const [{ isOver, canDrop }, dropRef] = useDrop({
+    accept: props.document.type === 'document' ? 'none' : ['document', 'folder'],
+    drop: (item) => {props.handleMoveDocument(props.document._id, item._id)},
+    canDrop: (item) => item._id !== props.document._id,
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop(),
+    }),
+  })
 
-  render() {
-    return (
-      <li className='document-item' key={this.props.document._id}>
-        <Card
+  dragRef(dropRef(ref))
+
+  return (
+    <li
+      key={props.document._id}
+      ref={props.user.type !== 'student' ? ref : null}
+      className='document-item'
+      style={{
+        position: 'relative',
+        listStyle: 'none',
+        borderRadius: '6px',
+        boxShadow: (isOver && canDrop) ? '0 0 0 3px var(--c-primary)' : 'none',
+      }}
+    >
+      {isDragging && <CustomDragLayer document={props.document} user={props.user} />}
+      <Card
+        className='document-item-card bp3-elevation-1'
+        style={{
+          opacity: isDragging ? '.5' : '1',
+        }}
+      >
+        <div
           style={{
+            position: 'relative',
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
+            height: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
             justifyContent: 'flex-start',
-            height: '8rem',
-            padding: '16px',
+            overflow: 'hidden',
           }}
-          onClick={(e) => {
-            if (this.props.type === 'document') {
-              window.open(`/documento/${this.props.document._id}`, '_blank')
-            } else {
-              this.getDocuments(this.props.document._id)
-            }
+          onClick={() => {
+            props.history.push(`/${props.document.type === 'document' ? 'documento' : 'documentos'}/${props.document._id}`)
+            if (props.document.type !== 'document') props.getDocuments(props.document._id)
           }}
         >
-          {this.props.type === 'document' &&
-            <Icon
-              icon='document'
-              iconSize={Icon.SIZE_LARGE} 
+          {props.document.type === 'student' &&
+            <div
               style={{
-                marginRight: '6px'}}
-            />
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center', 
+                width: '18px',
+                height: '18px',
+                backgroundColor: props.document.color || 'black',
+                color: 'white',
+                borderRadius: '50%',
+                marginRight: '2px',
+                fontSize: '12px',
+                fontWeight: '700',
+                userSelect: 'none',
+              }}
+            >
+              {props.document.name.substr(0, 1).toUpperCase()}
+            </div>
           }
-          {this.props.type === 'folder' &&
+          {props.document.type !== 'student' &&
+            <>
+              {props.user.type === 'student' && props.document.type === 'document' ? <RiFile3Line color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
+              props.user.type === 'student' && props.document.type === 'folder' ? <RiFolderFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
+              props.document.type === 'document' && props.document.shared === true ? <RiFileUserLine color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+              props.document.type === 'document' ? <RiFile3Line color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+              props.document.type === 'folder' && props.document.shared === true ? <RiFolderUserFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+              props.document.type === 'folder' ? <RiFolderFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+              <RiUserFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} />}
+            </>
+          }
+          <h4
+            style={{
+              flex: '1',
+              fontWeight: '300',
+              margin: '0 0 0 4px',
+              // pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          >
+            {!!props.document.name.trim().length ? props.document.name : 'Documento sin nombre' }
+          </h4>
+        </div>
+      </Card>
+      {props.user.type === 'teacher' && !isDragging &&
+        <Popover
+          autoFocus={false}
+          content={<DropdownMenu
+            documentId={props.document._id}
+            documentName={props.document.name}
+            documentType={props.document.type}
+            documentShared={props.document.shared}
+            breadcrumbs={props.breadcrumbs}
+            handleShareDocument={props.handleShareDocument}
+            handleRename={props.handleRename}
+            handleColorChange={props.handleColorChange}
+            handleCloneDocument={props.handleCloneDocument}
+            handleDeleteDocument={props.handleDeleteDocument}
+            handleMoveDialogOpen={props.handleMoveDialogOpen}
+            handleEditDocumentDialogOpen={props.handleEditDocumentDialogOpen}
+          />}
+        >
+          <div
+            className={'card-actions'}
+            style={{
+              background: 'rgb(197, 197, 197)',
+              padding: '4px',
+              borderRadius: '3px',
+              lineHeight: '0',
+            }}
+          >
             <Icon
-              icon='folder-close'
-              iconSize={Icon.SIZE_LARGE} 
-              style={{
-                marginRight: '6px'}}
+              icon={<RiMoreFill size='1.2em' color='white' />}
+              color='white'
             />
-          }
-          <h2 style={{fontWeight: '400', margin: '8px 0 0 0'}}>
-            {!!this.props.document.name.trim().length ? this.props.document.name : 'Documento sin nombre' }
-          </h2>
-          {/* <Button
-            type='button'
-            icon='delete'
-            intent={Intent.PRIMARY}
-            className={`button__delete-document ${Classes.MINIMAL}`}
-            text='Eliminar'
-            onClick={(e) => this.handleDeleteDocument(document._id)}
-          /> */}
-        </Card>
-      </li>
-    )
-  }
+          </div>
+        </Popover>
+      }
+    </li>
+  )
 }
 
 export default withRouter(DocumentsItem)

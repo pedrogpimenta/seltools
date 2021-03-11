@@ -1,6 +1,7 @@
 import React from 'react';
 import Markers from '../Markers/Markers'
 import Highlights from '../Highlights/Highlights'
+import Lines from '../Lines/Lines'
 
 class FileWrapper extends React.Component {
   // constructor() {
@@ -67,6 +68,18 @@ class FileWrapper extends React.Component {
               isActive={this.props.mode === 'highlight'}
               // isStudent={this.props.isStudent}
               // hasRendered={this.props.hasRendered}
+            />
+          }
+          {this.props.fileType !== 'aac' &&
+            this.props.fileType !== 'mp3' &&
+            this.props.fileType !== 'ogg' &&
+            this.props.fileType !== 'opus' &&
+            this.props.fileType !== 'wav' &&
+            this.props.fileType !== 'webm' &&
+            <Lines
+              fileId={this.props.id}
+              lines={this.props.lines || []}
+              isActive={this.props.mode === 'lines'}
             />
           }
           {this.props.children}

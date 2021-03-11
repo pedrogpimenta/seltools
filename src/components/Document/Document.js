@@ -594,6 +594,7 @@ class Document extends React.Component {
             url: url,
             markers: [],
             highlights: [],
+            lines: [],
             stamps: [],
             creator: this.props.user.type === 'student' ? localStorage.getItem('studentName') : 'Sel',
           })
@@ -1038,6 +1039,7 @@ class Document extends React.Component {
                       fileType={file.type}
                       markers={file.markers}
                       highlights={file.highlights}
+                      lines={file.lines}
                       hasRendered={file.hasRendered}
                       isStudent={this.props.user.type === 'student'}
                       mode={this.props.editMode}
