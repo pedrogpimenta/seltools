@@ -124,7 +124,7 @@ class MoveDialog extends React.Component {
                           <RiFile3Line size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} />
 
                     return (
-                      <li key={`menuitem-${crumb}`}>
+                      <li key={`menuitem-${crumb._id}`}>
                         <span
                           className={`bp3-breadcrumb ${this.state.breadcrumbs.length - 1 === i ? 'bp3-breadcrumb-current' : ''}`}
                           onClick={() => {

@@ -2,27 +2,20 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { store } from '../../store/store'
 import { cloneDeep } from 'lodash'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import {
   Button,
   Classes,
-  Card,
-  Icon,
   Intent,
-  Popover,
   Spinner,
 } from "@blueprintjs/core"
 
 import {
-  RiFile3Line,
   RiFileAddFill,
-  RiFileUserLine,
   RiFolderAddFill,
-  RiFolderFill,
-  RiFolderUserFill,
-  RiMoreFill,
   RiUserAddFill,
-  RiUserFill,
 } from 'react-icons/ri'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
@@ -31,7 +24,7 @@ import DeleteDocumentDialog from '../DeleteDocumentDialog/DeleteDocumentDialog'
 import EditDocumentDialog from '../EditDocumentDialog/EditDocumentDialog'
 import MoveDialog from '../MoveDialog/MoveDialog'
 import AddStudentDialog from '../AddStudentDialog/AddStudentDialog'
-import DropdownMenu from '../DropdownMenu/DropdownMenu'
+import DocumentsItem from '../DocumentsItem/DocumentsItem'
 import TopBar from '../TopBar/TopBar'
 
 class Documents extends React.Component {
@@ -97,48 +90,6 @@ getDocuments = (folderId) => {
       })
   }
 
-  // handleDeleteDocument = (documentId, documentName, documentType) => {
-  //   const confirmDelete = window.confirm(`¿Quieres eliminar "${documentName}"?`)
-
-  //   if (confirmDelete) {
-  //     const requestOptions = {
-  //       method: 'DELETE',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
-  //       },
-  //     }
-
-  //     const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
-
-  //     fetch(fetchUrl, requestOptions)
-  //       .then(response => response.json())
-  //       .then(data => {
-  //         if (data.ok !== 1) return false
-
-  //         const updatedDocs = documentType === 'document' ?
-  //           this.state.userDocuments.filter((doc) => doc._id !== documentId) :
-  //           documentType === 'folder' ?
-  //             this.state.userFolders.filter((doc) => doc._id !== documentId) :
-  //             this.state.students.filter((doc) => doc._id !== documentId)
-
-  //         if (documentType === 'document') {
-  //           this.setState({
-  //             userDocuments: updatedDocs
-  //           })
-  //         } else if (documentType === 'folder') {
-  //           this.setState({
-  //             userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
-  //           })
-  //         } else {
-  //           this.setState({
-  //             students: updatedDocs
-  //           })
-  //         }
-  //       })
-  //   }
-  // }
-
   handleShareDocument = (documentId, documentShared, documentType) => {
     const documentObject = {
       shared: !documentShared,
@@ -195,23 +146,27 @@ getDocuments = (folderId) => {
       },
     }
 
-    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentmove/${this.state.selectedDocumentId}`
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentmove/${documentId}`
 
     fetch(fetchUrl, requestOptions)
       .then(response => response.json())
       .then(data => {
           if (data.ok !== 1) return false
           const documents = this.state.userDocuments.filter((doc) => doc._id !== documentId)
+          const folders = this.state.userFolders.filter((doc) => doc._id !== documentId)
+          const students = this.state.students.filter((doc) => doc._id !== documentId)
 
           this.setState({
-            userDocuments: documents
+            students: students,
+            userFolders: folders,
+            userDocuments: documents,
           })
 
-          if (!this.props.match.params.folder) {
-            this.getDocuments(this.props.user.userfolder)
-          } else {
-            this.getDocuments(this.props.match.params.folder)
-          }
+          // if (!this.props.match.params.folder) {
+          //   this.getDocuments(this.props.user.userfolder)
+          // } else {
+          //   this.getDocuments(this.props.match.params.folder)
+          // }
 
           // this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
       })
@@ -461,117 +416,6 @@ getDocuments = (folderId) => {
   }
 
   renderDocuments = () => {
-    const renderDocument = (document) => {
-      return (
-        <li
-          key={document._id}
-          className='document-item'
-          style={{
-            position: 'relative',
-            listStyle: 'none',
-          }}
-        >
-          <Card
-            className='document-item-card bp3-elevation-1'
-          >
-            <div
-              style={{
-                position: 'relative',
-                display: 'flex',
-                height: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                overflow: 'hidden',
-              }}
-              onClick={() => {
-                this.props.history.push(`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`)
-                if (document.type !== 'document') this.getDocuments(document._id)
-              }}
-              // to={`/${document.type === 'document' ? 'documento' : 'documentos'}/${document._id}`}
-            >
-              {document.type === 'student' &&
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center', 
-                    width: '18px',
-                    height: '18px',
-                    backgroundColor: document.color || 'black',
-                    color: 'white',
-                    borderRadius: '50%',
-                    marginRight: '2px',
-                    fontSize: '12px',
-                    fontWeight: '700',
-                    userSelect: 'none',
-                  }}
-                >
-                  {document.name.substr(0, 1).toUpperCase()}
-                </div>
-              }
-              {document.type !== 'student' &&
-                <>
-                  {this.props.user.type === 'student' && document.type === 'document' ? <RiFile3Line color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
-                  this.props.user.type === 'student' && document.type === 'folder' ? <RiFolderFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
-                  document.type === 'document' && document.shared === true ? <RiFileUserLine color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
-                  document.type === 'document' ? <RiFile3Line color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
-                  document.type === 'folder' && document.shared === true ? <RiFolderUserFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
-                  document.type === 'folder' ? <RiFolderFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
-                  <RiUserFill color={document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} />}
-                </>
-              }
-              <h4
-                style={{
-                  flex: '1',
-                  fontWeight: '300',
-                  margin: '0 0 0 4px',
-                  // pointerEvents: 'none',
-                  userSelect: 'none',
-                }}
-              >
-                {!!document.name.trim().length ? document.name : 'Documento sin nombre' }
-              </h4>
-            </div>
-          </Card>
-          {this.props.user.type === 'teacher' &&
-            <Popover
-              autoFocus={false}
-              content={<DropdownMenu
-                documentId={document._id}
-                documentName={document.name}
-                documentType={document.type}
-                documentShared={document.shared}
-                breadcrumbs={this.props.breadcrumbs}
-                handleShareDocument={this.handleShareDocument}
-                handleRename={this.handleRename}
-                handleColorChange={this.handleColorChange}
-                handleCloneDocument={this.handleCloneDocument}
-                handleDeleteDocument={this.handleDeleteDocument}
-                handleMoveDialogOpen={this.handleMoveDialogOpen}
-                handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
-              />}
-            >
-              <div
-                className={'card-actions'}
-                style={{
-                  background: 'rgb(197, 197, 197)',
-                  padding: '4px',
-                  borderRadius: '3px',
-                  lineHeight: '0',
-                }}
-              >
-                <Icon
-                  icon={<RiMoreFill size='1.2em' color='white' />}
-                  color='white'
-                />
-              </div>
-            </Popover>
-          }
-        </li>
-      )
-    }
-
     const students = () => {
       return (
         <>
@@ -609,7 +453,23 @@ getDocuments = (folderId) => {
               gridGap: '16px',
             }}
           >
-            {this.state.students.map(student => renderDocument(student))}
+            {this.state.students.map((student) => 
+              <DocumentsItem
+                key={student._id}
+                user={this.props.user}
+                document={student}
+                breadcrumbs={this.props.breadcrumbs}
+                getDocuments={this.getDocuments}
+                handleShareDocument={this.handleShareDocument}
+                handleRename={this.handleRename}
+                handleColorChange={this.handleColorChange}
+                handleCloneDocument={this.handleCloneDocument}
+                handleDeleteDocument={this.handleDeleteDocument}
+                handleMoveDialogOpen={this.handleMoveDialogOpen}
+                handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
+                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+              />
+            )}
           </ul>
         </>
       )
@@ -657,7 +517,23 @@ getDocuments = (folderId) => {
               justifyItems: 'stretch',
             }}
           >
-            {this.state.userFolders.map(folder => renderDocument(folder))}
+            {this.state.userFolders.map((folder) => 
+              <DocumentsItem
+                key={folder._id}
+                user={this.props.user}
+                document={folder}
+                breadcrumbs={this.props.breadcrumbs}
+                getDocuments={this.getDocuments}
+                handleShareDocument={this.handleShareDocument}
+                handleRename={this.handleRename}
+                handleColorChange={this.handleColorChange}
+                handleCloneDocument={this.handleCloneDocument}
+                handleDeleteDocument={this.handleDeleteDocument}
+                handleMoveDialogOpen={this.handleMoveDialogOpen}
+                handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
+                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+              />
+            )}
           </ul>
         </>
       )
@@ -707,7 +583,23 @@ getDocuments = (folderId) => {
               justifyItems: 'stretch',
             }}
           >
-            {this.state.userDocuments.map(document => renderDocument(document))}
+            {this.state.userDocuments.map((document) => 
+              <DocumentsItem
+                key={document._id}
+                user={this.props.user}
+                document={document}
+                breadcrumbs={this.props.breadcrumbs}
+                getDocuments={this.getDocuments}
+                handleShareDocument={this.handleShareDocument}
+                handleRename={this.handleRename}
+                handleColorChange={this.handleColorChange}
+                handleCloneDocument={this.handleCloneDocument}
+                handleDeleteDocument={this.handleDeleteDocument}
+                handleMoveDialogOpen={this.handleMoveDialogOpen}
+                handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
+                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+              />
+            )}
           </ul>
         </>
       )
@@ -778,14 +670,16 @@ getDocuments = (folderId) => {
           <div style={{
             margin: '0 0 32px',
           }}>
-            {!this.state.isLoadingDocuments ?
-              this.renderDocuments() :
-              <Spinner 
-                style={{
-                  background: 'red',
-                }}
-              />
-            }
+            <DndProvider backend={HTML5Backend}>
+              {!this.state.isLoadingDocuments ?
+                this.renderDocuments() :
+                <Spinner 
+                  style={{
+                    background: 'red',
+                  }}
+                />
+              }
+            </DndProvider>
           </div>
         </div>
         {this.renderDeleteDocumentDialog()}
