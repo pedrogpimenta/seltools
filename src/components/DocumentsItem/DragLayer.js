@@ -35,8 +35,7 @@ export const CustomDragLayer = (props) => {
         <Card
           className='document-item-card bp3-elevation-1'
           style={{
-            // display: 'inline-block',
-            width: '180px',
+            width: '200px',
           }}
         >
           <div
