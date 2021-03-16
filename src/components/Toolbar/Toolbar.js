@@ -119,6 +119,20 @@ class Toolbar extends React.Component {
                 <RiCloseCircleLine onClick={() => this.setState({showRemoveAllLinesDialog: true})} size='1.2em' />
               }
             />
+            {this.props.user.type === 'teacher' &&
+              <>
+                <MenuDivider />
+                <MenuItem
+                  active={this.props.editMode === 'textinputs'}
+                  icon={<RiTBoxLine size='1.2em' />}
+                  onClick={() => this.changeEditMode('textinputs')}
+                  text="Campos de texto"
+                  labelElement={this.props.user.type === 'teacher' &&
+                    <RiCloseCircleLine onClick={() => this.setState({showRemoveAllLinesDialog: true})} size='1.2em' />
+                  }
+                />
+              </>
+            }
           </Menu>
         </div>
         {this.state.showRemoveAllHighlightsDialog &&

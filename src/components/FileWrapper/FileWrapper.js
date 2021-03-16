@@ -2,6 +2,7 @@ import React from 'react';
 import Markers from '../Markers/Markers'
 import Highlights from '../Highlights/Highlights'
 import Lines from '../Lines/Lines'
+import TextInputs from '../TextInputs/TextInputs'
 
 class FileWrapper extends React.Component {
   // constructor() {
@@ -66,8 +67,6 @@ class FileWrapper extends React.Component {
               fileId={this.props.id}
               highlights={this.props.highlights || []}
               isActive={this.props.mode === 'highlight'}
-              // isStudent={this.props.isStudent}
-              // hasRendered={this.props.hasRendered}
             />
           }
           {this.props.fileType !== 'aac' &&
@@ -80,6 +79,21 @@ class FileWrapper extends React.Component {
               fileId={this.props.id}
               lines={this.props.lines || []}
               isActive={this.props.mode === 'lines'}
+            />
+          }
+          {this.props.fileType !== 'aac' &&
+            this.props.fileType !== 'mp3' &&
+            this.props.fileType !== 'ogg' &&
+            this.props.fileType !== 'opus' &&
+            this.props.fileType !== 'wav' &&
+            this.props.fileType !== 'webm' &&
+            <TextInputs
+              fileId={this.props.id}
+              textInputs={this.props.textInputs || []}
+              isActive={this.props.mode === 'textinputs'}
+              isStudent={this.props.isStudent}
+              isLocked={this.props.isLocked}
+              handleClickWhenLocked={this.props.handleClickWhenLocked}
             />
           }
           {this.props.children}

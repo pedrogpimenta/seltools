@@ -456,6 +456,148 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
 
+    case 'ADD_NEW_TEXTINPUT':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          if (!updatedFiles[file].textInputs) {
+            updatedFiles[file].textInputs = []
+          }
+          updatedFiles[file].textInputs.push({
+            id: action.id,
+            xPercent: action.xPercent,
+            yPercent: action.yPercent,
+            width: action.width,
+            height: action.height,
+            content: action.content,
+            answerState: action.answerState,
+            correctAnswers: action.correctAnswers,
+            enableCase: action.enableCase,
+            enableAccents: action.enableAccents,
+          })
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'DELETE_TEXTINPUT':
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let textInput in updatedFiles[file].textInputs) {
+            if (updatedFiles[file].textInputs[textInput].id === action.id) {
+              updatedFiles[file].textInputs.splice(textInput, 1)
+            }
+          }
+        }
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+    
+    case 'EDIT_TEXTINPUT':
+      // TODO: melhorar esta merda que aí vem
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let textInput in updatedFiles[file].textInputs) {
+            if (updatedFiles[file].textInputs[textInput].id === action.id) {
+              if (action.content !== undefined) {
+                updatedFiles[file].textInputs[textInput].content = action.content
+              }
+              if (!!action.x || action.x === 0) {
+                updatedFiles[file].textInputs[textInput].x = action.x
+              }
+              if (!!action.y || action.y === 0) {
+                updatedFiles[file].textInputs[textInput].y = action.y
+              }
+            }
+          }
+        }
+      }
+
+      filesForLS = updatedFiles.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'ADD_TEXTINPUT_ANSWER': 
+      // TODO: melhorar esta merda que aí vem
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let textInput in updatedFiles[file].textInputs) {
+            if (updatedFiles[file].textInputs[textInput].id === action.textInputId) {
+              updatedFiles[file].textInputs[textInput].correctAnswers.push(action.answer)
+            }
+          }
+        }
+      }
+
+      filesForLS = updatedFiles.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'DELETE_TEXTINPUT_ANSWER': 
+      // TODO: melhorar esta merda que aí vem
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let textInput in updatedFiles[file].textInputs) {
+            if (updatedFiles[file].textInputs[textInput].id === action.textInputId) {
+              for (let answer in updatedFiles[file].textInputs[textInput].correctAnswers) {
+                if (updatedFiles[file].textInputs[textInput].correctAnswers[answer] === action.answer) {
+                  updatedFiles[file].textInputs[textInput].correctAnswers.splice(answer, 1)
+                }
+              }
+            }
+          }
+        }
+      }
+
+      filesForLS = updatedFiles.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+
+    case 'SET_TEXTINPUT_STATE': 
+      // TODO: melhorar esta merda que aí vem
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let textInput in updatedFiles[file].textInputs) {
+            if (updatedFiles[file].textInputs[textInput].id === action.textInputId) {
+              updatedFiles[file].textInputs[textInput].answerState = action.answerState
+            }
+          }
+        }
+      }
+
+      filesForLS = updatedFiles.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
+    
     case 'ADD_NEW_LINE':
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {

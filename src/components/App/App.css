@@ -110,6 +110,7 @@ a:hover {
 .bp3-popover,
 .bp3-popover .bp3-popover-content {
   border-radius: 6px;
+  /* overflow: hidden; */
 }
 
 .bp3-menu-item {
@@ -576,6 +577,49 @@ body .medium-toolbar-arrow-under::after {
 
 .highlights .highlight:hover .delete {
   opacity: 1 !important;
+}
+
+/* .textInputs .ghost-textInput {
+  opacity: .3;
+} */
+
+.textInputs .textInput:hover {
+  z-index: 10;
+}
+
+.textInputs .textInput .drawer:before{
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 1px;
+  height: 10px;
+  background: rgba(0, 0, 0, .4);
+  transform: translateY(-50%);
+}
+
+.textInputs .textInput:hover .drawer,
+.textInputs .textInput .drawer.open {
+  opacity: 1 !important;
+}
+
+.textInputs .textInput .drawer:hover {
+  /* background-color: rgb(190, 190, 190) !important; */
+}
+
+.textInputs .textInput .drawer:hover svg {
+  /* opacity: .8 !important; */
+}
+
+.textInput .quill {
+  height: 96%;
+  cursor: text;
+}
+
+.textInput .ql-editor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .file:hover .fileButtons:not(.locked) {
