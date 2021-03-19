@@ -42,6 +42,7 @@ class FileWrapper extends React.Component {
         >
           {this.props.fileType !== 'aac' &&
             this.props.fileType !== 'mp3' &&
+            this.props.fileType !== 'm4a' &&
             this.props.fileType !== 'ogg' &&
             this.props.fileType !== 'opus' &&
             this.props.fileType !== 'wav' &&
@@ -58,6 +59,7 @@ class FileWrapper extends React.Component {
           }
           {this.props.fileType !== 'aac' &&
             this.props.fileType !== 'mp3' &&
+            this.props.fileType !== 'm4a' &&
             this.props.fileType !== 'ogg' &&
             this.props.fileType !== 'opus' &&
             this.props.fileType !== 'wav' &&
@@ -72,6 +74,7 @@ class FileWrapper extends React.Component {
           }
           {this.props.fileType !== 'aac' &&
             this.props.fileType !== 'mp3' &&
+            this.props.fileType !== 'm4a' &&
             this.props.fileType !== 'ogg' &&
             this.props.fileType !== 'opus' &&
             this.props.fileType !== 'wav' &&
