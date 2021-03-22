@@ -12,11 +12,11 @@ import {
   RiFile3Line,
   RiFolderFill,
   RiFolder5Fill,
-  RiUserSmileFill,
 } from 'react-icons/ri'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
 import IconSel from '../IconSel/IconSel'
+import UserIcon from '../UserIcon/UserIcon'
 
 class MoveDialog extends React.Component {
   constructor() {
@@ -120,7 +120,7 @@ class MoveDialog extends React.Component {
                       crumb.type === 'folder' ?
                         <RiFolder5Fill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
                         crumb.type === 'teacher' ?
-                          <RiUserSmileFill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                          <UserIcon username={crumb.name} color={crumb.color} /> :
                           <RiFile3Line size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} />
 
                     return (
@@ -132,26 +132,12 @@ class MoveDialog extends React.Component {
                           }}
                         >
                           {crumb.type === 'student' && 
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center', 
-                                width: '18px',
-                                height: '18px',
-                                backgroundColor: crumb.color || 'black',
-                                color: 'white',
-                                borderRadius: '50%',
-                                marginRight: '6px',
-                                fontSize: '12px',
-                                fontWeight: '700',
-                              }}
-                            >
-                              {crumb.name.substr(0, 1).toUpperCase()}
-                            </div>
+                            <UserIcon username={crumb.name} color={crumb.color} />
                           }
                           {crumb.type !== 'student' && icon}
-                          {crumb.name}
+                          <span style={{marginLeft: '4px'}}>
+                            {crumb.name}
+                          </span>
                         </span>
                       </li>
                     )}
@@ -202,23 +188,7 @@ class MoveDialog extends React.Component {
                               cursor: 'pointer',
                             }}
                           >
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center', 
-                                width: '18px',
-                                height: '18px',
-                                backgroundColor: student.color || 'black',
-                                color: 'white',
-                                borderRadius: '50%',
-                                marginRight: '2px',
-                                fontSize: '12px',
-                                fontWeight: '700',
-                              }}
-                            >
-                              {student.name.substr(0, 1).toUpperCase()}
-                            </div>
+                            <span style={{flexShrink: 0}}><UserIcon username={student.name} color={student.color} /></span>
                             <span
                               style={{
                                 marginLeft: '6px',

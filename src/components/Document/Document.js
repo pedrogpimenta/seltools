@@ -1041,6 +1041,7 @@ class Document extends React.Component {
                       highlights={file.highlights}
                       lines={file.lines}
                       hasRendered={file.hasRendered}
+                      user={this.props.user}
                       isStudent={this.props.user.type === 'student'}
                       mode={this.props.editMode}
                       fileButtons={this.renderFileButtons(i, file.id)}

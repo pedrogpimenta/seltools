@@ -37,6 +37,7 @@ import {
 } from 'react-icons/ri'
 
 import IconSel from '../IconSel/IconSel'
+import UserIcon from '../UserIcon/UserIcon'
 
 TimeAgo.addDefaultLocale(es)
 
@@ -88,10 +89,10 @@ class TopBar extends React.Component {
                     crumb.name === 'Sel' ?
                     <IconSel /> :
                     crumb.type === 'folder' ?
-                      <RiFolder5Fill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
+                      <RiFolder5Fill size='1.2em' color={crumb.color || '#666'} /> :
                       crumb.type === 'teacher' ?
-                        <RiUserSmileFill size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} /> :
-                        <RiFile3Line size='1.2em' color={crumb.color || '#666'} style={{marginRight: '5px'}} />
+                        <UserIcon username={crumb.name} color={crumb.color} /> :
+                        <RiFile3Line size='1.2em' color={crumb.color || '#666'} />
 
                   return (
                     <li key={`crumb-${crumb._id}`}>
@@ -105,40 +106,26 @@ class TopBar extends React.Component {
                         }}
                       >
                         {crumb.type === 'student' && 
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center', 
-                              width: '18px',
-                              height: '18px',
-                              backgroundColor: crumb.color || 'black',
-                              color: 'white',
-                              borderRadius: '50%',
-                              marginRight: '6px',
-                              fontSize: '12px',
-                              fontWeight: '700',
-                            }}
-                          >
-                            {crumb.name && crumb.name.substr(0, 1).toUpperCase()}
-                          </div>
+                          <UserIcon username={crumb.name} color={crumb.color} />
                         }
                         {crumb.type !== 'student' && icon}
-                        {this.props.user.type === 'teacher' && crumb.type === 'document' &&
-                          <EditableText
-                            style={{color: 'black'}}
-                            defaultValue={this.props.documentName}
-                            placeholder='Nuevo documento'
-                            confirmOnEnterKey={true}
-                            onConfirm={(e) => this.props.handleNameInputConfirm(e)}
-                          ></EditableText>
-                        }
-                        {this.props.user.type !== 'teacher' && crumb.type === 'document' &&
-                          crumb.name
-                        }
-                        {crumb.type !== 'document' && 
-                          crumb.name
-                        }
+                        <span style={{marginLeft: '6px'}}>
+                          {this.props.user.type === 'teacher' && crumb.type === 'document' &&
+                            <EditableText
+                              style={{color: 'black'}}
+                              defaultValue={this.props.documentName}
+                              placeholder='Nuevo documento'
+                              confirmOnEnterKey={true}
+                              onConfirm={(e) => this.props.handleNameInputConfirm(e)}
+                            ></EditableText>
+                          }
+                          {this.props.user.type !== 'teacher' && crumb.type === 'document' &&
+                            crumb.name
+                          }
+                          {crumb.type !== 'document' && 
+                            crumb.name
+                          }
+                        </span>
                       </span>
                     </li>
                   )}
@@ -161,24 +148,7 @@ class TopBar extends React.Component {
                     content={student.username}
                     position={Position.BOTTOM}
                   >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center', 
-                        width: '18px',
-                        height: '18px',
-                        backgroundColor: document.color || 'black',
-                        color: 'white',
-                        borderRadius: '50%',
-                        marginRight: '6px',
-                        fontSize: '12px',
-                        fontWeight: '700',
-                        userSelect: 'none',
-                      }}
-                    >
-                      {student.username.substr(0, 1).toUpperCase()}
-                    </div>
+                    <UserIcon username={student.username} color={student.color} />
                   </Tooltip>
                 )
               })}
