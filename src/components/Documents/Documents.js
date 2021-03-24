@@ -44,7 +44,7 @@ class Documents extends React.Component {
     }
   }
 
-getDocuments = (folderId) => {
+  getDocuments = (folderId) => {
     this.setState({
       isLoadingDocuments: true,
     })
@@ -56,8 +56,6 @@ getDocuments = (folderId) => {
         'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
       },
     }
-
-
 
     let fetchUrl =
       this.props.user.type === 'student' ? // is user a student?
@@ -161,14 +159,6 @@ getDocuments = (folderId) => {
             userFolders: folders,
             userDocuments: documents,
           })
-
-          // if (!this.props.match.params.folder) {
-          //   this.getDocuments(this.props.user.userfolder)
-          // } else {
-          //   this.getDocuments(this.props.match.params.folder)
-          // }
-
-          // this.props.getDocuments(localStorage.getItem('seltoolsuserfolder'))
       })
   }
 
