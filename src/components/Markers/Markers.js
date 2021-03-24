@@ -117,6 +117,7 @@ class Markers extends React.Component {
               content={marker.content}
               background={marker.background}
               editMarkerPosition={(e, markerId, dragEl) => this.editMarkerPosition(e, markerId, dragEl)}
+              user={this.props.user}
               isStudent={this.props.isStudent}
               hasFocus={marker.hasFocus}
             />

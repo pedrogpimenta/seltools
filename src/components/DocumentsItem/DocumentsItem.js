@@ -19,6 +19,7 @@ import {
 } from 'react-icons/ri'
 
 import DropdownMenu from '../DropdownMenu/DropdownMenu'
+import UserIcon from '../UserIcon/UserIcon'
 import { CustomDragLayer } from './DragLayer'
 
 const DocumentsItem = (props) => {
@@ -85,24 +86,7 @@ const DocumentsItem = (props) => {
           }}
         >
           {props.document.type === 'student' &&
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center', 
-                width: '18px',
-                height: '18px',
-                backgroundColor: props.document.color || 'black',
-                color: 'white',
-                borderRadius: '50%',
-                marginRight: '2px',
-                fontSize: '12px',
-                fontWeight: '700',
-                userSelect: 'none',
-              }}
-            >
-              {props.document.name.substr(0, 1).toUpperCase()}
-            </div>
+            <UserIcon username={props.document.name} color={props.document.color} />
           }
           {props.document.type !== 'student' &&
             <>

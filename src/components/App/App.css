@@ -105,6 +105,10 @@ body p:last-child {
   margin-bottom: 0;
 }
 
+img {
+  max-width: 100%;
+}
+
 a {
   color: var(--c-primary);
 }
@@ -704,4 +708,8 @@ table.bp3-html-table tbody tr:first-child td {
   opacity: 1;
   width: auto;
   max-width: 100px;
+}
+
+.openHelpButton {
+  cursor: pointer;
 }

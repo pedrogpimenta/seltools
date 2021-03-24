@@ -15,6 +15,8 @@ import {
   RiDragMove2Fill,
 } from 'react-icons/ri'
 
+import UserIcon from '../UserIcon/UserIcon'
+
 var FontAttributor = Quill.import('attributors/class/font');
 
 FontAttributor.whitelist = [
@@ -184,6 +186,7 @@ class Marker extends React.Component {
             onMouseLeave={(e) => this.handleOnMouseLeave(e)}
           >
             {this.props.background === 'var(--c-marker-background-teacher)' &&
+              (this.props.user._id === '5f3633a4e93634d14b1df842' || this.props.user.teacherId === '5f3633a4e93634d14b1df842') &&
               <div
                 style={{
                   position: 'absolute',
@@ -197,6 +200,21 @@ class Marker extends React.Component {
                 }}
               >
               </div>
+            }
+            {this.props.background === 'var(--c-marker-background-teacher)' &&
+              !(this.props.user._id === '5f3633a4e93634d14b1df842' || this.props.user.teacherId === '5f3633a4e93634d14b1df842') &&
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-7px',
+                    right: '-11px',
+                    width: '18px',
+                    height: '18px',
+                    zIndex: '-1',
+                  }}
+                >
+                  <UserIcon username={this.props.user.username} />
+                </div>
             }
             <div
               className='handle'

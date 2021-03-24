@@ -104,7 +104,7 @@ class Toolbar extends React.Component {
               active={this.props.editMode === 'highlight'}
               icon={<RiMarkPenFill size='1.2em' />}
               onClick={() => this.changeEditMode('highlight')}
-              text="Resaltar"
+              text="Destacar"
               labelElement={this.props.user.type === 'teacher' &&
                 <RiCloseCircleLine onClick={() => this.setState({showRemoveAllHighlightsDialog: true})} size='1.2em' />
               }
@@ -137,8 +137,8 @@ class Toolbar extends React.Component {
         </div>
         {this.state.showRemoveAllHighlightsDialog &&
           <DialogSimple
-            title='Eliminar resaltados'
-            content='Quieres eliminar todos los resaltados de este documento?'
+            title='Eliminar destacados'
+            content='Quieres eliminar todos los destacados de este documento?'
             yesText='Si, quiero eliminar'
             yes={this.handleRemoveAllHighlights}
             noText='No, quiero cancelar'

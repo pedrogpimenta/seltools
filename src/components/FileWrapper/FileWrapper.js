@@ -51,6 +51,7 @@ class FileWrapper extends React.Component {
             <Markers
               fileId={this.props.id}
               markers={this.props.markers}
+              user={this.props.user}
               isStudent={this.props.isStudent}
               hasRendered={this.props.hasRendered}
               isActive={this.props.mode === 'marker'}
