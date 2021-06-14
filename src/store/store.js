@@ -598,6 +598,35 @@ function reducer(state = initialState, action) {
         files: updatedFiles,
       }
     
+    case 'SET_TEXTINPUT_CORRECT_ANSWER': 
+      // TODO: melhorar esta merda que aí vem
+      for (let file in updatedFiles) {
+        if (updatedFiles[file].id === action.fileId) {
+          for (let textInput in updatedFiles[file].textInputs) {
+            if (updatedFiles[file].textInputs[textInput].id === action.textInputId) {
+              for (let answer in updatedFiles[file].textInputs[textInput].correctAnswers) {
+                if (updatedFiles[file].textInputs[textInput].correctAnswers[answer] === action.answer) {
+                  if (updatedFiles[file].textInputs[textInput].showCorrectAnswer === action.answer) {
+                    updatedFiles[file].textInputs[textInput].showCorrectAnswer = ''
+                  } else {
+                    updatedFiles[file].textInputs[textInput].showCorrectAnswer = action.answer
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      filesForLS = updatedFiles.slice()
+      for (let file in filesForLS) {
+        filesForLS[file].hasRendered = false
+      }
+
+      return {
+        ...state,
+        files: updatedFiles,
+      }
     case 'ADD_NEW_LINE':
       for (let file in updatedFiles) {
         if (updatedFiles[file].id === action.fileId) {

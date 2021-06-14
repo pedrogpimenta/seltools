@@ -42,7 +42,7 @@ export class TagBlot extends Inline {
 }
 Quill.register(TagBlot)
 
-class TextInputs extends React.Component {
+class TextInput extends React.Component {
   constructor() {
     super()
 
@@ -125,6 +125,7 @@ class TextInputs extends React.Component {
 
     return (
       <Tooltip
+        disabled={!this.props.isStudent ? true : this.props.textInput.answerState === 'wrong'}
         placement='top'
         content={`correct answer`}
       >
@@ -252,4 +253,4 @@ class TextInputs extends React.Component {
   }
 }
 
-export default TextInputs
+export default TextInput

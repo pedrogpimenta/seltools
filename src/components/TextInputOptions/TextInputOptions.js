@@ -10,6 +10,8 @@ import {
 
 import {
   RiAddLine,
+  RiCheckboxBlankLine,
+  RiCheckboxLine,
 } from 'react-icons/ri'
 
 class TextInputOptions extends React.Component {
@@ -57,6 +59,19 @@ class TextInputOptions extends React.Component {
     }) 
   }
 
+  handleMarkAsCorrectAnswer = (e) => {
+    store.dispatch({
+      type: 'SET_TEXTINPUT_CORRECT_ANSWER',
+      fileId: this.props.fileId,
+      textInputId: this.props.textInput.id,
+      answer: e,
+    })
+
+    store.dispatch({
+      type: "DOCUMENT_UNSAVED",
+    }) 
+  }
+
   onInputFocus = (e) => {
     this.setState({hasFocus: true})
   }
@@ -70,7 +85,6 @@ class TextInputOptions extends React.Component {
   // }
 
   render() {
-
     const addButton = (
       <Button
         icon={<RiAddLine />}
@@ -83,6 +97,18 @@ class TextInputOptions extends React.Component {
         onClick={this.handleAddAnswer}
       />
     )
+
+    const tagRightIcon = (answer) => {
+      if (answer === this.props.textInput.showCorrectAnswer) {
+        return (
+          <RiCheckboxLine onClick={() => this.handleMarkAsCorrectAnswer(answer)} />
+        )
+      } else {
+        return (
+          <RiCheckboxBlankLine onClick={() => this.handleMarkAsCorrectAnswer(answer)} />
+        )
+      }
+    }
 
     return (
       <div
@@ -109,6 +135,8 @@ class TextInputOptions extends React.Component {
                 key={answer}
                 large={true}
                 fill={true}
+                minimal={!(this.props.textInput.showCorrectAnswer === answer)}
+                icon={tagRightIcon(answer)}
                 style={{
                   marginBottom: i !== this.props.textInput.correctAnswers.length - 1 ? '8px' : '',
                 }}
