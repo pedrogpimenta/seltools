@@ -35,6 +35,7 @@ class Documents extends React.Component {
       isLoadingDocuments: true,
       userFolders: [],
       userDocuments: [],
+      userClassNotes: [],
       students: [],
       selectedDocumentId: null,
       selectedDocumentName: null,
@@ -76,12 +77,14 @@ class Documents extends React.Component {
 
         const folders = data.documents.filter(doc => doc.type === 'folder')
         const documents = data.documents.filter(doc => doc.type === 'document')
+        const classNotes = data.documents.filter(doc => doc.type === 'classNotes')
 
         this.setState({
           isLoadingDocuments: false,
           students: data.students,
           userFolders: folders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0),
           userDocuments: documents,
+          userClassNotes: classNotes,
         })
 
         document.title = `${data.folder.name} - Seldocs`;
@@ -595,11 +598,78 @@ class Documents extends React.Component {
       )
     }
 
+    const classNotes = () => {
+      return (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '0 0 .5rem 0',
+          }}>
+            <div
+              style={{
+                fontSize: '.8rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}
+            >
+              Notas de clase
+            </div>
+            {this.props.user.type === 'teacher' &&
+              <div>
+                <Button
+                  type='button'
+                  icon={<RiFileAddFill />}
+                  className={Classes.MINIMAL}
+                  intent={Intent.PRIMARY}
+                  text='Nueva nota de clase'
+                  // href={`/documento?parent=${this.props.match.params.folder}`}
+                  style={{marginRight: '8px'}}
+                  onClick={() => this.props.history.push(`/documento?parent=${this.props.match.params.folder}`)}
+                />
+              </div>
+            }
+          </div>
+          <ul
+            className='documents__documents'
+            style={{
+              margin: '.5rem 0 2rem 0',
+              padding: '0',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+              gridGap: '16px',
+              justifyItems: 'stretch',
+            }}
+          >
+            {this.state.userClassNotes.map((document) => 
+              <DocumentsItem
+                key={document._id}
+                user={this.props.user}
+                document={document}
+                breadcrumbs={this.props.breadcrumbs}
+                getDocuments={this.getDocuments}
+                handleShareDocument={this.handleShareDocument}
+                handleRename={this.handleRename}
+                handleColorChange={this.handleColorChange}
+                handleCloneDocument={this.handleCloneDocument}
+                handleDeleteDocument={this.handleDeleteDocument}
+                handleMoveDialogOpen={this.handleMoveDialogOpen}
+                handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
+                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+              />
+            )}
+          </ul>
+        </>
+      )
+    }
+
     return (
       <div>
         {this.props.breadcrumbs.length === 1 && this.props.user.type === 'teacher' && students()}
         {folders()}
         {documents()}
+        {classNotes()}
       </div>
     )
   }

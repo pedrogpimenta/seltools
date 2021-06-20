@@ -2,8 +2,10 @@ import { createStore } from 'redux'
 import { cloneDeep } from 'lodash'
 
 const initialState = {
+  name: '',
   files: [],
   filesOnLoad: [],
+  filesLength: 0,
   documents: [],
   students: [],
   sharedWith: [],
@@ -685,6 +687,12 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         modifiedDate: action.modifiedDate,
+      }
+
+    case 'CHANGE_DOCUMENT_FILES_LENGTH':
+      return {
+        ...state,
+        filesLength: action.filesLength,
       }
 
     case 'DOCUMENT_IS_LOADED':

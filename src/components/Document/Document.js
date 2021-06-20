@@ -24,6 +24,7 @@ import {
   RiImage2Fill,
   RiMusic2Fill,
   RiYoutubeLine,
+  RiRefreshLine,
 } from 'react-icons/ri'
 
 import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
@@ -59,6 +60,7 @@ class Document extends React.Component {
       isLoadingDocument: true,
       dateInterval: '',
       hasUpdatedSinceOffline: true,
+      filesToDelete: [],
     }
   }
 
@@ -71,46 +73,6 @@ class Document extends React.Component {
     })
 
     this.props.socket.emit('document unlock', this.props.user._id, this.props.id)
-
-    // this.props.dispatch({
-    //   type: 'DOCUMENT_IS_SAVING',
-    // })
-    
-    // const documentObject = {
-    //   name: this.props.name,
-    //   teacher: this.props.teacher,
-    //   type: 'document',
-    //   files: this.props.files,
-    // }
-
-    // for (let file in documentObject.files) {
-    //   for (let marker in documentObject.files[file].markers) {
-    //     delete documentObject.files[file].markers[marker].hasFocus
-    //   }
-    // }
-
-    // const requestOptions = {
-    //   method: 'PUT',
-    //   body: JSON.stringify(documentObject),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
-    //   },
-    // }
-    
-    // fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.id}`, requestOptions)
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     this.props.dispatch({
-    //       type: 'DOCUMENT_SAVED',
-    //     })
-
-    //     if (options.shouldUnlock) {
-    //       this.props.socket.emit('document unlock', this.props.user._id, this.props.id)
-    //     }
-    //     this.props.socket.emit('document saved after unlock', this.props.user._id, this.props.id)
-    //   })
-    
   }
 
   handleSaveDocument = (shouldUpdateDate) => {
@@ -125,6 +87,7 @@ class Document extends React.Component {
       teacher: this.props.teacher,
       type: 'document',
       files: this.props.files,
+      filesToDelete: this.state.filesToDelete,
     }
 
     if (this.props.location.search.length > 0) {
@@ -323,7 +286,7 @@ class Document extends React.Component {
           })
       } 
     } else {
-      fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}`)
+      fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}/0`)
         .then(response => response.json())
         .then(data => {
           const LSfiles = data.document.files || []
@@ -380,6 +343,11 @@ class Document extends React.Component {
           this.props.dispatch({
             type: 'CHANGE_DOCUMENT_MODIFIED_DATE',
             modifiedDate: data.document.modifiedDate,
+          })
+          
+          this.props.dispatch({
+            type: 'CHANGE_DOCUMENT_FILES_LENGTH',
+            filesLength: data.documentFilesLength,
           })
 
           this.props.dispatch({
@@ -470,6 +438,30 @@ class Document extends React.Component {
 
     this.handleUnsaveDocument()
     this.handleOfflineState()
+  }
+
+  getMoreFiles = (filesLength) => {
+    console.log(' filesLength:', filesLength)
+    fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}/${this.props.files.length}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log('---------- DATA START')
+      console.log(data)
+      console.log('---------- DATA END')
+
+      const newFiles = data.document.files
+
+      if (newFiles.length > 0) {
+        const loadFiles = this.props.files.concat(newFiles)
+
+        this.props.dispatch({
+          type: 'LOAD_FILES',
+          files: loadFiles,
+          noReset: true,
+        })
+      }
+
+    })
   }
 
   handleOfflineState = () => {
@@ -719,6 +711,13 @@ class Document extends React.Component {
     const confirmDelete = window.confirm('¿Quieres eliminar el archivo?')
 
     if (confirmDelete) {
+      const filesToDelete = this.state.filesToDelete
+      filesToDelete.push(fileId)
+
+      this.setState({
+        filesToDelete,
+      })
+
       this.props.dispatch({
         type: "DELETE_FILE",
         fileId: fileId,
@@ -1105,6 +1104,22 @@ class Document extends React.Component {
                 }}
               />
             }
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '18px auto',
+              // opacity: '.6',
+            }}>
+              <Button
+                style={{margin: '0 8px'}}
+                intent={Intent.PRIMARY}
+                icon={<RiRefreshLine size='1.2em' />}
+                large={true}
+                text='Cargar más'
+                onClick={() => this.getMoreFiles(this.props.files.length)}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -1120,6 +1135,7 @@ function mapStateToProps(state, ownProps) {
     shared: state.shared || false,
     files: state.files || [],
     filesOnLoad: state.filesOnLoad,
+    filesLength: state.filesLength,
     isSaved: state.isSaved,
     isSaving: state.isSaving,
     dragging: state.dragging,
