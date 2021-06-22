@@ -259,7 +259,7 @@ class TopBar extends React.Component {
               }}
               size='1.4em'
               onClick={() => this.setState({isHelpDialogOpen: true})}
-              handleCloseButton={() => this.setState({isHelpDialogOpen: false})}
+              // handleCloseButton={() => this.setState({isHelpDialogOpen: false})}
             />
             <Popover
                 autoFocus={false}
