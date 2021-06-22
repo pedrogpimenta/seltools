@@ -58,6 +58,7 @@ class Document extends React.Component {
       fileUrls: [],
       uploadingFiles: false,
       isLoadingDocument: true,
+      loadingMoreFiles: true,
       dateInterval: '',
       hasUpdatedSinceOffline: true,
       filesToDelete: [],
@@ -206,6 +207,17 @@ class Document extends React.Component {
       })
   }
 
+  handleScrollEvent = (e) => {
+    const scrollHeight = e.target.documentElement.scrollHeight
+    const scrollTop = e.target.documentElement.scrollTop
+    const clientHeight = e.target.documentElement.clientHeight
+
+    if (clientHeight + scrollTop > scrollHeight - 10) {
+      this.getMoreFiles(this.props.files.length)
+    }
+
+  }
+
   componentWillUnmount() {
     clearInterval(this.saveInterval)
     clearTimeout(this.saveDateInterval)
@@ -215,6 +227,7 @@ class Document extends React.Component {
     if (!this.props.id) return
 
     if (this.props.socket) this.props.socket.emit('document unlock', this.props.user._id, this.props.id)
+    window.removeEventListener('scroll', this.handleScrollEvent)
   }
 
   componentDidMount() {
@@ -282,6 +295,7 @@ class Document extends React.Component {
             
             this.setState({
               isLoadingDocument: false,
+              loadingMoreFiles: false,
             })
           })
       } 
@@ -363,6 +377,7 @@ class Document extends React.Component {
 
           this.setState({
             isLoadingDocument: false,
+            loadingMoreFiles: false,
           })
 
           // WebSockets
@@ -438,17 +453,21 @@ class Document extends React.Component {
 
     this.handleUnsaveDocument()
     this.handleOfflineState()
+
+    window.addEventListener('scroll', this.handleScrollEvent)
+
   }
 
   getMoreFiles = (filesLength) => {
-    console.log(' filesLength:', filesLength)
+    if (this.state.loadingMoreFiles || this.props.files.length >= this.props.filesLength) return
+
+    this.setState({
+      loadingMoreFiles: true,
+    })
+
     fetch(`${REACT_APP_SERVER_BASE_URL}/document/${this.props.match.params.id}/${this.props.files.length}`)
     .then(response => response.json())
     .then(data => {
-      console.log('---------- DATA START')
-      console.log(data)
-      console.log('---------- DATA END')
-
       const newFiles = data.document.files
 
       if (newFiles.length > 0) {
@@ -459,7 +478,19 @@ class Document extends React.Component {
           files: loadFiles,
           noReset: true,
         })
+
+        this.setState({
+          loadingMoreFiles: false,
+        })
+
+        return loadFiles
       }
+
+      this.setState({
+        loadingMoreFiles: false,
+      })
+
+      return null
 
     })
   }
@@ -1097,29 +1128,9 @@ class Document extends React.Component {
                 />
               }
             </div>
-            {this.state.isLoadingDocument &&
-              <Spinner 
-                style={{
-                  background: 'red',
-                }}
-              />
+            {(this.state.isLoadingDocument || this.state.loadingMoreFiles) &&
+              <Spinner />
             }
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '18px auto',
-              // opacity: '.6',
-            }}>
-              <Button
-                style={{margin: '0 8px'}}
-                intent={Intent.PRIMARY}
-                icon={<RiRefreshLine size='1.2em' />}
-                large={true}
-                text='Cargar más'
-                onClick={() => this.getMoreFiles(this.props.files.length)}
-              />
-            </div>
           </div>
         </div>
       </div>
