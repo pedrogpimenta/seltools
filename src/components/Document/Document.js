@@ -19,7 +19,6 @@ import {
   RiImage2Fill,
   RiMusic2Fill,
   RiYoutubeLine,
-  RiRefreshLine,
 } from "react-icons/ri";
 
 import { REACT_APP_SERVER_BASE_URL } from "../../CONSTANTS";
