@@ -1,35 +1,26 @@
-import React from 'react'
-import { withRouter } from 'react-router-dom'
-import { store } from '../../store/store'
-import { cloneDeep } from 'lodash'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import React from "react";
+import { withRouter } from "react-router-dom";
+import { store } from "../../store/store";
+import { cloneDeep } from "lodash";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
-import {
-  Button,
-  Classes,
-  Intent,
-  Spinner,
-} from "@blueprintjs/core"
+import { Button, Classes, Intent, Spinner } from "@blueprintjs/core";
 
-import {
-  RiFileAddFill,
-  RiFolderAddFill,
-  RiUserAddFill,
-} from 'react-icons/ri'
+import { RiFileAddFill, RiFolderAddFill, RiUserAddFill } from "react-icons/ri";
 
-import { REACT_APP_SERVER_BASE_URL } from '../../CONSTANTS'
+import { REACT_APP_SERVER_BASE_URL } from "../../CONSTANTS";
 
-import DeleteDocumentDialog from '../DeleteDocumentDialog/DeleteDocumentDialog'
-import EditDocumentDialog from '../EditDocumentDialog/EditDocumentDialog'
-import MoveDialog from '../MoveDialog/MoveDialog'
-import AddStudentDialog from '../AddStudentDialog/AddStudentDialog'
-import DocumentsItem from '../DocumentsItem/DocumentsItem'
-import TopBar from '../TopBar/TopBar'
+import DeleteDocumentDialog from "../DeleteDocumentDialog/DeleteDocumentDialog";
+import EditDocumentDialog from "../EditDocumentDialog/EditDocumentDialog";
+import MoveDialog from "../MoveDialog/MoveDialog";
+import AddStudentDialog from "../AddStudentDialog/AddStudentDialog";
+import DocumentsItem from "../DocumentsItem/DocumentsItem";
+import TopBar from "../TopBar/TopBar";
 
 class Documents extends React.Component {
   constructor() {
-    super()
+    super();
 
     this.state = {
       isLoadingDocuments: true,
@@ -42,316 +33,367 @@ class Documents extends React.Component {
       isMoveDialogOpen: false,
       isEditDocumentDialogOpen: false,
       isDeleteDocumentDialogOpen: false,
-    }
+    };
   }
 
   getDocuments = (folderId) => {
     this.setState({
       isLoadingDocuments: true,
-    })
+    });
 
     const requestOptions = {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("seltoolstoken")}`,
       },
-    }
+    };
 
     let fetchUrl =
-      this.props.user.type === 'student' ? // is user a student?
-        `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?userIsStudent=true` :
-        localStorage.getItem('seltoolsuserfolder') === folderId ? // is current folder the root teacher folder?
-          `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?isTeacherFolder=true` :
-          `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`
+      this.props.user.type === "student" // is user a student?
+        ? `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?userIsStudent=true`
+        : localStorage.getItem("seltoolsuserfolder") === folderId // is current folder the root teacher folder?
+        ? `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}?isTeacherFolder=true`
+        : `${REACT_APP_SERVER_BASE_URL}/user/${this.props.user._id}/documents/${folderId}`;
 
     fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        const newBreadcrumbs = data.breadcrumbs
-        newBreadcrumbs.push({icon: 'folder-open', name: data.folder.name, _id: data.folder._id, type: data.folder.type, color: data.folder.color})
-        if (this.props.user.type === 'student') {
-          newBreadcrumbs.shift()
+      .then((response) => response.json())
+      .then((data) => {
+        const newBreadcrumbs = data.breadcrumbs;
+        newBreadcrumbs.push({
+          icon: "folder-open",
+          name: data.folder.name,
+          _id: data.folder._id,
+          type: data.folder.type,
+          color: data.folder.color,
+        });
+        if (this.props.user.type === "student") {
+          newBreadcrumbs.shift();
         }
-        this.props.setLocation(newBreadcrumbs)
+        this.props.setLocation(newBreadcrumbs);
 
-        const folders = data.documents.filter(doc => doc.type === 'folder')
-        const documents = data.documents.filter(doc => doc.type === 'document')
-        const classNotes = data.documents.filter(doc => doc.type === 'classNotes')
+        const folders = data.documents.filter((doc) => doc.type === "folder");
+        const documents = data.documents.filter(
+          (doc) => doc.type === "document"
+        );
+        const classNotes = data.documents.filter(
+          (doc) => doc.type === "classNotes"
+        );
 
         this.setState({
           isLoadingDocuments: false,
           students: data.students,
-          userFolders: folders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0),
+          userFolders: folders.sort((a, b) =>
+            a.name.toUpperCase() < b.name.toUpperCase()
+              ? -1
+              : a.name.toUpperCase() > b.name.toUpperCase()
+              ? 1
+              : 0
+          ),
           userDocuments: documents,
           userClassNotes: classNotes,
-        })
+        });
 
         document.title = `${data.folder.name} - Seldocs`;
-      })
-  }
+      });
+  };
 
   handleShareDocument = (documentId, documentShared, documentType) => {
     const documentObject = {
       shared: !documentShared,
-    }
+    };
 
     const requestOptions = {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(documentObject),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("seltoolstoken")}`,
       },
-    }
+    };
 
-    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`;
 
     fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        if (data.ok !== 1) return false
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.ok !== 1) return false;
 
-        const updatedDocs = documentType === 'document' ? [...this.state.userDocuments] : documentType === 'folder' ? [...this.state.userFolders] : [...this.state.students]
+        const updatedDocs =
+          documentType === "document"
+            ? [...this.state.userDocuments]
+            : documentType === "folder"
+            ? [...this.state.userFolders]
+            : [...this.state.students];
 
-        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
-        updatedDocs[docIndex].shared = !updatedDocs[docIndex].shared
+        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId);
+        updatedDocs[docIndex].shared = !updatedDocs[docIndex].shared;
 
-        if (documentType === 'document') {
+        if (documentType === "document") {
           this.setState({
-            userDocuments: updatedDocs
-          })
-        } else if (documentType === 'folder') {
+            userDocuments: updatedDocs,
+          });
+        } else if (documentType === "folder") {
           this.setState({
-            userFolders: updatedDocs.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0)
-          })
+            userFolders: updatedDocs.sort((a, b) =>
+              a.name.toUpperCase() < b.name.toUpperCase()
+                ? -1
+                : a.name.toUpperCase() > b.name.toUpperCase()
+                ? 1
+                : 0
+            ),
+          });
         } else {
           this.setState({
-            students: updatedDocs
-          })
+            students: updatedDocs,
+          });
         }
-      })
-  }
+      });
+  };
 
   handleMoveDocument = (folderId, documentId) => {
     const documentObject = {
       parentId: folderId,
-    }
+    };
 
     const requestOptions = {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(documentObject),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("seltoolstoken")}`,
       },
-    }
+    };
 
-    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentmove/${documentId}`
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentmove/${documentId}`;
 
     fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-          if (data.ok !== 1) return false
-          const documents = this.state.userDocuments.filter((doc) => doc._id !== documentId)
-          const folders = this.state.userFolders.filter((doc) => doc._id !== documentId)
-          const students = this.state.students.filter((doc) => doc._id !== documentId)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.ok !== 1) return false;
+        const documents = this.state.userDocuments.filter(
+          (doc) => doc._id !== documentId
+        );
+        const folders = this.state.userFolders.filter(
+          (doc) => doc._id !== documentId
+        );
+        const students = this.state.students.filter(
+          (doc) => doc._id !== documentId
+        );
 
-          this.setState({
-            students: students,
-            userFolders: folders,
-            userDocuments: documents,
-          })
-      })
-  }
+        this.setState({
+          students: students,
+          userFolders: folders,
+          userDocuments: documents,
+        });
+      });
+  };
 
   handleAddFolder = () => {
-    const folderName = window.prompt('¿Qué nombre tiene la nueva carpeta?')
+    const folderName = window.prompt("¿Qué nombre tiene la nueva carpeta?");
 
     if (!!folderName && folderName.length > 0) {
-      const parent = this.props.breadcrumbs[this.props.breadcrumbs.length - 1]._id
+      const parent =
+        this.props.breadcrumbs[this.props.breadcrumbs.length - 1]._id;
 
       const requestOptions = {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
           name: folderName,
           parent: parent,
-          type: 'folder',
+          type: "folder",
         }),
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("seltoolstoken")}`,
         },
-      }
+      };
 
-      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`
+      const fetchUrl = `${REACT_APP_SERVER_BASE_URL}/folder/`;
 
       fetch(fetchUrl, requestOptions)
-        .then(response => response.json())
+        .then((response) => response.json())
         .then((data) => {
-          const folders = this.state.userFolders
+          const folders = this.state.userFolders;
 
           folders.unshift({
             _id: data.insertedId,
             name: folderName,
-            type: 'folder',
-          })
+            type: "folder",
+          });
 
           this.setState({
-            userFolders: folders.sort((a, b) => a.name.toUpperCase() < b.name.toUpperCase() ? -1 : a.name.toUpperCase() > b.name.toUpperCase() ? 1 : 0),
-          })
-        })
+            userFolders: folders.sort((a, b) =>
+              a.name.toUpperCase() < b.name.toUpperCase()
+                ? -1
+                : a.name.toUpperCase() > b.name.toUpperCase()
+                ? 1
+                : 0
+            ),
+          });
+        });
     }
-  }
+  };
 
   handleRename = (documentId, documentName, documentType) => {
-    const newName = window.prompt('Cambia el nombre:', documentName)
+    const newName = window.prompt("Cambia el nombre:", documentName);
 
     if (!!newName) {
       const documentObject = {
         parentId: this.props.breadcrumbs[this.props.breadcrumbs.length - 1].id,
         name: newName,
-      }
-  
+      };
+
       const requestOptions = {
-        method: 'PUT',
+        method: "PUT",
         body: JSON.stringify(documentObject),
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("seltoolstoken")}`,
         },
-      }
-  
-      let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
-  
+      };
+
+      let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`;
+
       fetch(fetchUrl, requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          if (data.ok !== 1) return false
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.ok !== 1) return false;
 
-          const updatedDocs = documentType === 'document' ? [...this.state.userDocuments] : documentType === 'folder' ? [...this.state.userFolders] : [...this.state.students]
+          const updatedDocs =
+            documentType === "document"
+              ? [...this.state.userDocuments]
+              : documentType === "folder"
+              ? [...this.state.userFolders]
+              : [...this.state.students];
 
-          const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
-          updatedDocs[docIndex].name = newName
-  
-          if (documentType === 'document') {
+          const docIndex = updatedDocs.findIndex(
+            (doc) => doc._id === documentId
+          );
+          updatedDocs[docIndex].name = newName;
+
+          if (documentType === "document") {
             this.setState({
-              userDocuments: updatedDocs
-            })
-          } else if (documentType === 'folder') {
+              userDocuments: updatedDocs,
+            });
+          } else if (documentType === "folder") {
             this.setState({
-              userFolders: updatedDocs
-            })
+              userFolders: updatedDocs,
+            });
           } else {
             this.setState({
-              students: updatedDocs
-            })
+              students: updatedDocs,
+            });
           }
-        })
+        });
     }
-
-  }
+  };
 
   handleColorChange = (color, documentId, documentType) => {
     const documentObject = {
       color: color.hex,
-    }
+    };
 
     const requestOptions = {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(documentObject),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("seltoolstoken")}`,
       },
-    }
+    };
 
-    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/document/${documentId}`;
 
     fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        if (data.ok !== 1) return false
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.ok !== 1) return false;
 
-        const updatedDocs = documentType === 'document' ? [...this.state.userDocuments] : documentType === 'folder' ? [...this.state.userFolders] : [...this.state.students]
+        const updatedDocs =
+          documentType === "document"
+            ? [...this.state.userDocuments]
+            : documentType === "folder"
+            ? [...this.state.userFolders]
+            : [...this.state.students];
 
-        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
-        updatedDocs[docIndex].color = color.hex
+        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId);
+        updatedDocs[docIndex].color = color.hex;
 
-        if (documentType === 'document') {
+        if (documentType === "document") {
           this.setState({
-            userDocuments: updatedDocs
-          })
-        } else if (documentType === 'folder') {
+            userDocuments: updatedDocs,
+          });
+        } else if (documentType === "folder") {
           this.setState({
-            userFolders: updatedDocs
-          })
+            userFolders: updatedDocs,
+          });
         } else {
           this.setState({
-            students: updatedDocs
-          })
+            students: updatedDocs,
+          });
         }
-
-      })
-  }
+      });
+  };
 
   handleCloneDocument = (documentId) => {
     const requestOptions = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('seltoolstoken')}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("seltoolstoken")}`,
       },
-    }
+    };
 
-    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentclone/${documentId}`
+    let fetchUrl = `${REACT_APP_SERVER_BASE_URL}/documentclone/${documentId}`;
 
     fetch(fetchUrl, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        if (!data.id) return false
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.id) return false;
 
-        const updatedDocs = [...this.state.userDocuments]
-        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId)
-        const newDoc = cloneDeep(updatedDocs[docIndex])
-        newDoc._id = data.id
-        newDoc.name = newDoc.name + ' (COPIA)'
-        newDoc.shared = false
-        updatedDocs.unshift(newDoc)
+        const updatedDocs = [...this.state.userDocuments];
+        const docIndex = updatedDocs.findIndex((doc) => doc._id === documentId);
+        const newDoc = cloneDeep(updatedDocs[docIndex]);
+        newDoc._id = data.id;
+        newDoc.name = newDoc.name + " (COPIA)";
+        newDoc.shared = false;
+        updatedDocs.unshift(newDoc);
 
-        this.setState({userDocuments: updatedDocs})
-      })
-  }
+        this.setState({ userDocuments: updatedDocs });
+      });
+  };
 
   handleMoveDialogOpen = (documentId, documentName) => {
     this.setState({
       isMoveDialogOpen: true,
       selectedDocumentId: documentId,
       selectedDocumentName: documentName,
-    })
-  }
+    });
+  };
 
   handleEditDocumentDialogOpen = (documentId, documentName) => {
     this.setState({
       isEditDocumentDialogOpen: true,
       selectedDocumentId: documentId,
       selectedDocumentName: documentName,
-    })
-  }
+    });
+  };
 
   renderEditDocumentDialog = () => {
-    if (!this.state.isEditDocumentDialogOpen) return false
+    if (!this.state.isEditDocumentDialogOpen) return false;
 
-    return(
+    return (
       <EditDocumentDialog
         user={this.props.user}
         selectedDocumentId={this.state.selectedDocumentId}
-        handleCloseButton={() => this.setState({isEditDocumentDialogOpen: false})}
+        handleCloseButton={() =>
+          this.setState({ isEditDocumentDialogOpen: false })
+        }
         getDocuments={this.getDocuments}
-      >
-      </EditDocumentDialog>
-    )
-  }
+      ></EditDocumentDialog>
+    );
+  };
 
   handleDeleteDocument = (documentId, documentName, documentType) => {
     this.setState({
@@ -359,94 +401,100 @@ class Documents extends React.Component {
       selectedDocumentId: documentId,
       selectedDocumentName: documentName,
       selectedDocumentType: documentType,
-    })
-  }
-  
-  renderDeleteDocumentDialog = () => {
-    if (!this.state.isDeleteDocumentDialogOpen) return false
+    });
+  };
 
-    return(
+  renderDeleteDocumentDialog = () => {
+    if (!this.state.isDeleteDocumentDialogOpen) return false;
+
+    return (
       <DeleteDocumentDialog
         user={this.props.user}
         selectedDocumentId={this.state.selectedDocumentId}
         selectedDocumentName={this.state.selectedDocumentName}
         selectedDocumentType={this.state.selectedDocumentType}
-        handleCloseButton={() => this.setState({isDeleteDocumentDialogOpen: false})}
+        handleCloseButton={() =>
+          this.setState({ isDeleteDocumentDialogOpen: false })
+        }
         getDocuments={this.getDocuments}
-      >
-      </DeleteDocumentDialog>
-    )
-  }
+      ></DeleteDocumentDialog>
+    );
+  };
 
   renderMoveDialog = () => {
-    if (!this.state.isMoveDialogOpen) return false
+    if (!this.state.isMoveDialogOpen) return false;
 
-    return(
+    return (
       <MoveDialog
         initialFolder={this.props.user.userfolder}
         user={this.props.user}
         selectedDocumentId={this.state.selectedDocumentId}
         selectedDocumentName={this.state.selectedDocumentName}
-        handleCloseButton={() => this.setState({isMoveDialogOpen: false})}
-        handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+        handleCloseButton={() => this.setState({ isMoveDialogOpen: false })}
+        handleMoveDocument={(folderId, documentId) =>
+          this.handleMoveDocument(folderId, documentId)
+        }
         setLocation={this.props.setLocation}
-      >
-      </MoveDialog>
-    )
-  }
+      ></MoveDialog>
+    );
+  };
 
   renderAddStudentDialog = () => {
-    if (!this.state.isAddStudentDialogOpen) return false
+    if (!this.state.isAddStudentDialogOpen) return false;
 
-    return(
+    return (
       <AddStudentDialog
         getDocuments={this.getDocuments}
-        handleCloseButton={() => this.setState({isAddStudentDialogOpen: false})}
-      >
-      </AddStudentDialog>
-    )
-
-  }
+        handleCloseButton={() =>
+          this.setState({ isAddStudentDialogOpen: false })
+        }
+      ></AddStudentDialog>
+    );
+  };
 
   renderDocuments = () => {
     const students = () => {
       return (
         <>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            margin: '0 0 .5rem 0',
-          }}>
-            <div style={{
-              fontSize: '.8rem',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-            }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              margin: "0 0 .5rem 0",
+            }}
+          >
+            <div
+              style={{
+                fontSize: ".8rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            >
               Alumnos
             </div>
             <div>
               <Button
-                type='button'
+                type="button"
                 icon={<RiUserAddFill />}
                 className={Classes.MINIMAL}
                 intent={Intent.PRIMARY}
-                text='Nuevo alumno'
-                onClick={() => this.setState({isAddStudentDialogOpen: true})}
+                text="Nuevo alumno"
+                onClick={() => this.setState({ isAddStudentDialogOpen: true })}
               />
             </div>
           </div>
           <ul
-            className='documents__students'
+            className="documents__students"
             style={{
-              margin: '.5rem 0 2rem 0',
-              padding: '0',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-              gridGap: '16px',
+              margin: ".5rem 0 2rem 0",
+              padding: "0",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
+              gridGap: "16px",
             }}
           >
-            {this.state.students.map((student) => 
+            {this.state.students.map((student) => (
               <DocumentsItem
                 key={student._id}
                 user={this.props.user}
@@ -460,57 +508,61 @@ class Documents extends React.Component {
                 handleDeleteDocument={this.handleDeleteDocument}
                 handleMoveDialogOpen={this.handleMoveDialogOpen}
                 handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
-                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+                handleMoveDocument={(folderId, documentId) =>
+                  this.handleMoveDocument(folderId, documentId)
+                }
               />
-            )}
+            ))}
           </ul>
         </>
-      )
-    }
+      );
+    };
 
     const folders = () => {
       return (
         <>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            margin: '0 0 .5rem 0',
-          }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              margin: "0 0 .5rem 0",
+            }}
+          >
             <div
               style={{
-                fontSize: '.8rem',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
+                fontSize: ".8rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
               }}
             >
               Carpetas
             </div>
-            {this.props.user.type === 'teacher' &&
+            {this.props.user.type === "teacher" && (
               <div>
                 <Button
-                  type='button'
+                  type="button"
                   icon={<RiFolderAddFill />}
                   className={Classes.MINIMAL}
                   intent={Intent.PRIMARY}
-                  text='Nueva carpeta'
+                  text="Nueva carpeta"
                   onClick={this.handleAddFolder}
                 />
               </div>
-            }
+            )}
           </div>
           <ul
-            className='documents__documents'
+            className="documents__documents"
             style={{
-              margin: '.5rem 0 2rem 0',
-              padding: '0',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-              gridGap: '16px',
-              justifyItems: 'stretch',
+              margin: ".5rem 0 2rem 0",
+              padding: "0",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
+              gridGap: "16px",
+              justifyItems: "stretch",
             }}
           >
-            {this.state.userFolders.map((folder) => 
+            {this.state.userFolders.map((folder) => (
               <DocumentsItem
                 key={folder._id}
                 user={this.props.user}
@@ -524,59 +576,67 @@ class Documents extends React.Component {
                 handleDeleteDocument={this.handleDeleteDocument}
                 handleMoveDialogOpen={this.handleMoveDialogOpen}
                 handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
-                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+                handleMoveDocument={(folderId, documentId) =>
+                  this.handleMoveDocument(folderId, documentId)
+                }
               />
-            )}
+            ))}
           </ul>
         </>
-      )
-    }
+      );
+    };
 
     const documents = () => {
       return (
         <>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            margin: '0 0 .5rem 0',
-          }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              margin: "0 0 .5rem 0",
+            }}
+          >
             <div
               style={{
-                fontSize: '.8rem',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
+                fontSize: ".8rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
               }}
             >
               Documentos
             </div>
-            {this.props.user.type === 'teacher' &&
+            {this.props.user.type === "teacher" && (
               <div>
                 <Button
-                  type='button'
+                  type="button"
                   icon={<RiFileAddFill />}
                   className={Classes.MINIMAL}
                   intent={Intent.PRIMARY}
-                  text='Nuevo documento'
+                  text="Nuevo documento"
                   // href={`/documento?parent=${this.props.match.params.folder}`}
-                  style={{marginRight: '8px'}}
-                  onClick={() => this.props.history.push(`/documento?parent=${this.props.match.params.folder}`)}
+                  style={{ marginRight: "8px" }}
+                  onClick={() =>
+                    this.props.history.push(
+                      `/documento?parent=${this.props.match.params.folder}`
+                    )
+                  }
                 />
               </div>
-            }
+            )}
           </div>
           <ul
-            className='documents__documents'
+            className="documents__documents"
             style={{
-              margin: '.5rem 0 2rem 0',
-              padding: '0',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-              gridGap: '16px',
-              justifyItems: 'stretch',
+              margin: ".5rem 0 2rem 0",
+              padding: "0",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
+              gridGap: "16px",
+              justifyItems: "stretch",
             }}
           >
-            {this.state.userDocuments.map((document) => 
+            {this.state.userDocuments.map((document) => (
               <DocumentsItem
                 key={document._id}
                 user={this.props.user}
@@ -590,59 +650,68 @@ class Documents extends React.Component {
                 handleDeleteDocument={this.handleDeleteDocument}
                 handleMoveDialogOpen={this.handleMoveDialogOpen}
                 handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
-                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+                handleMoveDocument={(folderId, documentId) =>
+                  this.handleMoveDocument(folderId, documentId)
+                }
               />
-            )}
+            ))}
           </ul>
         </>
-      )
-    }
+      );
+    };
 
     const classNotes = () => {
       return (
         <>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            margin: '0 0 .5rem 0',
-          }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              margin: "0 0 .5rem 0",
+            }}
+          >
             <div
               style={{
-                fontSize: '.8rem',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
+                fontSize: ".8rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
               }}
             >
               Notas de clase
             </div>
-            {this.props.user.type === 'teacher' &&
+            {this.props.user.type === "teacher" && (
               <div>
                 <Button
-                  type='button'
+                  type="button"
                   icon={<RiFileAddFill />}
                   className={Classes.MINIMAL}
                   intent={Intent.PRIMARY}
-                  text='Nueva nota de clase'
-                  // href={`/documento?parent=${this.props.match.params.folder}`}
-                  style={{marginRight: '8px'}}
-                  onClick={() => this.props.history.push(`/documento?parent=${this.props.match.params.folder}`)}
+                  text="Nueva nota de clase"
+                  // href={`/documento?parent=${this.props.match.params.folder}&type=classNotes`}
+                  style={{ marginRight: "8px" }}
+                  onClick={() =>
+                    this.props.history.push(
+                      `/documento?parent=${this.props.match.params.folder}&type=classNotes`
+                    )
+                  }
                 />
               </div>
-            }
+            )}
           </div>
           <ul
-            className='documents__documents'
+            className="documents__documents"
             style={{
-              margin: '.5rem 0 2rem 0',
-              padding: '0',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-              gridGap: '16px',
-              justifyItems: 'stretch',
+              margin: ".5rem 0 2rem 0",
+              padding: "0 0 2rem 0",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
+              gridGap: "16px",
+              justifyItems: "stretch",
+              borderBottom: "1px solid #ccc",
             }}
           >
-            {this.state.userClassNotes.map((document) => 
+            {this.state.userClassNotes.map((document) => (
               <DocumentsItem
                 key={document._id}
                 user={this.props.user}
@@ -656,56 +725,60 @@ class Documents extends React.Component {
                 handleDeleteDocument={this.handleDeleteDocument}
                 handleMoveDialogOpen={this.handleMoveDialogOpen}
                 handleEditDocumentDialogOpen={this.handleEditDocumentDialogOpen}
-                handleMoveDocument={(folderId, documentId) => this.handleMoveDocument(folderId, documentId)}
+                handleMoveDocument={(folderId, documentId) =>
+                  this.handleMoveDocument(folderId, documentId)
+                }
               />
-            )}
+            ))}
           </ul>
         </>
-      )
-    }
+      );
+    };
 
     return (
       <div>
-        {this.props.breadcrumbs.length === 1 && this.props.user.type === 'teacher' && students()}
+        {this.props.breadcrumbs.length === 1 &&
+          this.props.user.type === "teacher" &&
+          students()}
+        {classNotes()}
         {folders()}
         {documents()}
-        {classNotes()}
       </div>
-    )
-  }
+    );
+  };
 
   componentDidMount = () => {
     // TODO: needed?
     store.dispatch({
-      type: 'RESET_FILES',
+      type: "RESET_FILES",
       files: [],
       filesOnLoad: [],
-    })
-    
+    });
+
     if (!this.props.match.params.folder) {
-      this.getDocuments(this.props.user.userfolder)
+      this.getDocuments(this.props.user.userfolder);
     } else {
-      this.getDocuments(this.props.match.params.folder)
+      this.getDocuments(this.props.match.params.folder);
     }
 
     this.props.history.listen((location, action) => {
-      if (action !== 'POP') return
+      if (action !== "POP") return;
 
-      const locationArray = location.pathname.split('/')
-      const docId = locationArray[locationArray.length - 1]
-      this.getDocuments(docId)
-    })
-  }
+      const locationArray = location.pathname.split("/");
+      const docId = locationArray[locationArray.length - 1];
+      this.getDocuments(docId);
+    });
+  };
 
   render() {
     return (
       <div
-        className='App'
+        className="App"
         style={{
-          display: 'flex',
-          minHeight: '100vh',
-          overflow: 'hidden',
-          backgroundColor: '#f8f8f8',
+          display: "flex",
+          minHeight: "100vh",
+          overflow: "hidden",
+          backgroundColor: "#f8f8f8",
         }}
       >
         <TopBar
@@ -715,30 +788,33 @@ class Documents extends React.Component {
           breadcrumbs={this.props.breadcrumbs}
           connectedStudents={this.props.connectedStudents}
           getDocuments={this.getDocuments}
-          isStudent={this.props.user.type === 'student'}
+          isStudent={this.props.user.type === "student"}
         />
         <div
           style={{
-            width: '1100px',
-            maxWidth: '100%',
-            margin: '0 auto',
-            paddingTop: '70px',
-            paddingLeft: '16px',
-            paddingRight: '16px',
+            width: "1100px",
+            maxWidth: "100%",
+            margin: "0 auto",
+            paddingTop: "70px",
+            paddingLeft: "16px",
+            paddingRight: "16px",
           }}
         >
-          <div style={{
-            margin: '0 0 32px',
-          }}>
+          <div
+            style={{
+              margin: "0 0 32px",
+            }}
+          >
             <DndProvider backend={HTML5Backend}>
-              {!this.state.isLoadingDocuments ?
-                this.renderDocuments() :
-                <Spinner 
+              {!this.state.isLoadingDocuments ? (
+                this.renderDocuments()
+              ) : (
+                <Spinner
                   style={{
-                    background: 'red',
+                    background: "red",
                   }}
                 />
-              }
+              )}
             </DndProvider>
           </div>
         </div>
@@ -747,8 +823,8 @@ class Documents extends React.Component {
         {this.renderMoveDialog()}
         {this.renderAddStudentDialog()}
       </div>
-    )
+    );
   }
 }
 
-export default withRouter(Documents)
+export default withRouter(Documents);
