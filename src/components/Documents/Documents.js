@@ -740,7 +740,7 @@ class Documents extends React.Component {
         {this.props.breadcrumbs.length === 1 &&
           this.props.user.type === "teacher" &&
           students()}
-        {classNotes()}
+        {this.props.breadcrumbs[1].type === "student" && classNotes()}
         {folders()}
         {documents()}
       </div>
