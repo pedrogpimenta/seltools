@@ -81,7 +81,7 @@ const DocumentsItem = (props) => {
             overflow: 'hidden',
           }}
           onClick={() => {
-            props.history.push(`/${props.document.type === 'document' ? 'documento' : 'documentos'}/${props.document._id}`)
+            props.history.push(`/${(props.document.type === 'document' || props.document.type === 'classNotes') ? 'documento' : 'documentos'}/${props.document._id}`)
             if (props.document.type !== 'document') props.getDocuments(props.document._id)
           }}
         >
@@ -90,10 +90,10 @@ const DocumentsItem = (props) => {
           }
           {props.document.type !== 'student' &&
             <>
-              {props.user.type === 'student' && props.document.type === 'document' ? <RiFile3Line color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
+              {props.user.type === 'student' && (props.document.type === 'document' || props.document.type === 'classNotes') ? <RiFile3Line color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
               props.user.type === 'student' && props.document.type === 'folder' ? <RiFolderFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> : 
-              props.document.type === 'document' && props.document.shared === true ? <RiFileUserLine color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
-              props.document.type === 'document' ? <RiFile3Line color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+              (props.document.type === 'document' || props.document.type === 'classNotes') && props.document.shared === true ? <RiFileUserLine color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
+              (props.document.type === 'document' || props.document.type === 'classNotes') ? <RiFile3Line color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
               props.document.type === 'folder' && props.document.shared === true ? <RiFolderUserFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
               props.document.type === 'folder' ? <RiFolderFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} /> :
               <RiUserFill color={props.document.color || '#888'} size='1.2em' style={{marginRight: '2px'}} />}

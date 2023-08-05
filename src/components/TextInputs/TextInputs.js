@@ -1,10 +1,8 @@
 import React from 'react'
 import { store } from '../../store/store'
-import {
-  Icon,
-} from "@blueprintjs/core"
+import TextInput from '../TextInput/TextInput'
 
-class Highlights extends React.Component {
+class TextInputs extends React.Component {
   constructor() {
     super()
 
@@ -19,12 +17,16 @@ class Highlights extends React.Component {
       ghostWidth: 0,
       ghostHeight: 0,
       componentIsReady: false,
+      hasFocus: false,
     }
 
-    this.highlightsRef = React.createRef();
+    this.textInputsRef = React.createRef()
+    this.editableInput = React.createRef()
   }
 
   handleMouseDown = (e) => {
+    if (e.target.className !== 'textInputs') return
+
     this.setState({
       mouseDown: true,
       mouseDownX: e.clientX,
@@ -34,7 +36,7 @@ class Highlights extends React.Component {
 
   handleMouseMove = (e) => {
     if (this.state.mouseDown) {
-      const c = this.highlightsRef.current
+      const c = this.textInputsRef.current
       const fileInfo = c.getBoundingClientRect()
 
       let width = (e.clientX - fileInfo.x) - (this.state.mouseDownX - fileInfo.x)
@@ -62,6 +64,8 @@ class Highlights extends React.Component {
   }
 
   handleMouseUp = (e) => {
+    if (!this.state.mouseDown) return
+
     this.setState({
       mouseDown: false,
       ghostX: 0,
@@ -70,7 +74,7 @@ class Highlights extends React.Component {
       ghostHeight: 0,
     })
 
-    const c = this.highlightsRef.current
+    const c = this.textInputsRef.current
     const fileInfo = c.getBoundingClientRect()
     const xPercentStart = ((this.state.mouseDownX - fileInfo.x) * 100) / fileInfo.width
     const yPercentStart = ((this.state.mouseDownY - fileInfo.y) * 100) / fileInfo.height
@@ -82,11 +86,11 @@ class Highlights extends React.Component {
       ((e.clientX > this.state.mouseDownX + 5) && (e.clientY < this.state.mouseDownY - 5)) ||
       ((e.clientX < this.state.mouseDownX - 5) && (e.clientY > this.state.mouseDownY + 5)) ||
       ((e.clientX < this.state.mouseDownX - 5) && (e.clientY < this.state.mouseDownY - 5))) {
-      this.handleNewHighlight(xPercentStart, yPercentStart, xPercentEnd, yPercentEnd)
+      this.handleNewTextInput(xPercentStart, yPercentStart, xPercentEnd, yPercentEnd)
     }
   }
 
-  handleNewHighlight = (xPercentStart, yPercentStart, xPercentEnd, yPercentEnd) => {
+  handleNewTextInput = (xPercentStart, yPercentStart, xPercentEnd, yPercentEnd) => {
     let width = xPercentEnd - xPercentStart
     let height = yPercentEnd - yPercentStart
 
@@ -105,13 +109,19 @@ class Highlights extends React.Component {
 
     store.dispatch(
       {
-        type: 'ADD_NEW_HIGHLIGHT',
+        type: 'ADD_NEW_TEXTINPUT',
         fileId: this.props.fileId,
-        id: `highlight-${Math.floor((Math.random() * 100000) + 1)}`,
+        id: `textInput-${Math.floor((Math.random() * 100000) + 1)}`,
         xPercent: thisXPercent,
         yPercent: thisYPercent,
         width: width,
         height: height,
+        content: '',
+        answerState: 'unanswered', // 'unanswered', 'correct', 'wrong'
+        correctAnswers: [], // [ 'amar', 'querer' ]
+        enableCase: false, // Bool
+        enableAccents: false, // Bool
+
       }
     )
 
@@ -120,12 +130,12 @@ class Highlights extends React.Component {
     }) 
   }
 
-  deleteHighlight = (highlight) => {
+  deleteTextInput = (textInput) => {
     store.dispatch(
       {
-        type: 'DELETE_HIGHLIGHT',
+        type: 'DELETE_TEXTINPUT',
         fileId: this.props.fileId,
-        id: highlight,
+        id: textInput,
       }
     )
 
@@ -145,23 +155,37 @@ class Highlights extends React.Component {
   render() {
     return (
       <div
-        ref={this.highlightsRef}
-        className='highlights'
+        ref={this.textInputsRef}
+        className='textInputs'
         style={{
           position: 'absolute',
           top: '0',
           left: '0',
           width: '100%',
           height: '100%',
-          zIndex: this.props.isActive ? '5' : '2',
+          zIndex: this.props.isStudent ? '6' : this.props.isActive ? '5' : '2',
+          pointerEvents: this.props.isStudent ? 'none' : this.props.isActive ? 'all' : 'none',
         }}
         onMouseMove={(e) => this.handleMouseMove(e)}
         onMouseDown={(e) => this.handleMouseDown(e)}
         onMouseUp={(e) => this.handleMouseUp(e)}
       >
+        {this.props.isLocked &&
+          <div
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              zIndex: '100',
+              pointerEvents: 'all',
+            }}
+            onClick={this.props.handleClickWhenLocked}
+          >
+          </div>
+        }
         <div
-          key='ghost-highlight'
-          className='ghost-highlight'
+          key='ghost-textInput'
+          className='ghost-textInput'
           style={{
             position: 'absolute',
             display: !!this.state.ghostWidth ? 'block' : 'none',
@@ -169,65 +193,41 @@ class Highlights extends React.Component {
             left: `${this.state.ghostX}px`,
             width: `${this.state.ghostWidth}px`,
             height: `${this.state.ghostHeight}px`,
-            background: 'yellow',
+            background: 'white',
+            boxShadow: 'rgba(16, 22, 26, 0.4) 0px 0px 1px inset, rgba(16, 22, 26, 0) 0px 0px 0px inset, rgba(16, 22, 26, 0.2) 0px 1px 3px inset',
+            borderRadius: '6px',
           }}
         ></div>
-        {this.state.componentIsReady && this.props.highlights.map(highlight => {
-          const c = this.highlightsRef.current
+        {this.state.componentIsReady && this.props.textInputs.map(textInput => {
+          const c = this.textInputsRef.current
           const width = c.getBoundingClientRect().width
           const height = c.getBoundingClientRect().height
 
-          const highlightX = (highlight.xPercent * width) / 100
-          const highlightY = (highlight.yPercent * height) / 100
-          const highlightWidth = (highlight.width * width) / 100
-          const highlightHeight = (highlight.height * height) / 100
+          const textInputX = (textInput.xPercent * width) / 100
+          const textInputY = (textInput.yPercent * height) / 100
+          const textInputWidth = (textInput.width * width) / 100
+          const textInputHeight = (textInput.height * height) / 100
 
           return (
             <div
-              key={highlight.id}
-              className='highlight'
+              key={textInput.id}
+              className='textInput'
               style={{
                 position: 'absolute',
-                top: `${highlightY}px`,
-                left: `${highlightX}px`,
-                width: `${highlightWidth}px`,
-                height: `${highlightHeight}px`,
+                top: `${textInputY}px`,
+                left: `${textInputX}px`,
+                width: `${textInputWidth}px`,
+                height: `${textInputHeight}px`,
               }}
               >
-              <div
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  top: '0',
-                  left: '0',
-                  background: 'yellow',
-                  opacity: '.3',
-                }}
-              >
-              </div>
-              <div
-                className='delete'
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'absolute',
-                  top: '-8px',
-                  left: 'calc(100% - 8px)',
-                  width: '17px',
-                  height: '17px',
-                  opacity: '0',
-                  backgroundColor: 'var(--c-primary-dark)',
-                  borderRadius: '9px',
-                  boxShadow: 'rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 2px 8px 0px',
-                  transition: 'all 100ms ease-out',
-                  cursor: 'pointer',
-                }}
-                onClick={() => this.deleteHighlight(highlight.id)}
-              >
-                <Icon icon='delete' iconSize={12} color='white' />
-              </div>
+                <TextInput
+                  key={textInput.id}
+                  fileId={this.props.fileId}
+                  textInput={textInput}
+                  deleteTextInput={this.deleteTextInput}
+                  isStudent={this.props.isStudent}
+                />
+
             </div>
           )
         })}
@@ -236,5 +236,4 @@ class Highlights extends React.Component {
   }
 }
 
-
-export default Highlights
+export default TextInputs
